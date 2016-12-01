@@ -24,6 +24,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     Context context = Mock(Context)
     TradeItAccountLinker accountLinker = Mock(TradeItAccountLinker)
     TradeItLinkedBrokerManager linkedBrokerManager
+    Context context = Mock(Context)
     String accountLabel = "My account label"
     String myUserId = "My trade it userId"
     String myUserToken = "My trade it userToken"

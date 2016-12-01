@@ -18,6 +18,7 @@ import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
 import it.trade.tradeitapi.model.TradeItOAuthAccessTokenResponse;
 import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileRequest;
 import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileResponse;
+import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
 import retrofit2.Call;
 import retrofit2.Callback;
