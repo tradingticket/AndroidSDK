@@ -19,6 +19,7 @@ import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
+import it.trade.tradeitapi.model.TradeItLinkedAccount;
 import trade.it.android.sdk.model.TradeItCallBackImpl;
 import trade.it.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
 import trade.it.android.sdk.model.TradeItErrorResult;
