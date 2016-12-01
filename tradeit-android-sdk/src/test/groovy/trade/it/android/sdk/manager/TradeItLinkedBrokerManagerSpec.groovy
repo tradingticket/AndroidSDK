@@ -1,11 +1,13 @@
 package trade.it.android.sdk.manager
 
+import android.content.Context
 import it.trade.tradeitapi.API.TradeItAccountLinker
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse
+import it.trade.tradeitapi.model.*
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker
-import it.trade.tradeitapi.model.TradeItEnvironment
-import it.trade.tradeitapi.model.TradeItErrorCode
-import it.trade.tradeitapi.model.TradeItResponseStatus
+import org.junit.Rule
+import org.powermock.api.mockito.PowerMockito
+import org.powermock.core.classloader.annotations.PrepareForTest
+import org.powermock.modules.junit4.rule.PowerMockRule
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,10 +15,17 @@ import spock.lang.Specification
 import trade.it.android.sdk.model.TradeItCallBackImpl
 import trade.it.android.sdk.model.TradeItErrorResult
 
+@PrepareForTest([TradeItAccountLinker.class])
 class TradeItLinkedBrokerManagerSpec extends Specification {
 
     TradeItLinkedBrokerManager linkedBrokerManager = new TradeItLinkedBrokerManager("test", TradeItEnvironment.QA);
     TradeItAccountLinker accountLinker = Mock(TradeItAccountLinker)
+    Context context = Mock(Context)
+    String accountLabel = "My account label"
+    String myUserId = "My trade it userId"
+    String myUserToken = "My trade it userToken"
+
+    @Rule PowerMockRule powerMockRule = new PowerMockRule();
 
     void setup() {
         linkedBrokerManager.accountLinker = accountLinker
@@ -122,5 +131,100 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
             and: "expects an empty list"
                 brokerList.isEmpty() == true;
+    }
+
+    def "linkBroker handles a successful response from trade it api"() {
+        given: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            1* accountLinker.linkBrokerAccount(_, _) >> { args ->
+                Callback<TradeItLinkAccountResponse> callback = args[1]
+                Call<TradeItLinkAccountResponse> call = Mock(Call)
+                TradeItLinkAccountResponse tradeItLinkAccountResponse = new TradeItLinkAccountResponse()
+                tradeItLinkAccountResponse.sessionToken = "My session token"
+                tradeItLinkAccountResponse.longMessages = null
+                tradeItLinkAccountResponse.status = TradeItResponseStatus.SUCCESS
+                tradeItLinkAccountResponse.userId = myUserId
+                tradeItLinkAccountResponse.userToken = myUserToken
+                Response<TradeItLinkAccountResponse> response = Response.success(tradeItLinkAccountResponse);
+                callback.onResponse(call, response);
+            }
+            PowerMockito.mockStatic(TradeItAccountLinker.class)
+
+
+        when: "calling linkBroker"
+            PowerMockito.doNothing().when(TradeItAccountLinker.class);
+            TradeItLinkedAccount linkedBroker = null
+            linkedBrokerManager.linkBroker(context, accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+
+                @Override
+                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                    successCallBackCount++
+                    linkedBroker = linkedAccount
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "the accountLinker static method save was called"
+            PowerMockito.verifyStatic()
+
+        and: "expects a linkedBroker containing userId and userToken"
+            linkedBroker.userId == myUserId
+            linkedBroker.userToken == myUserToken
+            linkedBroker.broker == "My broker 1"
+    }
+
+    def "linkBroker handles an error response from trade it api"() {
+        given: "An error response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            TradeItErrorCode errorCode = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
+            String shortMessage = "My error when linking broker"
+            1* accountLinker.linkBrokerAccount(_, _) >> { args ->
+                Callback<TradeItLinkAccountResponse> callback = args[1]
+                Call<TradeItLinkAccountResponse> call = Mock(Call)
+                TradeItLinkAccountResponse tradeItLinkAccountResponse = new TradeItLinkAccountResponse()
+                tradeItLinkAccountResponse.sessionToken = "My session token"
+                tradeItLinkAccountResponse.longMessages = null
+                tradeItLinkAccountResponse.status = TradeItResponseStatus.ERROR
+                tradeItLinkAccountResponse.code = errorCode
+                tradeItLinkAccountResponse.shortMessage = shortMessage
+                tradeItLinkAccountResponse.userId = null
+                tradeItLinkAccountResponse.userToken = null
+                Response<TradeItLinkAccountResponse> response = Response.success(tradeItLinkAccountResponse);
+                callback.onResponse(call, response);
+            }
+
+        when: "calling linkBroker"
+            TradeItErrorResult errorResult = null
+            linkedBrokerManager.linkBroker(context, accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+
+                @Override
+                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                    errorResult = error
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
+
+        and: "expects a populated TradeItErrorResult"
+            errorResult.getErrorCode() == errorCode
+            errorResult.getShortMessage() == shortMessage
     }
 }
