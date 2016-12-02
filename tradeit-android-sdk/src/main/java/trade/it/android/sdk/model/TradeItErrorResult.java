@@ -33,6 +33,9 @@ public class TradeItErrorResult {
         this.errorCode = TradeItErrorCode.SYSTEM_ERROR;
     }
 
+    public TradeItErrorResult() {
+    }
+
     public TradeItErrorCode getErrorCode() {
         return errorCode;
     }

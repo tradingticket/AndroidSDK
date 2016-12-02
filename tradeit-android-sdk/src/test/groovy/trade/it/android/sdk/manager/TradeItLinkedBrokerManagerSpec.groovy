@@ -15,6 +15,9 @@ import spock.lang.Specification
 import trade.it.android.sdk.model.TradeItCallBackImpl
 import trade.it.android.sdk.model.TradeItErrorResult
 
+/**
+ * Note: if you run this with android studio, you may need to add '-noverify' in the VM options because of a bug in PowerMock
+ */
 @PrepareForTest([TradeItAccountLinker.class])
 class TradeItLinkedBrokerManagerSpec extends Specification {
 
@@ -25,7 +28,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     String myUserId = "My trade it userId"
     String myUserToken = "My trade it userToken"
 
-    @Rule PowerMockRule powerMockRule = new PowerMockRule();
+    @Rule
+    PowerMockRule powerMockRule = new PowerMockRule();
 
     void setup() {
         linkedBrokerManager.accountLinker = accountLinker
@@ -33,7 +37,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
     def "GetAvailableBrokers handles a successful response from trade it api"() {
         given: "a successful response from trade it"
-            1 * accountLinker.getAvailableBrokers(_ ) >> { args ->
+            1 * accountLinker.getAvailableBrokers(_) >> { args ->
                 Callback<TradeItAvailableBrokersResponse> callback = args[0]
                 Call<TradeItAvailableBrokersResponse> call = Mock(Call)
                 TradeItAvailableBrokersResponse tradeItAvailableBrokersResponse = new TradeItAvailableBrokersResponse()
@@ -58,7 +62,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 tradeItAvailableBrokersResponse.status = TradeItResponseStatus.SUCCESS
                 Response<TradeItAvailableBrokersResponse> response = Response.success(tradeItAvailableBrokersResponse);
                 callback.onResponse(call, response);
-            }
+        }
 
         when: "calling getAvailableBrokers"
             int successCallBackCount = 0
@@ -93,7 +97,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
     def "GetAvailableBrokers handles an error response from trade it api"() {
         given: "an error response from trade it"
-            1 * accountLinker.getAvailableBrokers(_ ) >> { args ->
+            1 * accountLinker.getAvailableBrokers(_) >> { args ->
                 Callback<TradeItAvailableBrokersResponse> callback = args[0]
                 Call<TradeItAvailableBrokersResponse> call = Mock(Call)
                 TradeItAvailableBrokersResponse tradeItAvailableBrokersResponse = new TradeItAvailableBrokersResponse()
@@ -125,19 +129,19 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 }
             });
 
-            then: "expects the successCallback called once"
-                successCallBackCount == 1
-                errorCallBackCount == 0
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
 
-            and: "expects an empty list"
-                brokerList.isEmpty() == true;
+        and: "expects an empty list"
+            brokerList.isEmpty() == true;
     }
 
     def "linkBroker handles a successful response from trade it api"() {
         given: "a successful response from trade it api"
             int successCallBackCount = 0
             int errorCallBackCount = 0
-            1* accountLinker.linkBrokerAccount(_, _) >> { args ->
+            1 * accountLinker.linkBrokerAccount(_, _) >> { args ->
                 Callback<TradeItLinkAccountResponse> callback = args[1]
                 Call<TradeItLinkAccountResponse> call = Mock(Call)
                 TradeItLinkAccountResponse tradeItLinkAccountResponse = new TradeItLinkAccountResponse()
@@ -188,7 +192,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int errorCallBackCount = 0
             TradeItErrorCode errorCode = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
             String shortMessage = "My error when linking broker"
-            1* accountLinker.linkBrokerAccount(_, _) >> { args ->
+            1 * accountLinker.linkBrokerAccount(_, _) >> { args ->
                 Callback<TradeItLinkAccountResponse> callback = args[1]
                 Call<TradeItLinkAccountResponse> call = Mock(Call)
                 TradeItLinkAccountResponse tradeItLinkAccountResponse = new TradeItLinkAccountResponse()
@@ -226,5 +230,94 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         and: "expects a populated TradeItErrorResult"
             errorResult.getErrorCode() == errorCode
             errorResult.getShortMessage() == shortMessage
+    }
+
+    def "getOAuthLoginPopupUrlForMobile handles a successful response from trade it api"() {
+        given: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
+            1 * accountLinker.getOAuthLoginPopupUrlForMobile(_, _) >> { args ->
+                Callback<TradeItOAuthLoginPopupUrlForMobileResponse> callback = args[1]
+                Call<TradeItOAuthLoginPopupUrlForMobileRequest> call = Mock(Call)
+                TradeItOAuthLoginPopupUrlForMobileResponse tradeItOAuthLoginPopupUrlForMobileResponse = new TradeItOAuthLoginPopupUrlForMobileResponse()
+                tradeItOAuthLoginPopupUrlForMobileResponse.sessionToken = "My session token"
+                tradeItOAuthLoginPopupUrlForMobileResponse.longMessages = null
+                tradeItOAuthLoginPopupUrlForMobileResponse.status = TradeItResponseStatus.SUCCESS
+                tradeItOAuthLoginPopupUrlForMobileResponse.oAuthURL = mySpecialUrl
+                Response<TradeItOAuthLoginPopupUrlForMobileResponse> response = Response.success(tradeItOAuthLoginPopupUrlForMobileResponse);
+                callback.onResponse(call, response);
+            }
+
+        when: "calling getOAuthLoginPopupUrlForMobile"
+            TradeItErrorResult errorResult = null
+            String oAuthUrlResult = null
+            linkedBrokerManager.getOAuthLoginPopupUrlForMobile("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+
+                @Override
+                void onSuccess(String oAuthUrl) {
+                    successCallBackCount++
+                    oAuthUrlResult = oAuthUrl
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "expects the oAuthUrl to be populated"
+            oAuthUrlResult == mySpecialUrl
+    }
+
+    def "getOAuthLoginPopupUrlForMobile handles an error response from trade it api"() {
+        given: "An error response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            TradeItErrorCode errorCode = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
+            String shortMessage = "My error when linking broker"
+            1 * accountLinker.getOAuthLoginPopupUrlForMobile(_, _) >> { args ->
+                Callback<TradeItOAuthLoginPopupUrlForMobileResponse> callback = args[1]
+                Call<TradeItOAuthLoginPopupUrlForMobileRequest> call = Mock(Call)
+                TradeItOAuthLoginPopupUrlForMobileResponse tradeItOAuthLoginPopupUrlForMobileResponse = new TradeItOAuthLoginPopupUrlForMobileResponse()
+                tradeItOAuthLoginPopupUrlForMobileResponse.sessionToken = "My session token"
+                tradeItOAuthLoginPopupUrlForMobileResponse.longMessages = null
+                tradeItOAuthLoginPopupUrlForMobileResponse.status = TradeItResponseStatus.ERROR
+                tradeItOAuthLoginPopupUrlForMobileResponse.code = errorCode
+                tradeItOAuthLoginPopupUrlForMobileResponse.shortMessage = shortMessage
+                tradeItOAuthLoginPopupUrlForMobileResponse.oAuthURL = null
+
+                Response<TradeItOAuthLoginPopupUrlForMobileResponse> response = Response.success(tradeItOAuthLoginPopupUrlForMobileResponse);
+                callback.onResponse(call, response);
+            }
+
+        when: "calling getOAuthLoginPopupUrlForMobile"
+            TradeItErrorResult errorResult = null
+            linkedBrokerManager.getOAuthLoginPopupUrlForMobile("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+
+                @Override
+                void onSuccess(String oAuthUrl) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                    errorResult = error
+                }
+            })
+
+        then: "expects the errorCallback called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
+
+        and: "expects a populated TradeItErrorResult"
+            errorResult.getErrorCode() == errorCode
+            errorResult.getShortMessage() == shortMessage
+
     }
 }
