@@ -59,6 +59,27 @@ public class TradeItLinkedBrokerManagerTest {
     }
 
     @Test
+    public void linkBrokerOldMethod() throws InterruptedException {
+        linkedBrokerManager.linkBroker(instrumentationCtx, "My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedAccount>() {
+            @Override
+            public void onSuccess(TradeItLinkedAccount linkedAccount) {
+                assertThat("The linkedAccount userId is not null", linkedAccount.userId , notNullValue());
+                assertThat("The linkedAccount userToken is not null", linkedAccount.userId , notNullValue());
+                lock.countDown();
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                Log.e(this.getClass().getName(), error.toString());
+                assertThat("fails to link broker", error, nullValue());
+                lock.countDown();
+            }
+        });
+        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        assertThat("The call to linkBroker is not expired", notExpired, is(true));
+    }
+
+    @Test
     public void getOAuthLoginPopupUrlForMobile() throws InterruptedException {
         linkedBrokerManager.getOAuthLoginPopupUrlForMobile("Dummy", "myinternalappcallback", new TradeItCallBackImpl<String>() {
 
@@ -78,26 +99,5 @@ public class TradeItLinkedBrokerManagerTest {
 
         boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
         assertThat("The call to getOAuthLoginPopupUrlForMobile is not expired", notExpired, is(true));
-    }
-
-    @Test
-    public void linkBrokerOldMethod() throws InterruptedException {
-        linkedBrokerManager.linkBroker(instrumentationCtx, "My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedAccount>() {
-            @Override
-            public void onSuccess(TradeItLinkedAccount linkedAccount) {
-                assertThat("The linkedAccount userId is not null", linkedAccount.userId , notNullValue());
-                assertThat("The linkedAccount userToken is not null", linkedAccount.userId , notNullValue());
-                lock.countDown();
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to link broker", error, nullValue());
-                lock.countDown();
-            }
-        });
-        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
-        assertThat("The call to linkBroker is not expired", notExpired, is(true));
     }
 }

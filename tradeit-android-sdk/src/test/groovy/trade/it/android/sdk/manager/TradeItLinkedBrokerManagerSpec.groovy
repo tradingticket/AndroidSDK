@@ -239,7 +239,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
             1 * accountLinker.getOAuthLoginPopupUrlForMobile(_, _) >> { args ->
                 Callback<TradeItOAuthLoginPopupUrlForMobileResponse> callback = args[1]
-                Call<TradeItOAuthLoginPopupUrlForMobileRequest> call = Mock(Call)
+                Call<TradeItOAuthLoginPopupUrlForMobileResponse> call = Mock(Call)
                 TradeItOAuthLoginPopupUrlForMobileResponse tradeItOAuthLoginPopupUrlForMobileResponse = new TradeItOAuthLoginPopupUrlForMobileResponse()
                 tradeItOAuthLoginPopupUrlForMobileResponse.sessionToken = "My session token"
                 tradeItOAuthLoginPopupUrlForMobileResponse.longMessages = null
@@ -319,5 +319,100 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             errorResult.getErrorCode() == errorCode
             errorResult.getShortMessage() == shortMessage
 
+    }
+
+    def "linkBrokerWithOauthVerifier handles a successful response from trade it api"() {
+        given: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            1 * accountLinker.getOAuthAccessToken(_, _) >> { args ->
+                Callback<TradeItOAuthAccessTokenResponse> callback = args[1]
+                Call<TradeItOAuthAccessTokenResponse> call = Mock(Call)
+                TradeItOAuthAccessTokenResponse tradeItOAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse()
+                tradeItOAuthAccessTokenResponse.sessionToken = "My session token"
+                tradeItOAuthAccessTokenResponse.longMessages = null
+                tradeItOAuthAccessTokenResponse.status = TradeItResponseStatus.SUCCESS
+                tradeItOAuthAccessTokenResponse.userId = myUserId
+                tradeItOAuthAccessTokenResponse.userToken = myUserToken
+                Response<TradeItLinkAccountResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
+                callback.onResponse(call, response);
+            }
+            PowerMockito.mockStatic(TradeItAccountLinker.class)
+
+
+        when: "calling linkBrokerWithOauthVerifier"
+            PowerMockito.doNothing().when(TradeItAccountLinker.class);
+            TradeItLinkedAccount linkedBroker = null
+            linkedBrokerManager.linkBrokerWithOauthVerifier(context, accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+
+                @Override
+                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                    successCallBackCount++
+                    linkedBroker = linkedAccount
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "the accountLinker static method save was called"
+            PowerMockito.verifyStatic()
+
+        and: "expects a linkedBroker containing userId and userToken"
+            linkedBroker.userId == myUserId
+            linkedBroker.userToken == myUserToken
+            linkedBroker.broker == "My broker 1"
+    }
+
+    def "linkBrokerWithOauthVerifier handles an error response from trade it api"() {
+        given: "An error response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            TradeItErrorCode errorCode = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
+            String shortMessage = "My error when linking broker"
+            1 * accountLinker.getOAuthAccessToken(_, _) >> { args ->
+                Callback<TradeItOAuthAccessTokenResponse> callback = args[1]
+                Call<TradeItOAuthAccessTokenResponse> call = Mock(Call)
+                TradeItOAuthAccessTokenResponse tradeItOAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse()
+                tradeItOAuthAccessTokenResponse.sessionToken = "My session token"
+                tradeItOAuthAccessTokenResponse.longMessages = null
+                tradeItOAuthAccessTokenResponse.status = TradeItResponseStatus.ERROR
+                tradeItOAuthAccessTokenResponse.code = errorCode
+                tradeItOAuthAccessTokenResponse.shortMessage = shortMessage
+                tradeItOAuthAccessTokenResponse.userId = null
+                tradeItOAuthAccessTokenResponse.userToken = null
+                Response<TradeItLinkAccountResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
+                callback.onResponse(call, response);
+            }
+
+        when: "calling linkBroker"
+            TradeItErrorResult errorResult = null
+            linkedBrokerManager.linkBrokerWithOauthVerifier(context, accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+
+                @Override
+                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                    errorResult = error
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
+
+        and: "expects a populated TradeItErrorResult"
+            errorResult.getErrorCode() == errorCode
+            errorResult.getShortMessage() == shortMessage
     }
 }
