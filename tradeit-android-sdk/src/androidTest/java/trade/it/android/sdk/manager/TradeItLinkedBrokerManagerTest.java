@@ -168,12 +168,13 @@ public class TradeItLinkedBrokerManagerTest {
             @Override
             public void onError(TradeItErrorResult error) {
                 Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to link broker", error, nullValue());
+                assertThat("fails to get the Oauth login popup url", error, nullValue());
                 lock.countDown();
             }
         });
+
         boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
-        assertThat("The call to linkBroker is not expired", notExpired, is(true));
+        assertThat("The call to getOAuthLoginPopupUrlForMobile is not expired", notExpired, is(true));
     }
 
     @Test
