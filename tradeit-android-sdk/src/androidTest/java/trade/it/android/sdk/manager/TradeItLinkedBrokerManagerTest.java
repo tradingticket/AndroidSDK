@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import it.trade.tradeitapi.API.TradeItAccountLinker;
+import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItLinkedAccount;
@@ -34,9 +36,9 @@ public class TradeItLinkedBrokerManagerTest {
     private Context instrumentationCtx;
 
     @Before
-    public void createTradeItLinkedBrokerManager() {
-        linkedBrokerManager = new TradeItLinkedBrokerManager("tradeit-test-api-key", TradeItEnvironment.QA);
+    public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException {
         instrumentationCtx = InstrumentationRegistry.getContext();
+        linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx, new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
     }
 
     @Test
@@ -60,7 +62,7 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void linkBrokerOldMethod() throws InterruptedException {
-        linkedBrokerManager.linkBroker(instrumentationCtx, "My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedAccount>() {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedAccount>() {
             @Override
             public void onSuccess(TradeItLinkedAccount linkedAccount) {
                 assertThat("The linkedAccount userId is not null", linkedAccount.userId , notNullValue());

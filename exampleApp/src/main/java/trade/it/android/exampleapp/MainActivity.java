@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import it.trade.tradeitapi.API.TradeItAccountLinker;
+import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItLinkedAccount;
 import trade.it.android.sdk.manager.TradeItLinkedBrokerManager;
@@ -24,7 +26,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.textViewResult = (TextView) findViewById(R.id.textViewResult);
-        linkedBrokerManager = new TradeItLinkedBrokerManager("tradeit-test-api-key", TradeItEnvironment.QA);
+
+        try {
+            linkedBrokerManager = new TradeItLinkedBrokerManager(this.getApplicationContext(), new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
+        } catch (TradeItKeystoreServiceCreateKeyException e) {
+            this.textViewResult.append("Error initializing linkedBrokerManager: " + e.getMessage());
+        }
     }
 
     @Override
@@ -34,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
             if (oAuthVerifier != null) {
-                linkedBrokerManager.linkBrokerWithOauthVerifier(this, "MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedAccount>() {
+                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedAccount>() {
                     @Override
                     public void onSuccess(TradeItLinkedAccount linkedAccount) {
                         textViewResult.append("oAuthFlow Success: " + linkedAccount.toString());
