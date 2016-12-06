@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.trade.tradeitapi.API.TradeItAccountLinker;
+import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.exception.TradeItSaveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
@@ -25,6 +26,7 @@ import retrofit2.Response;
 import trade.it.android.sdk.internal.CallBackWithDefaultErrorHandling;
 import trade.it.android.sdk.model.TradeItCallback;
 import trade.it.android.sdk.model.TradeItErrorResult;
+import trade.it.android.sdk.model.TradeItLinkedBroker;
 
 public class TradeItLinkedBrokerManager {
 
@@ -65,15 +67,17 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
-    public void linkBrokerWithOauthVerifier(final String accountLabel, final String broker, String oAuthVerifier, final TradeItCallback<TradeItLinkedAccount> callback) {
+    public void linkBrokerWithOauthVerifier(final String accountLabel, final String broker, String oAuthVerifier, final TradeItCallback<TradeItLinkedBroker> callback) {
         final TradeItOAuthAccessTokenRequest request = new TradeItOAuthAccessTokenRequest(oAuthVerifier);
-        accountLinker.getOAuthAccessToken(request, new CallBackWithDefaultErrorHandling<TradeItOAuthAccessTokenResponse, TradeItLinkedAccount>(callback) {
+        request.environment = accountLinker.getTradeItEnvironment();
+        accountLinker.getOAuthAccessToken(request, new CallBackWithDefaultErrorHandling<TradeItOAuthAccessTokenResponse, TradeItLinkedBroker>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItOAuthAccessTokenResponse> response) {
                 TradeItLinkedAccount linkedAccount = new TradeItLinkedAccount(broker, request, response.body());
                 try {
                     TradeItAccountLinker.saveLinkedAccount(context, linkedAccount, accountLabel);
-                    callback.onSuccess(linkedAccount);
+                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedAccount));
+                    callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedAccountException e) {
                     Log.e(this.getClass().getName(), e.getMessage(), e);
                     callback.onError(new TradeItErrorResult("Failed to link broker", e.getMessage()));
@@ -87,15 +91,17 @@ public class TradeItLinkedBrokerManager {
      * @deprecated Use the new OAuth flow and the {@link #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback)} method instead
      */
     @Deprecated
-    public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedAccount> callback) {
+    public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBroker> callback) {
         final TradeItLinkAccountRequest linkAccountRequest = new TradeItLinkAccountRequest(username, password, broker);
-        accountLinker.linkBrokerAccount(linkAccountRequest, new CallBackWithDefaultErrorHandling<TradeItLinkAccountResponse, TradeItLinkedAccount>(callback) {
+        linkAccountRequest.environment = accountLinker.getTradeItEnvironment();
+        accountLinker.linkBrokerAccount(linkAccountRequest, new CallBackWithDefaultErrorHandling<TradeItLinkAccountResponse, TradeItLinkedBroker>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItLinkAccountResponse> response) {
                 TradeItLinkedAccount linkedAccount = new TradeItLinkedAccount(linkAccountRequest, response.body());
                 try {
                     TradeItAccountLinker.saveLinkedAccount(context, linkedAccount, accountLabel);
-                    callback.onSuccess(linkedAccount);
+                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedAccount));
+                    callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedAccountException e) {
                     Log.e(this.getClass().getName(), e.getMessage(), e);
                     callback.onError(new TradeItErrorResult("Failed to link broker", e.getMessage()));

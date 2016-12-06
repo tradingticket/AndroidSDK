@@ -14,6 +14,7 @@ import retrofit2.Response
 import spock.lang.Specification
 import trade.it.android.sdk.model.TradeItCallBackImpl
 import trade.it.android.sdk.model.TradeItErrorResult
+import trade.it.android.sdk.model.TradeItLinkedBroker
 
 /**
  * Note: if you run this with android studio, you may need to add '-noverify' in the VM options because of a bug in PowerMock
@@ -32,6 +33,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     PowerMockRule powerMockRule = new PowerMockRule();
 
     void setup() {
+        accountLinker.getTradeItEnvironment() >> TradeItEnvironment.QA
     }
 
     def "GetAvailableBrokers handles a successful response from trade it api"() {
@@ -162,13 +164,13 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBroker"
             PowerMockito.doNothing().when(TradeItAccountLinker.class);
-            TradeItLinkedAccount linkedBroker = null
-            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+            TradeItLinkedBroker linkedBrokerResult = null
+            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedBroker>() {
 
                 @Override
-                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                void onSuccess(TradeItLinkedBroker linkedBroker) {
                     successCallBackCount++
-                    linkedBroker = linkedAccount
+                    linkedBrokerResult = linkedBroker
                 }
 
                 @Override
@@ -185,9 +187,9 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             PowerMockito.verifyStatic()
 
         and: "expects a linkedBroker containing userId and userToken"
-            linkedBroker.userId == myUserId
-            linkedBroker.userToken == myUserToken
-            linkedBroker.broker == "My broker 1"
+            linkedBrokerResult.getLinkedAccount().userId == myUserId
+            linkedBrokerResult.getLinkedAccount().userToken == myUserToken
+            linkedBrokerResult.getLinkedAccount().broker == "My broker 1"
     }
 
     def "linkBroker handles an error response from trade it api"() {
@@ -215,10 +217,10 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBroker"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedBroker>() {
 
                 @Override
-                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                void onSuccess(TradeItLinkedBroker linkedBroker) {
                     successCallBackCount++
                 }
 
@@ -353,13 +355,13 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBrokerWithOauthVerifier"
             PowerMockito.doNothing().when(TradeItAccountLinker.class);
-            TradeItLinkedAccount linkedBroker = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+            TradeItLinkedBroker linkedBrokerResult = null
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
 
                 @Override
-                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                void onSuccess(TradeItLinkedBroker linkedBroker) {
                     successCallBackCount++
-                    linkedBroker = linkedAccount
+                    linkedBrokerResult = linkedBroker
                 }
 
                 @Override
@@ -376,9 +378,9 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             PowerMockito.verifyStatic()
 
         and: "expects a linkedBroker containing userId and userToken"
-            linkedBroker.userId == myUserId
-            linkedBroker.userToken == myUserToken
-            linkedBroker.broker == "My broker 1"
+            linkedBrokerResult.getLinkedAccount().userId == myUserId
+            linkedBrokerResult.getLinkedAccount().userToken == myUserToken
+            linkedBrokerResult.getLinkedAccount().broker == "My broker 1"
     }
 
     def "linkBrokerWithOauthVerifier handles an error response from trade it api"() {
@@ -406,10 +408,10 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBroker"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedAccount>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
 
                 @Override
-                void onSuccess(TradeItLinkedAccount linkedAccount) {
+                void onSuccess(TradeItLinkedBroker linkedBroker) {
                     successCallBackCount++
                 }
 
