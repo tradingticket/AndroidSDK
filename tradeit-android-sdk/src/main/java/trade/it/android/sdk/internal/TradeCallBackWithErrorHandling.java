@@ -9,16 +9,11 @@ import retrofit2.Response;
 import trade.it.android.sdk.model.TradeItCallback;
 import trade.it.android.sdk.model.TradeItErrorResult;
 
-/**
- * This class handles common error behaviors (to use inside the sdk)
- * @param <TradeItResponseType> the trade it response type
- * @param <TradeItCallBackType> the type we want to return to the user in the TradeItCallBack
- */
-public abstract class DefaultCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> implements Callback<TradeItResponseType> {
+public abstract class TradeCallBackWithErrorHandling <TradeItResponseType, TradeItCallBackType> implements Callback<TradeItResponseType> {
 
     private TradeItCallback<TradeItCallBackType> callback;
 
-    protected DefaultCallbackWithErrorHandling(TradeItCallback<TradeItCallBackType> callback) {
+    protected TradeCallBackWithErrorHandling(TradeItCallback<TradeItCallBackType> callback) {
         this.callback = callback;
     }
 
@@ -29,7 +24,7 @@ public abstract class DefaultCallbackWithErrorHandling<TradeItResponseType, Trad
             TradeItResponse tradeItResponse = responseType instanceof TradeItResponse ? (TradeItResponse) responseType : null;
             if (tradeItResponse == null) {
                 callback.onError(new TradeItErrorResult());
-            } else if (tradeItResponse.status == TradeItResponseStatus.SUCCESS) {
+            } else if (tradeItResponse.status == TradeItResponseStatus.REVIEW_ORDER) {
                 onSuccessResponse(response);
             } else {
                 callback.onError(new TradeItErrorResult(tradeItResponse.code, tradeItResponse.shortMessage, tradeItResponse.longMessages));
@@ -45,5 +40,4 @@ public abstract class DefaultCallbackWithErrorHandling<TradeItResponseType, Trad
     }
 
     public abstract void onSuccessResponse(Response<TradeItResponseType> response);
-
 }
