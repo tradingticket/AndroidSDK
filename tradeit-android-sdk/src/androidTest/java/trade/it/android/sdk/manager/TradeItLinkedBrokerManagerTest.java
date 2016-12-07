@@ -16,13 +16,14 @@ import java.util.concurrent.TimeUnit;
 
 import it.trade.tradeitapi.API.TradeItAccountLinker;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
-import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
+import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import trade.it.android.sdk.model.TradeItCallBackImpl;
 import trade.it.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
 import trade.it.android.sdk.model.TradeItErrorResult;
 import trade.it.android.sdk.model.TradeItLinkedBroker;
+import trade.it.android.sdk.model.TradeItLinkedBrokerAccount;
 import trade.it.android.sdk.model.TradeItSecurityQuestion;
 
 import static org.hamcrest.Matchers.is;
@@ -39,7 +40,7 @@ public class TradeItLinkedBrokerManagerTest {
     private Context instrumentationCtx;
 
     @Before
-    public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException {
+    public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedAccountException {
         instrumentationCtx = InstrumentationRegistry.getContext();
         linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx, new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
     }
@@ -70,9 +71,9 @@ public class TradeItLinkedBrokerManagerTest {
             public void onSuccess(TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
                 assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItAuthenticateResponse.Account>>() {
+                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
-                    public void onSuccess(List<TradeItAuthenticateResponse.Account> accounts) {
+                    public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
                         assertThat("The authentication is successful",  accounts, notNullValue());
                         lock.countDown();
                     }
@@ -109,9 +110,9 @@ public class TradeItLinkedBrokerManagerTest {
             public void onSuccess(TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
                 assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userToken , notNullValue());
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItAuthenticateResponse.Account>>() {
+                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
-                    public void onSuccess(List<TradeItAuthenticateResponse.Account> accounts) {
+                    public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
                         assertThat("fails to get security question",  accounts, nullValue());
                         lock.countDown();
                     }

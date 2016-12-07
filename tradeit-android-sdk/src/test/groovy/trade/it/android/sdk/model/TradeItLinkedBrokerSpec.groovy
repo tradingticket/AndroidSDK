@@ -30,7 +30,7 @@ class TradeItLinkedBrokerSpec extends Specification {
             Account account2 = new Account();
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
-            List<Account> accountsExpected = [account1, account2]
+            List<TradeItLinkedBrokerAccount> accountsExpected = [new TradeItLinkedBrokerAccount(linkedBroker, account1), new TradeItLinkedBrokerAccount(linkedBroker, account2)]
             1 * apiClient.authenticate(_) >> { args ->
                 Callback<TradeItAuthenticateResponse> callback = args[0]
                 Call<TradeItAuthenticateResponse> call = Mock(Call)
@@ -38,7 +38,7 @@ class TradeItLinkedBrokerSpec extends Specification {
                 tradeItAuthenticateResponse.sessionToken = "My session token"
                 tradeItAuthenticateResponse.longMessages = null
                 tradeItAuthenticateResponse.status = TradeItResponseStatus.SUCCESS
-                tradeItAuthenticateResponse.accounts = accountsExpected
+                tradeItAuthenticateResponse.accounts = [account1, account2]
 
                 Response<TradeItAuthenticateResponse> response = Response.success(tradeItAuthenticateResponse);
                 callback.onResponse(call, response);
@@ -70,8 +70,11 @@ class TradeItLinkedBrokerSpec extends Specification {
             securityQuestionCallbackCount == 0
             errorCallBackCount == 0
 
-        and: "expects a list of accounts"
+        and: "expects a list of TradeItLinkedBrokerAccount"
             accountsResult == accountsExpected
+
+        and: "the list is kept in memory"
+            linkedBroker.getAccounts() == accountsExpected
     }
 
     def "authenticate handles a successful response with a security question from trade it api"() {

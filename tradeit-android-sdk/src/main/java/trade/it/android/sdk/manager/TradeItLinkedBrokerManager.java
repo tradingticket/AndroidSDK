@@ -9,6 +9,7 @@ import java.util.List;
 import it.trade.tradeitapi.API.TradeItAccountLinker;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
+import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.exception.TradeItSaveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker;
@@ -33,10 +34,21 @@ public class TradeItLinkedBrokerManager {
     protected TradeItAccountLinker accountLinker;
     private Context context = null;
 
-    public TradeItLinkedBrokerManager(Context context, TradeItAccountLinker accountLinker) throws TradeItKeystoreServiceCreateKeyException {
+    private List<TradeItLinkedBroker> linkedBrokers = new ArrayList<>();
+
+    public TradeItLinkedBrokerManager(Context context, TradeItAccountLinker accountLinker) throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedAccountException {
         this.accountLinker = accountLinker;
         this.context = context;
         TradeItAccountLinker.initKeyStore(context);
+        this.loadLinkedBrokersFromSharedPreferences();
+    }
+
+    private void loadLinkedBrokersFromSharedPreferences() throws TradeItRetrieveLinkedAccountException {
+        List<TradeItLinkedAccount> linkedAccountList = TradeItAccountLinker.getLinkedAccounts(this.context);
+        for (TradeItLinkedAccount linkedAccount : linkedAccountList) {
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedAccount));
+            linkedBrokers.add(linkedBroker);
+        }
     }
 
     public void getAvailableBrokers(final TradeItCallback<List<Broker>> callback) {
@@ -77,6 +89,7 @@ public class TradeItLinkedBrokerManager {
                 try {
                     TradeItAccountLinker.saveLinkedAccount(context, linkedAccount, accountLabel);
                     TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedAccount));
+                    linkedBrokers.add(linkedBroker);
                     callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedAccountException e) {
                     Log.e(this.getClass().getName(), e.getMessage(), e);
@@ -101,6 +114,7 @@ public class TradeItLinkedBrokerManager {
                 try {
                     TradeItAccountLinker.saveLinkedAccount(context, linkedAccount, accountLabel);
                     TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedAccount));
+                    linkedBrokers.add(linkedBroker);
                     callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedAccountException e) {
                     Log.e(this.getClass().getName(), e.getMessage(), e);

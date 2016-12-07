@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import it.trade.tradeitapi.API.TradeItAccountLinker;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
+import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import trade.it.android.sdk.manager.TradeItLinkedBrokerManager;
 import trade.it.android.sdk.model.TradeItCallBackImpl;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
             linkedBrokerManager = new TradeItLinkedBrokerManager(this.getApplicationContext(), new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
         } catch (TradeItKeystoreServiceCreateKeyException e) {
             this.textViewResult.append("Error initializing linkedBrokerManager: " + e.getMessage());
+        } catch (TradeItRetrieveLinkedAccountException e) {
+            this.textViewResult.append("Error retreiving linked accounts: " + e.getMessage());
         }
     }
 
