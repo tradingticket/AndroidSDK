@@ -8,7 +8,7 @@ import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
 import it.trade.tradeitapi.model.TradeItLinkedAccount;
 import retrofit2.Response;
-import trade.it.android.sdk.internal.CallBackWithDefaultSecurityQuestionAndErrorHandling;
+import trade.it.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
 
 public class TradeItLinkedBroker {
     private TradeItApiClient apiClient;
@@ -19,7 +19,7 @@ public class TradeItLinkedBroker {
     }
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
-        this.apiClient.authenticate(new CallBackWithDefaultSecurityQuestionAndErrorHandling<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback) {
+        this.apiClient.authenticate(new AuthenticationCallbackWithErrorHandling<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
                 TradeItAuthenticateResponse authResponse = response.body();
@@ -40,7 +40,7 @@ public class TradeItLinkedBroker {
     }
 //    public void answerSecurityQuestion(String securityAnswer, final TradeItCallbackWithSecurityQuestion<List<Account>> callback) {
 //        TradeItAnswerSecurityQuestionRequest answerSecurityQuestionRequest = new TradeItAnswerSecurityQuestionRequest(securityAnswer);
-//        this.apiClient.answerSecurityQuestion(answerSecurityQuestionRequest, new CallBackWithDefaultSecurityQuestionAndErrorHandling<TradeItAuthenticateResponse, List<Account>>(callback) {
+//        this.apiClient.answerSecurityQuestion(answerSecurityQuestionRequest, new AuthenticationCallbackWithErrorHandling<TradeItAuthenticateResponse, List<Account>>(callback) {
 //            @Override
 //            public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
 //                TradeItAuthenticateResponse authResponse = response.body();
@@ -52,6 +52,10 @@ public class TradeItLinkedBroker {
 
     public TradeItLinkedAccount getLinkedAccount() {
         return this.apiClient.getTradeItLinkedAccount();
+    }
+
+    protected TradeItApiClient getTradeItApiClient() {
+        return this.apiClient;
     }
 
     public List<TradeItLinkedBrokerAccount> getAccounts() {

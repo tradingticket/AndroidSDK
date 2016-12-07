@@ -24,7 +24,7 @@ import it.trade.tradeitapi.model.TradeItResponseStatus;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import trade.it.android.sdk.internal.CallBackWithDefaultErrorHandling;
+import trade.it.android.sdk.internal.DefaultCallbackWithErrorHandling;
 import trade.it.android.sdk.model.TradeItCallback;
 import trade.it.android.sdk.model.TradeItErrorResult;
 import trade.it.android.sdk.model.TradeItLinkedBroker;
@@ -71,7 +71,7 @@ public class TradeItLinkedBrokerManager {
 
     public void getOAuthLoginPopupUrlForMobile(String broker, String interAppAddressCallback, final TradeItCallback<String> callback) {
         TradeItOAuthLoginPopupUrlForMobileRequest request = new TradeItOAuthLoginPopupUrlForMobileRequest(broker, interAppAddressCallback);
-        accountLinker.getOAuthLoginPopupUrlForMobile(request, new CallBackWithDefaultErrorHandling<TradeItOAuthLoginPopupUrlForMobileResponse, String>(callback) {
+        accountLinker.getOAuthLoginPopupUrlForMobile(request, new DefaultCallbackWithErrorHandling<TradeItOAuthLoginPopupUrlForMobileResponse, String>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItOAuthLoginPopupUrlForMobileResponse> response) {
                 callback.onSuccess(response.body().oAuthURL);
@@ -82,7 +82,7 @@ public class TradeItLinkedBrokerManager {
     public void linkBrokerWithOauthVerifier(final String accountLabel, final String broker, String oAuthVerifier, final TradeItCallback<TradeItLinkedBroker> callback) {
         final TradeItOAuthAccessTokenRequest request = new TradeItOAuthAccessTokenRequest(oAuthVerifier);
         request.environment = accountLinker.getTradeItEnvironment();
-        accountLinker.getOAuthAccessToken(request, new CallBackWithDefaultErrorHandling<TradeItOAuthAccessTokenResponse, TradeItLinkedBroker>(callback) {
+        accountLinker.getOAuthAccessToken(request, new DefaultCallbackWithErrorHandling<TradeItOAuthAccessTokenResponse, TradeItLinkedBroker>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItOAuthAccessTokenResponse> response) {
                 TradeItLinkedAccount linkedAccount = new TradeItLinkedAccount(broker, request, response.body());
@@ -107,7 +107,7 @@ public class TradeItLinkedBrokerManager {
     public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBroker> callback) {
         final TradeItLinkAccountRequest linkAccountRequest = new TradeItLinkAccountRequest(username, password, broker);
         linkAccountRequest.environment = accountLinker.getTradeItEnvironment();
-        accountLinker.linkBrokerAccount(linkAccountRequest, new CallBackWithDefaultErrorHandling<TradeItLinkAccountResponse, TradeItLinkedBroker>(callback) {
+        accountLinker.linkBrokerAccount(linkAccountRequest, new DefaultCallbackWithErrorHandling<TradeItLinkAccountResponse, TradeItLinkedBroker>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItLinkAccountResponse> response) {
                 TradeItLinkedAccount linkedAccount = new TradeItLinkedAccount(linkAccountRequest, response.body());

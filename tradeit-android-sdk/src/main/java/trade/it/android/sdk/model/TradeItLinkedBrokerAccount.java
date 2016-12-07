@@ -1,6 +1,7 @@
 package trade.it.android.sdk.model;
 
 
+import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
 
 public class TradeItLinkedBrokerAccount {
@@ -15,6 +16,22 @@ public class TradeItLinkedBrokerAccount {
         this.accountName = account.name;
         this.accountNumber = account.accountNumber;
         this.accountBaseCurrency = account.accountBaseCurrency;
+    }
+
+    protected TradeItApiClient getTradeItApiClient() {
+        return this.linkedBroker.getTradeItApiClient();
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public String getAccountBaseCurrency() {
+        return accountBaseCurrency;
     }
 
     @Override
