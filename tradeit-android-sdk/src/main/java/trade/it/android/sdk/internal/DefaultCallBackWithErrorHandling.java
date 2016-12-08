@@ -16,7 +16,7 @@ import trade.it.android.sdk.model.TradeItErrorResult;
  */
 public abstract class DefaultCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> implements Callback<TradeItResponseType> {
 
-    private TradeItCallback<TradeItCallBackType> callback;
+    protected TradeItCallback<TradeItCallBackType> callback;
 
     protected DefaultCallbackWithErrorHandling(TradeItCallback<TradeItCallBackType> callback) {
         this.callback = callback;

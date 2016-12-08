@@ -4,18 +4,15 @@ import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
 import it.trade.tradeitapi.model.TradeItResponse;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import trade.it.android.sdk.model.TradeItCallbackWithSecurityQuestion;
 import trade.it.android.sdk.model.TradeItErrorResult;
 import trade.it.android.sdk.model.TradeItSecurityQuestion;
 
-public abstract class AuthenticationCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> implements Callback<TradeItResponseType> {
-
-    private TradeItCallbackWithSecurityQuestion<TradeItCallBackType> callback;
+public abstract class AuthenticationCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> extends DefaultCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> {
 
     protected AuthenticationCallbackWithErrorHandling(TradeItCallbackWithSecurityQuestion<TradeItCallBackType> callback) {
-        this.callback = callback;
+        super(callback);
     }
 
     @Override
@@ -35,7 +32,7 @@ public abstract class AuthenticationCallbackWithErrorHandling<TradeItResponseTyp
                 if (tradeItResponse == null) {
                     callback.onError(new TradeItErrorResult());
                 } else {
-                    callback.onSecurityQuestion(new TradeItSecurityQuestion(authenticateResponse.securityQuestion, authenticateResponse.securityQuestionOptions));
+                    ((TradeItCallbackWithSecurityQuestion<TradeItCallBackType>) callback).onSecurityQuestion(new TradeItSecurityQuestion(authenticateResponse.securityQuestion, authenticateResponse.securityQuestionOptions));
                 }
             } else {
                 callback.onError(new TradeItErrorResult(tradeItResponse.code, tradeItResponse.shortMessage, tradeItResponse.longMessages));
@@ -44,12 +41,4 @@ public abstract class AuthenticationCallbackWithErrorHandling<TradeItResponseTyp
             callback.onError(new TradeItErrorResult(response.code()));
         }
     }
-
-    @Override
-    public void onFailure(Call<TradeItResponseType> call, Throwable t) {
-        callback.onError(new TradeItErrorResult("Network exception occurred", t.getMessage()));
-    }
-
-    public abstract void onSuccessResponse(Response<TradeItResponseType> response);
-
 }
