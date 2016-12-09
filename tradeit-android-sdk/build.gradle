@@ -1,6 +1,29 @@
 apply plugin: 'com.android.library'
 apply plugin: 'groovyx.android'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'tradeit-android-sdk'
+
+    publishedGroupId = 'it.trade.tradeit'
+    libraryName = 'tradeit-android-sdk'
+    artifact = 'tradeit-android-sdk'
+    libraryDescription = 'Android SDK for the Trade.it API: https://www.trade.it/api'
+
+    siteUrl = 'https://github.com/tradingticket/AndroidSDK'
+    gitUrl = 'https://github.com/tradingticket/AndroidSDK.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'tradingticket'
+    developerName = 'Trade It'
+    developerEmail = 'alex@trade.it'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
@@ -9,7 +32,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName libraryVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -35,3 +58,6 @@ dependencies {
     testCompile 'org.objenesis:objenesis:1.4'
     testCompile 'cglib:cglib:2.2'
 }
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
