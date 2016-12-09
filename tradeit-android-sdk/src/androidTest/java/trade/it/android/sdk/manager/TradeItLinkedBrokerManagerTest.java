@@ -20,6 +20,7 @@ import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
+import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
 import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
@@ -71,7 +72,7 @@ public class TradeItLinkedBrokerManagerTest {
     }
 
     @Test
-    public void linkBrokerOldMethodAndAuthenticationAndRefreshBalance() throws InterruptedException {
+    public void linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions() throws InterruptedException {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
             public void onSuccess(TradeItLinkedBroker linkedBroker) {
@@ -80,17 +81,31 @@ public class TradeItLinkedBrokerManagerTest {
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
 
                     @Override
-                    public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
+                    public void onSuccess(final List<TradeItLinkedBrokerAccount> accounts) {
                         assertThat("The authentication is successful", !accounts.isEmpty(), is(true));
                         accounts.get(0).refreshBalance(new TradeItCallBackImpl<TradeItGetAccountOverviewResponse>() {
                             @Override
                             public void onSuccess(TradeItGetAccountOverviewResponse balance) {
                                 assertThat("refreshBalance returns available cash", balance.availableCash, notNullValue());
-                                lock.countDown();
+                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<TradeItGetPositionsResponse.Position>>() {
+                                    @Override
+                                    public void onSuccess(List<TradeItGetPositionsResponse.Position> positions) {
+                                        assertThat("refresh positions is successful", !positions.isEmpty(), is(true));
+                                        lock.countDown();
+                                    }
+
+                                    @Override
+                                    public void onError(TradeItErrorResult error) {
+                                        Log.e(this.getClass().getName(), error.toString());
+                                        assertThat("fails to refresh positions", error, nullValue());
+                                        lock.countDown();
+                                    }
+                                });
                             }
 
                             @Override
                             public void onError(TradeItErrorResult error) {
+                                Log.e(this.getClass().getName(), error.toString());
                                 assertThat("fails to refresh balances", error, nullValue());
                                 lock.countDown();
                             }

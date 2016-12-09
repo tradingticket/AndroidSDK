@@ -1,12 +1,17 @@
 package trade.it.android.sdk.model;
 
 
+import java.util.List;
+
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewRequest;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
+import it.trade.tradeitapi.model.TradeItGetPositionsRequest;
+import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
 import retrofit2.Response;
 import trade.it.android.sdk.internal.DefaultCallbackWithErrorHandling;
+import it.trade.tradeitapi.model.TradeItGetPositionsResponse.Position;
 
 public class TradeItLinkedBrokerAccount {
 
@@ -15,6 +20,7 @@ public class TradeItLinkedBrokerAccount {
     private String accountBaseCurrency;
     private TradeItLinkedBroker linkedBroker;
     private TradeItGetAccountOverviewResponse balance;
+    private List<Position> positions;
 
     public TradeItLinkedBrokerAccount(TradeItLinkedBroker linkedBroker, Account account) {
         this.linkedBroker = linkedBroker;
@@ -43,6 +49,10 @@ public class TradeItLinkedBrokerAccount {
         return balance;
     }
 
+    public List<Position> getPositions() {
+        return positions;
+    }
+
     public void refreshBalance(final TradeItCallback<TradeItGetAccountOverviewResponse> callback) {
         TradeItGetAccountOverviewRequest balanceRequest = new TradeItGetAccountOverviewRequest(accountNumber);
         this.getTradeItApiClient().getAccountOverview(balanceRequest, new DefaultCallbackWithErrorHandling<TradeItGetAccountOverviewResponse, TradeItGetAccountOverviewResponse>(callback) {
@@ -50,6 +60,17 @@ public class TradeItLinkedBrokerAccount {
             public void onSuccessResponse(Response<TradeItGetAccountOverviewResponse> response) {
                 balance = response.body();
                 callback.onSuccess(response.body());
+            }
+        });
+    }
+
+    public void refreshPositions(final TradeItCallback<List<Position>> callback) {
+        TradeItGetPositionsRequest positionsRequest = new TradeItGetPositionsRequest(accountNumber, null);
+        this.getTradeItApiClient().getPositions(positionsRequest, new DefaultCallbackWithErrorHandling<TradeItGetPositionsResponse, List<Position>>(callback) {
+            @Override
+            public void onSuccessResponse(Response<TradeItGetPositionsResponse> response) {
+                positions = response.body().positions;
+                callback.onSuccess(positions);
             }
         });
     }
