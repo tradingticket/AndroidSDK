@@ -9,21 +9,21 @@ import it.trade.tradeitapi.model.TradeItGetAccountOverviewRequest;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
 import it.trade.tradeitapi.model.TradeItGetPositionsRequest;
 import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
+import it.trade.tradeitapi.model.TradeItGetPositionsResponse.Position;
 import retrofit2.Response;
 import trade.it.android.sdk.internal.DefaultCallbackWithErrorHandling;
-import it.trade.tradeitapi.model.TradeItGetPositionsResponse.Position;
 
 public class TradeItLinkedBrokerAccount {
 
     private String accountName;
     private String accountNumber;
     private String accountBaseCurrency;
-    private TradeItLinkedBroker linkedBroker;
+    private transient TradeItLinkedBroker linkedBroker;
     private TradeItGetAccountOverviewResponse balance;
     private List<Position> positions;
 
     public TradeItLinkedBrokerAccount(TradeItLinkedBroker linkedBroker, Account account) {
-        this.linkedBroker = linkedBroker;
+        this.linkedBroker =  linkedBroker;
         this.accountName = account.name;
         this.accountNumber = account.accountNumber;
         this.accountBaseCurrency = account.accountBaseCurrency;

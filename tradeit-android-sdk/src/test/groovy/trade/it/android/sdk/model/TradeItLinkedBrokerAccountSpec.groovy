@@ -150,11 +150,11 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
             }
 
         when: "calling refresh balance on the linked broker account"
-            List<Position> positions = null
-            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<TradeItGetPositionsResponse>() {
+            List<Position> positionsResult = null
+            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<Position>>() {
                 @Override
-                void onSuccess(TradeItGetPositionsResponse response) {
-                    positions = response.positions
+                void onSuccess(List<Position> positions) {
+                    positionsResult = positions
                     successCallbackCount++
                 }
 
@@ -169,10 +169,10 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
                 errorCallbackCount == 0
 
         then: "expects positions to be returned"
-            positions == [positions1, positions2]
+            positionsResult == [position1, position2]
 
         and: "the linked broker account should have his positions property updated"
-            linkedBrokerAccount.getPositions() == balance
+            linkedBrokerAccount.getPositions() == positionsResult
 
 
     }
@@ -184,7 +184,7 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
             tradeItApiClient.getPositions(_, _) >> { args ->
                 Callback<TradeItGetPositionsResponse> callback = args[1]
                 Call<TradeItGetPositionsResponse> call = Mock(Call)
-                tradeItGetPositionsResponse tradeItGetPositionsResponse = new TradeItGetPositionsResponse()
+                TradeItGetPositionsResponse tradeItGetPositionsResponse = new TradeItGetPositionsResponse()
                 tradeItGetPositionsResponse.code = TradeItErrorCode.SESSION_EXPIRED
                 tradeItGetPositionsResponse.status = TradeItResponseStatus.ERROR
                 tradeItGetPositionsResponse.shortMessage = "My short message"
@@ -197,9 +197,9 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             TradeItErrorResult errorResult = null
-            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<TradeItGetPositionsResponse>() {
+            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<Position>>() {
                 @Override
-                void onSuccess(TradeItGetPositionsResponse response) {
+                void onSuccess(List<Position> positions) {
                     successCallbackCount++
                 }
 
