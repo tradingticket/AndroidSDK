@@ -27,7 +27,8 @@ public class TradeItLinkedBroker {
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
         final TradeItLinkedBroker linkedBroker = this;
-        this.apiClient.authenticate(new AuthenticationCallbackWithErrorHandling<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback) {
+
+        this.apiClient.authenticate(new AuthenticationCallbackWithErrorHandling<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback, apiClient) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
                 TradeItAuthenticateResponse authResponse = response.body();
@@ -48,17 +49,6 @@ public class TradeItLinkedBroker {
                 ", accounts=" + getAccounts().toString() +
                 '}';
     }
-//    public void answerSecurityQuestion(String securityAnswer, final TradeItCallbackWithSecurityQuestion<List<Account>> callback) {
-//        TradeItAnswerSecurityQuestionRequest answerSecurityQuestionRequest = new TradeItAnswerSecurityQuestionRequest(securityAnswer);
-//        this.apiClient.answerSecurityQuestion(answerSecurityQuestionRequest, new AuthenticationCallbackWithErrorHandling<TradeItAuthenticateResponse, List<Account>>(callback) {
-//            @Override
-//            public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
-//                TradeItAuthenticateResponse authResponse = response.body();
-//                List<Account> accounts = authResponse.accounts;
-//                callback.onSuccess(accounts);
-//            }
-//        });
-//    }
 
     public TradeItLinkedAccount getLinkedAccount() {
         return this.apiClient.getTradeItLinkedAccount();

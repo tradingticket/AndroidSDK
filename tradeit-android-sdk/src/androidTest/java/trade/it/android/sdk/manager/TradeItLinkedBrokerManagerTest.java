@@ -217,14 +217,14 @@ public class TradeItLinkedBrokerManagerTest {
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
-                        assertThat("fails to get security question",  accounts, nullValue());
+                        assertThat("successful authentication after answering security question security question",  accounts, notNullValue());
                         lock.countDown();
                     }
 
                     @Override
                     public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
                         assertThat("security question is not null",  securityQuestion, notNullValue());
-                        lock.countDown();
+                        this.submitSecurityAnswer("tradingticket");
                     }
 
                     @Override
@@ -238,13 +238,13 @@ public class TradeItLinkedBrokerManagerTest {
             @Override
             public void onError(TradeItErrorResult error) {
                 Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to get the Oauth login popup url", error, nullValue());
+                assertThat("fails to linkBroker", error, nullValue());
                 lock.countDown();
             }
         });
 
         boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
-        assertThat("The call to getOAuthLoginPopupUrlForMobile is not expired", notExpired, is(true));
+        assertThat("The call to linkBrokerOldMethodAndSecurityQuestion is not expired", notExpired, is(true));
     }
 
     @Test
