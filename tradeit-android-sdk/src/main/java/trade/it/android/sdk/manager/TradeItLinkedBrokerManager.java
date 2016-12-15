@@ -8,6 +8,7 @@ import java.util.List;
 
 import it.trade.tradeitapi.API.TradeItAccountLinker;
 import it.trade.tradeitapi.API.TradeItApiClient;
+import it.trade.tradeitapi.exception.TradeItDeleteLinkedAccountException;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.exception.TradeItSaveLinkedAccountException;
@@ -20,6 +21,7 @@ import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
 import it.trade.tradeitapi.model.TradeItOAuthAccessTokenResponse;
 import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileRequest;
 import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileResponse;
+import it.trade.tradeitapi.model.TradeItResponse;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -102,6 +104,21 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
+    public void unlinkBroker(final TradeItLinkedBroker linkedBroker, TradeItCallback callback) {
+        try {
+            TradeItAccountLinker.deleteLinkedAccount(context, linkedBroker.getLinkedAccount());
+            linkedBrokers.remove(linkedBroker);
+            this.accountLinker.unlinkBrokerAccount(linkedBroker.getLinkedAccount(), new DefaultCallbackWithErrorHandling<TradeItResponse, TradeItResponse>(callback) {
+                @Override
+                public void onSuccessResponse(Response<TradeItResponse> response) {
+                    callback.onSuccess(response.body());
+                }
+            });
+        } catch (TradeItDeleteLinkedAccountException e) {
+            Log.e(this.getClass().getName(), e.getMessage(), e);
+            callback.onError(new TradeItErrorResult("Unlink broker error", "An error occured while unlinking the broker, please try again later"));
+        }
+    }
 
     /**
      * @deprecated Use the new OAuth flow and the {@link #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback)} method instead
@@ -125,5 +142,9 @@ public class TradeItLinkedBrokerManager {
                 }
             }
         });
+    }
+
+    public List<TradeItLinkedBroker> getLinkedBrokers() {
+        return new ArrayList<>(linkedBrokers);
     }
 }
