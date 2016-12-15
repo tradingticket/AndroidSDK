@@ -12,6 +12,7 @@ import it.trade.tradeitapi.exception.TradeItDeleteLinkedAccountException;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.exception.TradeItSaveLinkedAccountException;
+import it.trade.tradeitapi.exception.TradeItUpdateLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker;
 import it.trade.tradeitapi.model.TradeItLinkAccountRequest;
@@ -21,6 +22,8 @@ import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
 import it.trade.tradeitapi.model.TradeItOAuthAccessTokenResponse;
 import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileRequest;
 import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileResponse;
+import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForTokenUpdateRequest;
+import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForTokenUpdateResponse;
 import it.trade.tradeitapi.model.TradeItResponse;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
 import retrofit2.Call;
@@ -31,6 +34,9 @@ import trade.it.android.sdk.model.TradeItCallback;
 import trade.it.android.sdk.model.TradeItErrorResult;
 import trade.it.android.sdk.model.TradeItLinkedBroker;
 import trade.it.android.sdk.model.TradeItLinkedBrokerCache;
+
+import static it.trade.tradeitapi.API.TradeItAccountLinker.saveLinkedAccount;
+import static it.trade.tradeitapi.API.TradeItAccountLinker.updateLinkedAccount;
 
 public class TradeItLinkedBrokerManager {
 
@@ -74,11 +80,21 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
-    public void getOAuthLoginPopupUrlForMobile(String broker, String interAppAddressCallback, final TradeItCallback<String> callback) {
-        TradeItOAuthLoginPopupUrlForMobileRequest request = new TradeItOAuthLoginPopupUrlForMobileRequest(broker, interAppAddressCallback);
+    public void getOAuthLoginPopupUrlForMobile(String broker, String deepLinkCallback, final TradeItCallback<String> callback) {
+        TradeItOAuthLoginPopupUrlForMobileRequest request = new TradeItOAuthLoginPopupUrlForMobileRequest(broker, deepLinkCallback);
         accountLinker.getOAuthLoginPopupUrlForMobile(request, new DefaultCallbackWithErrorHandling<TradeItOAuthLoginPopupUrlForMobileResponse, String>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItOAuthLoginPopupUrlForMobileResponse> response) {
+                callback.onSuccess(response.body().oAuthURL);
+            }
+        });
+    }
+
+    public void getOAuthLoginPopupForTokenUpdateUrl(String broker, String userId, String deepLinkCallback, final TradeItCallback<String> callback) {
+        TradeItOAuthLoginPopupUrlForTokenUpdateRequest request = new TradeItOAuthLoginPopupUrlForTokenUpdateRequest(broker, deepLinkCallback, userId);
+        accountLinker.getOAuthLoginPopupUrlForTokenUpdate(request, new DefaultCallbackWithErrorHandling<TradeItOAuthLoginPopupUrlForTokenUpdateResponse, String>(callback) {
+            @Override
+            public void onSuccessResponse(Response<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> response) {
                 callback.onSuccess(response.body().oAuthURL);
             }
         });
@@ -92,13 +108,24 @@ public class TradeItLinkedBrokerManager {
             public void onSuccessResponse(Response<TradeItOAuthAccessTokenResponse> response) {
                 TradeItLinkedAccount linkedAccount = new TradeItLinkedAccount(broker, request, response.body());
                 try {
-                    TradeItAccountLinker.saveLinkedAccount(context, linkedAccount, accountLabel);
                     TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, new TradeItApiClient(linkedAccount));
-                    linkedBrokers.add(linkedBroker);
+                    int indexOfLinkedBroker = linkedBrokers.indexOf(linkedBroker);
+                    if (indexOfLinkedBroker != -1) { //linked broker for this user id already exists, this is a token update
+                        TradeItLinkedBroker linkedBrokerToUpdate = linkedBrokers.get(indexOfLinkedBroker);
+                        linkedBrokerToUpdate.setLinkedAccount(linkedAccount);
+                        linkedBroker = linkedBrokerToUpdate;
+                        updateLinkedAccount(context, linkedAccount);
+                    } else {
+                        saveLinkedAccount(context, linkedAccount, accountLabel);
+                        linkedBrokers.add(linkedBroker);
+                    }
                     callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedAccountException e) {
                     Log.e(this.getClass().getName(), e.getMessage(), e);
                     callback.onError(new TradeItErrorResult("Failed to link broker", e.getMessage()));
+                } catch (TradeItUpdateLinkedAccountException e) {
+                    Log.e(this.getClass().getName(), e.getMessage(), e);
+                    callback.onError(new TradeItErrorResult("Failed to update link broker", e.getMessage()));
                 }
             }
         });
@@ -132,7 +159,7 @@ public class TradeItLinkedBrokerManager {
             public void onSuccessResponse(Response<TradeItLinkAccountResponse> response) {
                 TradeItLinkedAccount linkedAccount = new TradeItLinkedAccount(linkAccountRequest, response.body());
                 try {
-                    TradeItAccountLinker.saveLinkedAccount(context, linkedAccount, accountLabel);
+                    saveLinkedAccount(context, linkedAccount, accountLabel);
                     TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, new TradeItApiClient(linkedAccount));
                     linkedBrokers.add(linkedBroker);
                     callback.onSuccess(linkedBroker);
