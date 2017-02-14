@@ -9,7 +9,7 @@ import java.util.List;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
-import it.trade.tradeitapi.model.TradeItLinkedAccount;
+import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import retrofit2.Response;
 import trade.it.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
 
@@ -45,14 +45,14 @@ public class TradeItLinkedBroker {
     @Override
     public String toString() {
         return "TradeItLinkedBroker{" +
-                "TradeItLinkedAccount=" + getLinkedAccount().toString() +
+                "TradeItLinkedLogin=" + getLinkedLogin().toString() +
                 ", accounts=" + getAccounts().toString() +
                 ", accountsLastUpdated=" + getAccountsLastUpdated() +
                 '}';
     }
 
-    public TradeItLinkedAccount getLinkedAccount() {
-        return this.apiClient.getTradeItLinkedAccount();
+    public TradeItLinkedLogin getLinkedLogin() {
+        return this.apiClient.getTradeItLinkedLogin();
     }
 
     TradeItApiClient getTradeItApiClient() {
@@ -90,17 +90,17 @@ public class TradeItLinkedBroker {
 
         TradeItLinkedBroker that = (TradeItLinkedBroker) o;
 
-        return apiClient.getTradeItLinkedAccount().userId.equals(that.apiClient.getTradeItLinkedAccount().userId);
+        return apiClient.getTradeItLinkedLogin().userId.equals(that.apiClient.getTradeItLinkedLogin().userId);
 
     }
 
     @Override
     public int hashCode() {
-        return apiClient.getTradeItLinkedAccount().userId.hashCode();
+        return apiClient.getTradeItLinkedLogin().userId.hashCode();
     }
 
-    public void setLinkedAccount(TradeItLinkedAccount linkedAccount) {
-        this.apiClient.setTradeItLinkedAccount(linkedAccount);
+    public void setLinkedLogin(TradeItLinkedLogin linkedLogin) {
+        this.apiClient.setTradeItLinkedLogin(linkedLogin);
     }
 }
 

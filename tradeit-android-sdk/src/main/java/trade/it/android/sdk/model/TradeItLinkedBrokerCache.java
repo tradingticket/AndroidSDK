@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import java.util.HashSet;
 import java.util.Set;
 
-import static it.trade.tradeitapi.API.TradeItAccountLinker.TRADE_IT_SHARED_PREFS_KEY;
+import static it.trade.tradeitapi.API.TradeItBrokerLinker.TRADE_IT_SHARED_PREFS_KEY;
 
 
 public class TradeItLinkedBrokerCache {
@@ -23,7 +23,7 @@ public class TradeItLinkedBrokerCache {
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY, new HashSet<String>());
-            String userId = linkedBroker.getLinkedAccount().userId;
+            String userId = linkedBroker.getLinkedLogin().userId;
 
             if (linkedBrokerCache.contains(userId)) {
                 editor.putString(LINKED_BROKER_CACHE_KEY + userId, linkedBrokerSerializedJson);
@@ -37,7 +37,7 @@ public class TradeItLinkedBrokerCache {
     }
 
     public void syncFromCache(Context context, TradeItLinkedBroker linkedBroker) {
-        String userId = linkedBroker.getLinkedAccount().userId;
+        String userId = linkedBroker.getLinkedLogin().userId;
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY, new HashSet<String>());
         if (linkedBrokerCache.contains(userId)) {

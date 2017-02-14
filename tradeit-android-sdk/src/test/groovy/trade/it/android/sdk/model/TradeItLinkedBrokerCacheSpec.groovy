@@ -17,12 +17,12 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
     String userId = "My userId"
 
     def setup() {
-        apiClient.getTradeItLinkedAccount() >> {
-            TradeItLinkAccountRequest linkAccountRequest = new TradeItLinkAccountRequest("my id", "my password", "broker")
-            TradeItLinkAccountResponse linkAccountResponse = new TradeItLinkAccountResponse()
-            linkAccountResponse.userId = userId
-            linkAccountResponse.userToken = "My userToken"
-            return new TradeItLinkedAccount(linkAccountRequest, linkAccountResponse)
+        apiClient.getTradeItLinkedLogin() >> {
+            TradeItLinkLoginRequest linkLoginRequest = new TradeItLinkLoginRequest("my id", "my password", "broker")
+            TradeItLinkLoginResponse linkLoginResponse = new TradeItLinkLoginResponse()
+            linkLoginResponse.userId = userId
+            linkLoginResponse.userToken = "My userToken"
+            return new TradeItLinkedLogin(linkLoginRequest, linkLoginResponse)
         }
 
         context.getSharedPreferences(_, Context.MODE_PRIVATE) >> {
@@ -161,7 +161,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             linkedBrokerCache.syncFromCache(context, linkedBroker)
 
         then: "expects the linkedBroker to be populated with the cache"
-            linkedBroker.linkedAccount.userId == userId
+            linkedBroker.linkedLogin.userId == userId
             linkedBroker.accountsLastUpdated != null
             linkedBroker.accounts.size() == 1
             linkedBroker.accounts[0].balance.availableCash == 20000
@@ -179,7 +179,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             }
             sharedPreferences.getString({it.contains("an other userId")}, "") >> {
                 TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(context, apiClient);
-                linkedBrokerCached.linkedAccount.userId == "an other userId"
+                linkedBrokerCached.linkedLogin.userId == "an other userId"
                 TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItAuthenticateResponse.Account));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
@@ -195,7 +195,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             linkedBrokerCache.syncFromCache(context, linkedBroker)
 
         then: "expects the linkedBroker to be populated with the cache"
-            linkedBroker.linkedAccount.userId == userId
+            linkedBroker.linkedLogin.userId == userId
             linkedBroker.accountsLastUpdated == null
             linkedBroker.accounts.size() == 0
     }
