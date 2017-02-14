@@ -39,7 +39,6 @@ class TradeItLinkedBrokerSpec extends Specification {
                 tradeItAuthenticateResponse.longMessages = null
                 tradeItAuthenticateResponse.status = TradeItResponseStatus.SUCCESS
                 tradeItAuthenticateResponse.accounts = [account1, account2]
-
                 Response<TradeItAuthenticateResponse> response = Response.success(tradeItAuthenticateResponse);
                 callback.onResponse(call, response);
             }

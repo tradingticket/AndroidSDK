@@ -3,6 +3,10 @@ package trade.it.android.sdk.model;
 
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
+import it.trade.tradeitapi.model.TradeItGetAccountOverviewRequest;
+import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
+import retrofit2.Response;
+import trade.it.android.sdk.internal.DefaultCallbackWithErrorHandling;
 
 public class TradeItLinkedBrokerAccount {
 
@@ -10,6 +14,7 @@ public class TradeItLinkedBrokerAccount {
     private String accountNumber;
     private String accountBaseCurrency;
     private TradeItLinkedBroker linkedBroker;
+    private TradeItGetAccountOverviewResponse balance;
 
     public TradeItLinkedBrokerAccount(TradeItLinkedBroker linkedBroker, Account account) {
         this.linkedBroker = linkedBroker;
@@ -32,6 +37,21 @@ public class TradeItLinkedBrokerAccount {
 
     public String getAccountBaseCurrency() {
         return accountBaseCurrency;
+    }
+
+    public TradeItGetAccountOverviewResponse getBalance() {
+        return balance;
+    }
+
+    public void refreshBalance(final TradeItCallback<TradeItGetAccountOverviewResponse> callback) {
+        TradeItGetAccountOverviewRequest balanceRequest = new TradeItGetAccountOverviewRequest(accountNumber);
+        this.getTradeItApiClient().getAccountOverview(balanceRequest, new DefaultCallbackWithErrorHandling<TradeItGetAccountOverviewResponse, TradeItGetAccountOverviewResponse>(callback) {
+            @Override
+            public void onSuccessResponse(Response<TradeItGetAccountOverviewResponse> response) {
+                balance = response.body();
+                callback.onSuccess(response.body());
+            }
+        });
     }
 
     @Override
