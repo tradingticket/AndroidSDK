@@ -47,6 +47,7 @@ public class TradeItLinkedBroker {
         return "TradeItLinkedBroker{" +
                 "TradeItLinkedAccount=" + getLinkedAccount().toString() +
                 ", accounts=" + getAccounts().toString() +
+                ", accountsLastUpdated=" + getAccountsLastUpdated() +
                 '}';
     }
 
