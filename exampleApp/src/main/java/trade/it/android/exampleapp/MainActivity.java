@@ -9,11 +9,12 @@ import android.widget.TextView;
 
 import it.trade.tradeitapi.API.TradeItAccountLinker;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
+import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItEnvironment;
-import it.trade.tradeitapi.model.TradeItLinkedAccount;
 import trade.it.android.sdk.manager.TradeItLinkedBrokerManager;
 import trade.it.android.sdk.model.TradeItCallBackImpl;
 import trade.it.android.sdk.model.TradeItErrorResult;
+import trade.it.android.sdk.model.TradeItLinkedBroker;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
             linkedBrokerManager = new TradeItLinkedBrokerManager(this.getApplicationContext(), new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
         } catch (TradeItKeystoreServiceCreateKeyException e) {
             this.textViewResult.append("Error initializing linkedBrokerManager: " + e.getMessage());
+        } catch (TradeItRetrieveLinkedAccountException e) {
+            this.textViewResult.append("Error retreiving linked accounts: " + e.getMessage());
         }
     }
 
@@ -41,10 +44,10 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
             if (oAuthVerifier != null) {
-                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedAccount>() {
+                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
                     @Override
-                    public void onSuccess(TradeItLinkedAccount linkedAccount) {
-                        textViewResult.append("oAuthFlow Success: " + linkedAccount.toString());
+                    public void onSuccess(TradeItLinkedBroker linkedBroker) {
+                        textViewResult.append("oAuthFlow Success: " + linkedBroker.toString());
                     }
 
                     @Override
