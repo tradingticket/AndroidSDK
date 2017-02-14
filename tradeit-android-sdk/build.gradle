@@ -1,4 +1,28 @@
 apply plugin: 'com.android.library'
+apply plugin: 'groovyx.android'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'tradeit-android-sdk'
+
+    publishedGroupId = 'it.trade.tradeit'
+    libraryName = 'tradeit-android-sdk'
+    artifact = 'tradeit-android-sdk'
+    libraryDescription = 'Android SDK for the Trade.it API: https://www.trade.it/api'
+
+    siteUrl = 'https://github.com/tradingticket/AndroidSDK'
+    gitUrl = 'https://github.com/tradingticket/AndroidSDK.git'
+
+    libraryVersion = '0.0.2-SNAPSHOT'
+
+    developerId = 'tradingticket'
+    developerName = 'Trade It'
+    developerEmail = 'alex@trade.it'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 android {
     compileSdkVersion 23
@@ -8,7 +32,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName libraryVersion
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -16,11 +41,32 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions{
+            unitTests.all {
+                jvmArgs '-noverify' //this is necessary because of PowerMock issue
+            }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'it.trade.tradeit:tradeit-android-api:0.1.2'
+    compile 'it.trade.tradeit:tradeit-android-api:0.1.5-SNAPSHOT'
+    androidTestCompile 'com.android.support:support-annotations:23.0.0'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.codehaus.groovy:groovy:2.4.7:grooid'
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+        exclude group: 'org.codehaus.groovy'
+    }
+    testCompile 'cglib:cglib:2.2'
+
+    testCompile 'org.powermock:powermock-core:1.6.6'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.6'
+    testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.6'
 }
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
