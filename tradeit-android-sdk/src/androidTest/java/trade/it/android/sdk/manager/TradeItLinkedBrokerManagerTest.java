@@ -49,7 +49,7 @@ public class TradeItLinkedBrokerManagerTest {
     @Before
     public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedAccountException {
         instrumentationCtx = InstrumentationRegistry.getContext();
-        linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx, new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
+        linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx.getApplicationContext(), new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
     }
 
     @Test
