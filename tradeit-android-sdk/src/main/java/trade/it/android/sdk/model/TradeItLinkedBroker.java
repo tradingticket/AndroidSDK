@@ -1,6 +1,9 @@
 package trade.it.android.sdk.model;
 
+import android.content.Context;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import it.trade.tradeitapi.API.TradeItApiClient;
@@ -11,14 +14,19 @@ import retrofit2.Response;
 import trade.it.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
 
 public class TradeItLinkedBroker {
-    private TradeItApiClient apiClient;
+    private transient TradeItApiClient apiClient;
     private List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
+    private Date accountsLastUpdated;
+    private transient TradeItLinkedBrokerCache linkedBrokerCache = new TradeItLinkedBrokerCache();
+    private transient Context context;
 
-    public TradeItLinkedBroker(TradeItApiClient apiClient) {
+    public TradeItLinkedBroker(Context context, TradeItApiClient apiClient) {
         this.apiClient = apiClient;
+        this.context = context;
     }
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
+        final TradeItLinkedBroker linkedBroker = this;
         this.apiClient.authenticate(new AuthenticationCallbackWithErrorHandling<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
@@ -26,6 +34,8 @@ public class TradeItLinkedBroker {
                 List<Account> accountsResult = authResponse.accounts;
                 List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = mapAccountsToLinkedBrokerAccount(accountsResult);
                 accounts = linkedBrokerAccounts;
+                accountsLastUpdated = new Date();
+                linkedBrokerCache.cache(context, linkedBroker);
                 callback.onSuccess(linkedBrokerAccounts);
             }
         });
@@ -54,12 +64,24 @@ public class TradeItLinkedBroker {
         return this.apiClient.getTradeItLinkedAccount();
     }
 
-    protected TradeItApiClient getTradeItApiClient() {
+    TradeItApiClient getTradeItApiClient() {
         return this.apiClient;
     }
 
     public List<TradeItLinkedBrokerAccount> getAccounts() {
         return this.accounts;
+    }
+
+    public Date getAccountsLastUpdated() {
+        return accountsLastUpdated;
+    }
+
+    void setAccounts(List<TradeItLinkedBrokerAccount> accounts) {
+        this.accounts = accounts;
+    }
+
+    void setAccountsLastUpdated(Date accountsLastUpdated) {
+        this.accountsLastUpdated = accountsLastUpdated;
     }
 
     private List<TradeItLinkedBrokerAccount> mapAccountsToLinkedBrokerAccount(List<Account> accounts) {
