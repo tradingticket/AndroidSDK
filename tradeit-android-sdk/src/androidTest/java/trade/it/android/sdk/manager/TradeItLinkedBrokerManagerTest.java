@@ -19,11 +19,13 @@ import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
+import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
 import trade.it.android.sdk.model.TradeItCallBackImpl;
 import trade.it.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
 import trade.it.android.sdk.model.TradeItErrorResult;
 import trade.it.android.sdk.model.TradeItLinkedBroker;
 import trade.it.android.sdk.model.TradeItLinkedBrokerAccount;
+import trade.it.android.sdk.model.TradeItOrder;
 import trade.it.android.sdk.model.TradeItSecurityQuestion;
 
 import static org.hamcrest.Matchers.is;
@@ -74,18 +76,35 @@ public class TradeItLinkedBrokerManagerTest {
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
-                        assertThat("The authentication is successful",  accounts, notNullValue());
-                        lock.countDown();
+                        assertThat("The authentication is successful",  !accounts.isEmpty(), is(true));
+
+                        TradeItOrder order = new TradeItOrder(accounts.get(0), "GE");
+                        order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+                            @Override
+                            public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
+                                assertThat("Preview order is successful",  response.orderId, notNullValue());
+                                lock.countDown();
+                            }
+
+                            @Override
+                            public void onError(TradeItErrorResult error) {
+                                Log.e(this.getClass().getName(), error.toString());
+                                assertThat("fails to call preview order",  error, nullValue());
+                                lock.countDown();
+                            }
+                        });
                     }
 
                     @Override
                     public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                        Log.e(this.getClass().getName(), securityQuestion.toString());
                         assertThat("fails to authenticate",  securityQuestion, nullValue());
                         lock.countDown();
                     }
 
                     @Override
                     public void onError(TradeItErrorResult error) {
+                        Log.e(this.getClass().getName(), error.toString());
                         assertThat("fails to authenticate",  error, nullValue());
                         lock.countDown();
                     }
