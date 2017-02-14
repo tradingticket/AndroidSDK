@@ -9,10 +9,11 @@ import com.google.gson.Gson;
 import java.util.HashSet;
 import java.util.Set;
 
+import static it.trade.tradeitapi.API.TradeItAccountLinker.TRADE_IT_SHARED_PREFS_KEY;
+
 
 public class TradeItLinkedBrokerCache {
     private static final String LINKED_BROKER_CACHE_KEY = "TRADE_IT_LINKED_BROKER_CACHE";
-    private static final String TRADE_IT_SHARED_PREFS_KEY = "TRADE_IT_SHARED_PREFS_KEY";
     Gson gson = new Gson();
 
     void cache(Context context, TradeItLinkedBroker linkedBroker) {

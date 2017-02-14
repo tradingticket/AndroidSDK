@@ -1,6 +1,7 @@
 package trade.it.android.sdk.manager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -23,6 +24,7 @@ import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
 import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
 import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
+import it.trade.tradeitapi.model.TradeItResponse;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
 import trade.it.android.sdk.model.TradeItCallBackImpl;
 import trade.it.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
@@ -32,6 +34,7 @@ import trade.it.android.sdk.model.TradeItLinkedBrokerAccount;
 import trade.it.android.sdk.model.TradeItOrder;
 import trade.it.android.sdk.model.TradeItSecurityQuestion;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -46,10 +49,20 @@ public class TradeItLinkedBrokerManagerTest {
     private TradeItLinkedBrokerManager linkedBrokerManager;
     private Context instrumentationCtx;
 
+
     @Before
     public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedAccountException {
-        instrumentationCtx = InstrumentationRegistry.getContext();
+        instrumentationCtx = InstrumentationRegistry.getTargetContext();
         linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx.getApplicationContext(), new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
+    }
+
+    @Before
+    public void cleanSharedPrefs() {
+        SharedPreferences sharedPreferences =
+                getInstrumentation().getTargetContext().getSharedPreferences(TradeItAccountLinker.TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
     }
 
     @Test
@@ -75,7 +88,7 @@ public class TradeItLinkedBrokerManagerTest {
     public void linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions() throws InterruptedException {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
-            public void onSuccess(TradeItLinkedBroker linkedBroker) {
+            public void onSuccess(final TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
                 assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
@@ -143,7 +156,7 @@ public class TradeItLinkedBrokerManagerTest {
     public void linkBrokerOldMethodAndAuthenticationAndTrade() throws InterruptedException {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
-            public void onSuccess(TradeItLinkedBroker linkedBroker) {
+            public void onSuccess(final TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
                 assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
@@ -211,20 +224,20 @@ public class TradeItLinkedBrokerManagerTest {
     public void linkBrokerOldMethodAndSecurityQuestion() throws InterruptedException {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummySecurity", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
-            public void onSuccess(TradeItLinkedBroker linkedBroker) {
+            public void onSuccess(final TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
                 assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userToken , notNullValue());
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
-                        assertThat("fails to get security question",  accounts, nullValue());
+                        assertThat("successful authentication after answering security question security question",  accounts, notNullValue());
                         lock.countDown();
                     }
 
                     @Override
                     public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
                         assertThat("security question is not null",  securityQuestion, notNullValue());
-                        lock.countDown();
+                        this.submitSecurityAnswer("tradingticket");
                     }
 
                     @Override
@@ -238,13 +251,13 @@ public class TradeItLinkedBrokerManagerTest {
             @Override
             public void onError(TradeItErrorResult error) {
                 Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to get the Oauth login popup url", error, nullValue());
+                assertThat("fails to linkBroker", error, nullValue());
                 lock.countDown();
             }
         });
 
         boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
-        assertThat("The call to getOAuthLoginPopupUrlForMobile is not expired", notExpired, is(true));
+        assertThat("The call to linkBrokerOldMethodAndSecurityQuestion is not expired", notExpired, is(true));
     }
 
     @Test
@@ -267,5 +280,42 @@ public class TradeItLinkedBrokerManagerTest {
 
         boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
         assertThat("The call to getOAuthLoginPopupUrlForMobile is not expired", notExpired, is(true));
+    }
+
+    @Test
+    public void linkAndUnlinkBrokers() throws InterruptedException {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            @Override
+            public void onSuccess(final TradeItLinkedBroker linkedBroker) {
+                List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+                assertThat("we linked one broker", linkedBrokers.size(), is(1));
+
+                linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl<TradeItResponse>() {
+                    @Override
+                    public void onSuccess(TradeItResponse response) {
+                        assertThat("unlink broker successfully", response, notNullValue());
+                        if (linkedBrokerManager.getLinkedBrokers().size() == 0) {
+                            lock.countDown();
+                        }
+                    }
+                    @Override
+                    public void onError(TradeItErrorResult error) {
+                        Log.e(this.getClass().getName(), error.toString());
+                        assertThat("fails to unlink broker", error, nullValue());
+                        lock.countDown();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                Log.e(this.getClass().getName(), error.toString());
+                assertThat("fails to link broker", error, nullValue());
+                lock.countDown();
+            }
+        });
+
+        boolean notExpired = lock.await(10000, TimeUnit.MILLISECONDS);
+        assertThat("The call to linkAndUnlinkBrokers is not expired", notExpired, is(true));
     }
 }
