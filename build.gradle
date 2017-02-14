@@ -18,6 +18,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenLocal() // to be able to use local snapshot
     }
 }
 

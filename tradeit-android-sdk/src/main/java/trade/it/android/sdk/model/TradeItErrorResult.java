@@ -7,6 +7,7 @@ import java.util.List;
 import it.trade.tradeitapi.model.TradeItErrorCode;
 
 public class TradeItErrorResult {
+
     private TradeItErrorCode errorCode = null;
     private String shortMessage = null;
     private List<String> longMessages = Arrays.asList("Trading is temporarily unavailable. Please try again in a few minutes.");
@@ -25,7 +26,44 @@ public class TradeItErrorResult {
         this.systemMessage = "error sending request to ems server";
     }
 
-    public TradeItErrorResult(String shortMessage) {
-        this.shortMessage = shortMessage;
+    public TradeItErrorResult(String title, String message) {
+        this.shortMessage = title;
+        this.longMessages = Arrays.asList(message);
+        this.systemMessage = message;
+        this.errorCode = TradeItErrorCode.SYSTEM_ERROR;
+    }
+
+    public TradeItErrorResult() {
+    }
+
+    public TradeItErrorCode getErrorCode() {
+        return errorCode;
+    }
+
+    public String getShortMessage() {
+        return shortMessage;
+    }
+
+    public List<String> getLongMessages() {
+        return longMessages;
+    }
+
+    public String getSystemMessage() {
+        return systemMessage;
+    }
+
+    public int getHttpCode() {
+        return httpCode;
+    }
+
+    @Override
+    public String toString() {
+        return "TradeItErrorResult{" +
+                "errorCode=" + errorCode +
+                ", shortMessage='" + shortMessage + '\'' +
+                ", longMessages=" + longMessages +
+                ", systemMessage='" + systemMessage + '\'' +
+                ", httpCode=" + httpCode +
+                '}';
     }
 }
