@@ -83,6 +83,25 @@ public class TradeItLinkedBroker {
         return linkedBrokerAccounts;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TradeItLinkedBroker that = (TradeItLinkedBroker) o;
+
+        return apiClient.getTradeItLinkedAccount().userId.equals(that.apiClient.getTradeItLinkedAccount().userId);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return apiClient.getTradeItLinkedAccount().userId.hashCode();
+    }
+
+    public void setLinkedAccount(TradeItLinkedAccount linkedAccount) {
+        this.apiClient.setTradeItLinkedAccount(linkedAccount);
+    }
 }
 
 
