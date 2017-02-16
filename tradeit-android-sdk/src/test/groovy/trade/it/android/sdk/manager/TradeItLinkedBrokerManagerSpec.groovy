@@ -2,6 +2,7 @@ package trade.it.android.sdk.manager
 
 import android.content.Context
 import it.trade.tradeitapi.API.TradeItAccountLinker
+import it.trade.tradeitapi.API.TradeItApiClient
 import it.trade.tradeitapi.model.*
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker
 import org.junit.Rule
@@ -429,5 +430,52 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         and: "expects a populated TradeItErrorResult"
             errorResult.getErrorCode() == errorCode
             errorResult.getShortMessage() == shortMessage
+    }
+
+    def "unlinkBroker handles a successful response from trade it api "() {
+        given: "a linked broker to unlink"
+            TradeItApiClient apiClient = Mock(TradeItApiClient)
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient)
+            apiClient.getTradeItLinkedAccount() >> Mock(TradeItLinkedAccount)
+
+        and: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            1 * accountLinker.unlinkBrokerAccount(_, _) >> { args ->
+                Callback<TradeItResponse> callback = args[1]
+                Call<TradeItResponse> call = Mock(Call)
+                TradeItResponse tradeItResponse = new TradeItResponse()
+                tradeItResponse.sessionToken = "My session token"
+                tradeItResponse.longMessages = null
+                tradeItResponse.status = TradeItResponseStatus.SUCCESS
+                Response<TradeItResponse> response = Response.success(tradeItResponse);
+                callback.onResponse(call, response);
+            }
+            PowerMockito.mockStatic(TradeItAccountLinker.class)
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context, accountLinker);
+            linkedBrokerManager.linkedBrokers = [linkedBroker]
+
+        when: "calling unlinkBroker"
+            linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl<TradeItResponse>() {
+                @Override
+                void onSuccess(TradeItResponse response) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "the delete accountLinker static method was called"
+            PowerMockito.verifyStatic()
+
+        and: "the linkedbrokers list is empty"
+            linkedBrokerManager.linkedBrokers.size() == 0
     }
 }
