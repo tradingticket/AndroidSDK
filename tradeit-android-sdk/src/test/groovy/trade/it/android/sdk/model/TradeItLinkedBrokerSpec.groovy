@@ -1,5 +1,6 @@
 package trade.it.android.sdk.model
 
+import android.content.Context
 import it.trade.tradeitapi.API.TradeItApiClient
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account
@@ -11,12 +12,13 @@ import retrofit2.Response
 import spock.lang.Specification
 
 class TradeItLinkedBrokerSpec extends Specification {
-
+    Context context = Mock(Context)
     TradeItApiClient apiClient = Mock(TradeItApiClient);
-    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient)
+    TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
+    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient)
 
     void setup() {
-
+        linkedBroker.linkedBrokerCache = linkedBrokerCache
     }
 
     def "authenticate handles a successful response from trade it api"() {

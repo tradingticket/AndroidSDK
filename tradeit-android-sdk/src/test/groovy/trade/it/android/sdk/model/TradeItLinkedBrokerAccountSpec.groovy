@@ -4,7 +4,9 @@ import it.trade.tradeitapi.API.TradeItApiClient
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse
 import it.trade.tradeitapi.model.TradeItErrorCode
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse
+import it.trade.tradeitapi.model.TradeItGetPositionsResponse
 import it.trade.tradeitapi.model.TradeItResponseStatus
+import it.trade.tradeitapi.model.TradeItGetPositionsResponse.Position
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -75,6 +77,9 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
             balance.totalPercentReturn == -2.34
             balance.totalValue == 12983.34
 
+        and: "the linked broker account should have his balance property updated"
+            linkedBrokerAccount.getBalance() == balance
+
     }
 
     def "RefreshBalance handles an error response from trade it"() {
@@ -118,6 +123,101 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
                 errorResult.errorCode == TradeItErrorCode.SESSION_EXPIRED
                 errorResult.shortMessage == "My short message"
                 errorResult.longMessages == ["My long message"]
+    }
+
+    def "RefreshPositions handles a successful response from trade it"() {
+        given: "a successful response from trade it api"
+            int successCallbackCount = 0
+            int errorCallbackCount = 0
+            Position position1 = new Position()
+            position1.quantity = 12
+            position1.symbol = "GE"
+            position1.lastPrice = 29.84
+            Position position2 = new Position()
+            position2.quantity = 22
+            position2.symbol = "AAPL"
+            position2.lastPrice = 109.84
+
+            tradeItApiClient.getPositions(_, _) >> { args ->
+                Callback<TradeItGetPositionsResponse> callback = args[1]
+                Call<TradeItGetPositionsResponse> call = Mock(Call)
+                TradeItGetPositionsResponse tradeItGetPositionsResponse = new TradeItGetPositionsResponse()
+                tradeItGetPositionsResponse.positions = [position1, position2]
+                tradeItGetPositionsResponse.status = TradeItResponseStatus.SUCCESS
+                Response<TradeItGetPositionsResponse> response = Response.success(tradeItGetPositionsResponse)
+                callback.onResponse(call, response)
+
+            }
+
+        when: "calling refresh balance on the linked broker account"
+            List<Position> positionsResult = null
+            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<Position>>() {
+                @Override
+                void onSuccess(List<Position> positions) {
+                    positionsResult = positions
+                    successCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallbackCount++
+                }
+            })
+
+            then: "expects the successCallback called once"
+                successCallbackCount == 1
+                errorCallbackCount == 0
+
+        then: "expects positions to be returned"
+            positionsResult == [position1, position2]
+
+        and: "the linked broker account should have his positions property updated"
+            linkedBrokerAccount.getPositions() == positionsResult
+
+
+    }
+
+    def "RefreshPositions handles an error response from trade it"() {
+        given: "an error response from trade it api"
+            int successCallbackCount = 0
+            int errorCallbackCount = 0
+            tradeItApiClient.getPositions(_, _) >> { args ->
+                Callback<TradeItGetPositionsResponse> callback = args[1]
+                Call<TradeItGetPositionsResponse> call = Mock(Call)
+                TradeItGetPositionsResponse tradeItGetPositionsResponse = new TradeItGetPositionsResponse()
+                tradeItGetPositionsResponse.code = TradeItErrorCode.SESSION_EXPIRED
+                tradeItGetPositionsResponse.status = TradeItResponseStatus.ERROR
+                tradeItGetPositionsResponse.shortMessage = "My short message"
+                tradeItGetPositionsResponse.longMessages = ["My long message"]
+
+                Response<TradeItGetPositionsResponse> response = Response.success(tradeItGetPositionsResponse)
+                callback.onResponse(call, response)
+
+            }
+
+        when: "calling refresh balance on the linked broker account"
+            TradeItErrorResult errorResult = null
+            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<Position>>() {
+                @Override
+                void onSuccess(List<Position> positions) {
+                    successCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorResult = error
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the errorCallbackCount called once"
+            successCallbackCount == 0
+            errorCallbackCount == 1
+
+        then: "expects error result correctly populated"
+            errorResult.errorCode == TradeItErrorCode.SESSION_EXPIRED
+            errorResult.shortMessage == "My short message"
+            errorResult.longMessages == ["My long message"]
 
 
     }
