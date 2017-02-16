@@ -19,7 +19,9 @@ import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
+import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
+import it.trade.tradeitapi.model.TradeItResponseStatus;
 import trade.it.android.sdk.model.TradeItCallBackImpl;
 import trade.it.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
 import trade.it.android.sdk.model.TradeItErrorResult;
@@ -31,6 +33,7 @@ import trade.it.android.sdk.model.TradeItSecurityQuestion;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
@@ -67,7 +70,7 @@ public class TradeItLinkedBrokerManagerTest {
     }
 
     @Test
-    public void linkBrokerOldMethodAndAuthentication() throws InterruptedException {
+    public void linkBrokerOldMethodAndAuthenticationAndTrade() throws InterruptedException {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
             public void onSuccess(TradeItLinkedBroker linkedBroker) {
@@ -78,12 +81,24 @@ public class TradeItLinkedBrokerManagerTest {
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
                         assertThat("The authentication is successful",  !accounts.isEmpty(), is(true));
 
-                        TradeItOrder order = new TradeItOrder(accounts.get(0), "GE");
+                        final TradeItOrder order = new TradeItOrder(accounts.get(0), "GE");
                         order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
                             @Override
                             public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                                 assertThat("Preview order is successful",  response.orderId, notNullValue());
-                                lock.countDown();
+                                order.placeOrder(response.orderId, new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+                                    @Override
+                                    public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
+                                        assertEquals("Place order is successful",  placeOrderResponse.status, TradeItResponseStatus.SUCCESS);
+                                        lock.countDown();
+                                    }
+
+                                    @Override
+                                    public void onError(TradeItErrorResult error) {
+                                        assertThat("fails to place order", error, nullValue());
+                                        lock.countDown();
+                                    }
+                                });
                             }
 
                             @Override
