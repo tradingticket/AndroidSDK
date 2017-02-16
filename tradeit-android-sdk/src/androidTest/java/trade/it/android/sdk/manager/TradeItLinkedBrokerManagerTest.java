@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import it.trade.tradeitapi.API.TradeItAccountLinker;
+import it.trade.tradeitapi.API.TradeItBrokerLinker;
 import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
-import it.trade.tradeitapi.exception.TradeItRetrieveLinkedAccountException;
+import it.trade.tradeitapi.exception.TradeItRetrieveLinkedLoginException;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
@@ -51,15 +51,15 @@ public class TradeItLinkedBrokerManagerTest {
 
 
     @Before
-    public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedAccountException {
+    public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedLoginException {
         instrumentationCtx = InstrumentationRegistry.getTargetContext();
-        linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx.getApplicationContext(), new TradeItAccountLinker("tradeit-test-api-key", TradeItEnvironment.QA));
+        linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx.getApplicationContext(), new TradeItBrokerLinker("tradeit-test-api-key", TradeItEnvironment.QA));
     }
 
     @Before
     public void cleanSharedPrefs() {
         SharedPreferences sharedPreferences =
-                getInstrumentation().getTargetContext().getSharedPreferences(TradeItAccountLinker.TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
+                getInstrumentation().getTargetContext().getSharedPreferences(TradeItBrokerLinker.TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.commit();
@@ -89,8 +89,8 @@ public class TradeItLinkedBrokerManagerTest {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
             public void onSuccess(final TradeItLinkedBroker linkedBroker) {
-                assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
-                assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
+                assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
+                assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
 
                     @Override
@@ -157,8 +157,8 @@ public class TradeItLinkedBrokerManagerTest {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
             public void onSuccess(final TradeItLinkedBroker linkedBroker) {
-                assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
-                assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
+                assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
+                assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
@@ -225,8 +225,8 @@ public class TradeItLinkedBrokerManagerTest {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummySecurity", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
             public void onSuccess(final TradeItLinkedBroker linkedBroker) {
-                assertThat("The linkedAccount userId is not null", linkedBroker.getLinkedAccount().userId , notNullValue());
-                assertThat("The linkedAccount userToken is not null", linkedBroker.getLinkedAccount().userToken , notNullValue());
+                assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
+                assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userToken , notNullValue());
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
@@ -324,7 +324,7 @@ public class TradeItLinkedBrokerManagerTest {
         linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
             @Override
             public void onSuccess(final TradeItLinkedBroker linkedBroker) {
-                String userId = linkedBroker.getLinkedAccount().userId;
+                String userId = linkedBroker.getLinkedLogin().userId;
                 assertThat("we linked one broker", userId, notNullValue());
 
                 linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl("Dummy", userId, "myinternalappcallback", new TradeItCallBackImpl<String>() {
