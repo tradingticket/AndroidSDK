@@ -318,4 +318,41 @@ public class TradeItLinkedBrokerManagerTest {
         boolean notExpired = lock.await(10000, TimeUnit.MILLISECONDS);
         assertThat("The call to linkAndUnlinkBrokers is not expired", notExpired, is(true));
     }
+
+    @Test
+    public void linkBrokerAndGetOAuthLoginPopupForTokenUpdateUrl() throws InterruptedException {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            @Override
+            public void onSuccess(final TradeItLinkedBroker linkedBroker) {
+                String userId = linkedBroker.getLinkedAccount().userId;
+                assertThat("we linked one broker", userId, notNullValue());
+
+                linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl("Dummy", userId, "myinternalappcallback", new TradeItCallBackImpl<String>() {
+
+                    @Override
+                    public void onSuccess(String oAuthUrl) {
+                        assertThat("oAuthUrl is not null", oAuthUrl , notNullValue());
+                        lock.countDown();
+                    }
+
+                    @Override
+                    public void onError(TradeItErrorResult error) {
+                        Log.e(this.getClass().getName(), error.toString());
+                        assertThat("fails to get the Oauth login popup url", error, nullValue());
+                        lock.countDown();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                Log.e(this.getClass().getName(), error.toString());
+                assertThat("fails to link broker", error, nullValue());
+                lock.countDown();
+            }
+        });
+
+        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        assertThat("The call to linkBrokerAndGetOAuthLoginPopupForTokenUpdateUrl is not expired", notExpired, is(true));
+    }
 }
