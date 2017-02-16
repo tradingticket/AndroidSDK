@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="trade.it.android.sdk">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="it.trade.android.sdk">
 
     <application android:allowBackup="true" android:label="@string/app_name"
         android:supportsRtl="true">
