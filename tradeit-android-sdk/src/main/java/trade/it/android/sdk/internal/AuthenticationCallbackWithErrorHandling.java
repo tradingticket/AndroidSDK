@@ -1,24 +1,20 @@
 package trade.it.android.sdk.internal;
 
-
+import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
 import it.trade.tradeitapi.model.TradeItResponse;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import trade.it.android.sdk.model.TradeItCallback;
+import trade.it.android.sdk.model.TradeItCallbackWithSecurityQuestion;
 import trade.it.android.sdk.model.TradeItErrorResult;
+import trade.it.android.sdk.model.TradeItSecurityQuestion;
 
-/**
- * This class handles common error behaviors (to use inside the sdk)
- * @param <TradeItResponseType> the trade it response type
- * @param <TradeItCallBackType> the type we want to return to the user in the TradeItCallBack
- */
-public abstract class CallBackWithDefaultErrorHandling<TradeItResponseType, TradeItCallBackType> implements Callback<TradeItResponseType> {
+public abstract class AuthenticationCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> implements Callback<TradeItResponseType> {
 
-    private TradeItCallback<TradeItCallBackType> callback;
+    private TradeItCallbackWithSecurityQuestion<TradeItCallBackType> callback;
 
-    protected CallBackWithDefaultErrorHandling(TradeItCallback<TradeItCallBackType> callback) {
+    protected AuthenticationCallbackWithErrorHandling(TradeItCallbackWithSecurityQuestion<TradeItCallBackType> callback) {
         this.callback = callback;
     }
 
@@ -31,6 +27,16 @@ public abstract class CallBackWithDefaultErrorHandling<TradeItResponseType, Trad
                 callback.onError(new TradeItErrorResult());
             } else if (tradeItResponse.status == TradeItResponseStatus.SUCCESS) {
                 onSuccessResponse(response);
+            } else if (tradeItResponse.status == TradeItResponseStatus.INFORMATION_NEEDED) {
+                // The broker is requesting a security question be answered by the user to authenticate.
+                // Display the question authResponse.securityQuestion to the user.
+                // Use tradeItApiClient.answerSecurityQuestion to submit the user's answer to the broker.
+                TradeItAuthenticateResponse authenticateResponse = responseType instanceof TradeItAuthenticateResponse ? (TradeItAuthenticateResponse) responseType : null;
+                if (tradeItResponse == null) {
+                    callback.onError(new TradeItErrorResult());
+                } else {
+                    callback.onSecurityQuestion(new TradeItSecurityQuestion(authenticateResponse.securityQuestion, authenticateResponse.securityQuestionOptions));
+                }
             } else {
                 callback.onError(new TradeItErrorResult(tradeItResponse.code, tradeItResponse.shortMessage, tradeItResponse.longMessages));
             }

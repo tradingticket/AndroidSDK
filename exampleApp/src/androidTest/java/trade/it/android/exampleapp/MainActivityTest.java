@@ -50,7 +50,7 @@ public class MainActivityTest {
         allOf(withId(R.id.button_test_oauth), withText("Test oAuth flow"), isDisplayed()));
         appCompatButton.perform(click());
 
-        Thread.sleep(2000l); //TODO there should be a better way for wating
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
         onWebView()
                 .withElement(findElement(Locator.NAME, "id"))
@@ -62,7 +62,7 @@ public class MainActivityTest {
                 .withElement(findElement(Locator.TAG_NAME, "button"))
                 .perform(webClick());
 
-        Thread.sleep(3000l); //TODO there should be a better way for wating
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
         onView(withId(R.id.textViewResult)).check(matches(withText(containsString("oAuthFlow Success:"))));
 
