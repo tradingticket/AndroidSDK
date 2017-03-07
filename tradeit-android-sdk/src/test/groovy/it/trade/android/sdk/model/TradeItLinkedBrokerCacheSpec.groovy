@@ -3,17 +3,13 @@ package it.trade.android.sdk.model
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import it.trade.android.sdk.model.TradeItLinkedBroker
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccount
-import it.trade.android.sdk.model.TradeItLinkedBrokerCache
 import it.trade.tradeitapi.API.TradeItApiClient
 import it.trade.tradeitapi.model.*
 import spock.lang.Specification
 
 class TradeItLinkedBrokerCacheSpec extends Specification {
-
-    TradeItLinkedBrokerCache linkedBrokerCache = new TradeItLinkedBrokerCache();
     Context context = Mock(Context)
+    TradeItLinkedBrokerCache linkedBrokerCache = new TradeItLinkedBrokerCache(context);
     TradeItApiClient apiClient = Mock(TradeItApiClient)
     SharedPreferences sharedPreferences = Mock(SharedPreferences)
     SharedPreferences.Editor editor = Mock(SharedPreferences.Editor)
@@ -39,7 +35,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "Cache handles a linked broker not yet cached with an empty cache"() {
         given: "a linked broker with one account"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
             TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItAuthenticateResponse.Account));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
@@ -73,7 +69,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
 
         when: "caching the linkedBroker"
-            linkedBrokerCache.cache(context, linkedBroker)
+            linkedBrokerCache.cache(linkedBroker)
 
         then: "expects the linkedBroker to be serialized and stored"
             stored == 1
@@ -88,7 +84,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "Cache update a linked broker already cached"() {
         given: "a linked broker with one account"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
             TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItAuthenticateResponse.Account));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
@@ -124,7 +120,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
 
         when: "caching the linkedBroker"
-            linkedBrokerCache.cache(context, linkedBroker)
+            linkedBrokerCache.cache(linkedBroker)
 
         then: "expects the linkedBroker to be serialized and stored"
             stored == 1
@@ -139,7 +135,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "SyncFromCache handles a linkedBroker cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
 
         and: "a linkedBroker cached"
             sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
@@ -148,7 +144,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
                 return set
             }
             sharedPreferences.getString({it.contains(userId)}, "") >> {
-                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(context, apiClient);
+                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient);
                 TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItAuthenticateResponse.Account));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
@@ -161,7 +157,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             }
 
         when: "syncFromCache called: "
-            linkedBrokerCache.syncFromCache(context, linkedBroker)
+            linkedBrokerCache.syncFromCache(linkedBroker)
 
         then: "expects the linkedBroker to be populated with the cache"
             linkedBroker.linkedLogin.userId == userId
@@ -172,7 +168,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "SyncFromCache handles a linkedBroker non cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
 
         and: "This linkedBroker is not cached"
             sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
@@ -181,7 +177,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
                 return set
             }
             sharedPreferences.getString({it.contains("an other userId")}, "") >> {
-                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(context, apiClient);
+                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient);
                 linkedBrokerCached.linkedLogin.userId == "an other userId"
                 TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItAuthenticateResponse.Account));
                 account1.accountName = "My Account Name"
@@ -195,7 +191,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             }
 
         when: "syncFromCache called: "
-            linkedBrokerCache.syncFromCache(context, linkedBroker)
+            linkedBrokerCache.syncFromCache(linkedBroker)
 
         then: "expects the linkedBroker to be populated with the cache"
             linkedBroker.linkedLogin.userId == userId

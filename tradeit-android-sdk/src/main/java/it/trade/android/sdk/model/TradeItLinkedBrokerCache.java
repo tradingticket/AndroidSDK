@@ -15,8 +15,13 @@ import static it.trade.tradeitapi.API.TradeItBrokerLinker.TRADE_IT_SHARED_PREFS_
 public class TradeItLinkedBrokerCache {
     private static final String LINKED_BROKER_CACHE_KEY = "TRADE_IT_LINKED_BROKER_CACHE";
     Gson gson = new Gson();
+    private Context context;
 
-    void cache(Context context, TradeItLinkedBroker linkedBroker) {
+    public TradeItLinkedBrokerCache(Context context) {
+        this.context = context;
+    }
+
+    void cache(TradeItLinkedBroker linkedBroker) {
             String linkedBrokerSerializedJson = gson.toJson(linkedBroker);
 
             SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
@@ -36,7 +41,7 @@ public class TradeItLinkedBrokerCache {
             editor.apply();
     }
 
-    public void syncFromCache(Context context, TradeItLinkedBroker linkedBroker) {
+    public void syncFromCache(TradeItLinkedBroker linkedBroker) {
         String userId = linkedBroker.getLinkedLogin().userId;
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY, new HashSet<String>());

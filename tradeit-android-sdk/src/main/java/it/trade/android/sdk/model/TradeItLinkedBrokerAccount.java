@@ -93,4 +93,13 @@ public class TradeItLinkedBrokerAccount {
         result = 31 * result + accountNumber.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "TradeItLinkedBrokerAccount{" +
+                "accountBaseCurrency='" + accountBaseCurrency + '\'' +
+                ", accountName='" + accountName + '\'' +
+                ", accountNumber='" + accountNumber + '\'' +
+                '}';
+    }
 }

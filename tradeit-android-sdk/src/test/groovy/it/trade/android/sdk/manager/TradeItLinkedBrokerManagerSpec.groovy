@@ -1,6 +1,7 @@
 package it.trade.android.sdk.manager
 
 import android.content.Context
+import it.trade.android.sdk.TradeItSDK
 import it.trade.android.sdk.model.TradeItCallBackImpl
 import it.trade.android.sdk.model.TradeItErrorResult
 import it.trade.android.sdk.model.TradeItLinkedBroker
@@ -35,6 +36,9 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
     void setup() {
         brokerLinker.getTradeItEnvironment() >> TradeItEnvironment.QA
+        TradeItSDK.context = context
+        TradeItSDK.apiKey = "test api key"
+        TradeItSDK.environment = TradeItEnvironment.QA
     }
 
     def "GetAvailableBrokers handles a successful response from trade it api"() {
@@ -66,7 +70,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getAvailableBrokers"
@@ -117,7 +121,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getAvailableBrokers"
@@ -162,7 +166,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
 
@@ -217,7 +221,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling linkBroker"
@@ -262,7 +266,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getOAuthLoginPopupUrlForMobile"
@@ -311,7 +315,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getOAuthLoginPopupUrlForMobile"
@@ -357,7 +361,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
 
@@ -408,7 +412,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         and: "an already linked broker with this user id"
@@ -418,7 +422,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             response.userToken = "My old userToken"
             TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin("My broker 1", request, response);
             TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItEnvironment.QA)
-            TradeItLinkedBroker existingLinkedBroker = new TradeItLinkedBroker(context, apiClient)
+            TradeItLinkedBroker existingLinkedBroker = new TradeItLinkedBroker(apiClient)
             linkedBrokerManager.linkedBrokers = [existingLinkedBroker]
 
 
@@ -479,7 +483,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling linkBrokerWithOauthVerifier"
@@ -510,7 +514,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     def "unlinkBroker handles a successful response from trade it api "() {
         given: "a linked broker to unlink"
             TradeItApiClient apiClient = Mock(TradeItApiClient)
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient)
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient)
             apiClient.getTradeItLinkedLogin() >> Mock(TradeItLinkedLogin)
 
         and: "a successful response from trade it api"
@@ -527,7 +531,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
             linkedBrokerManager.linkedBrokers = [linkedBroker]
 
@@ -573,7 +577,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager(context, "test api key", TradeItEnvironment.QA);
+            linkedBrokerManager = new TradeItLinkedBrokerManager();
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getOAuthLoginPopupForTokenUpdateUrl"
