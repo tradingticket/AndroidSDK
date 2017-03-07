@@ -1,19 +1,25 @@
 package it.trade.android.sdk.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.DefaultCallbackWithErrorHandling;
 import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
+import it.trade.tradeitapi.model.Account;
+import it.trade.tradeitapi.model.Position;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewRequest;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
 import it.trade.tradeitapi.model.TradeItGetPositionsRequest;
 import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
-import it.trade.tradeitapi.model.TradeItGetPositionsResponse.Position;
+import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import retrofit2.Response;
 
-public class TradeItLinkedBrokerAccount {
+public class TradeItLinkedBrokerAccount implements Parcelable {
 
     private String accountName;
     private String accountNumber;
@@ -21,12 +27,14 @@ public class TradeItLinkedBrokerAccount {
     private transient TradeItLinkedBroker linkedBroker;
     private TradeItGetAccountOverviewResponse balance;
     private List<Position> positions;
+    private TradeItLinkedLogin linkedLogin;
 
     public TradeItLinkedBrokerAccount(TradeItLinkedBroker linkedBroker, Account account) {
         this.linkedBroker =  linkedBroker;
         this.accountName = account.name;
         this.accountNumber = account.accountNumber;
         this.accountBaseCurrency = account.accountBaseCurrency;
+        this.linkedLogin = linkedBroker.getLinkedLogin();
     }
 
     protected TradeItApiClient getTradeItApiClient() {
@@ -49,8 +57,16 @@ public class TradeItLinkedBrokerAccount {
         return balance;
     }
 
+    public void setBalance(TradeItGetAccountOverviewResponse balance) {
+        this.balance = balance;
+    }
+
     public List<Position> getPositions() {
         return positions;
+    }
+
+    public void setPositions(List<Position> positions) {
+        this.positions = positions;
     }
 
     public void refreshBalance(final TradeItCallback<TradeItGetAccountOverviewResponse> callback) {
@@ -102,4 +118,43 @@ public class TradeItLinkedBrokerAccount {
                 ", accountNumber='" + accountNumber + '\'' +
                 '}';
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.accountName);
+        dest.writeString(this.accountNumber);
+        dest.writeString(this.accountBaseCurrency);
+        dest.writeParcelable(this.balance, flags);
+        dest.writeList(this.positions);
+        dest.writeParcelable(this.linkedLogin, flags);
+    }
+
+    protected TradeItLinkedBrokerAccount(Parcel in) {
+        this.accountName = in.readString();
+        this.accountNumber = in.readString();
+        this.accountBaseCurrency = in.readString();
+        this.balance = in.readParcelable(TradeItGetAccountOverviewResponse.class.getClassLoader());
+        this.positions = new ArrayList<Position>();
+        in.readList(this.positions, Position.class.getClassLoader());
+        this.linkedLogin = in.readParcelable(TradeItLinkedLogin.class.getClassLoader());
+        this.linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(this.linkedLogin, TradeItSDK.getEnvironment()));
+    }
+
+    public static final Parcelable.Creator<TradeItLinkedBrokerAccount> CREATOR = new Parcelable.Creator<TradeItLinkedBrokerAccount>() {
+        @Override
+        public TradeItLinkedBrokerAccount createFromParcel(Parcel source) {
+            return new TradeItLinkedBrokerAccount(source);
+        }
+
+        @Override
+        public TradeItLinkedBrokerAccount[] newArray(int size) {
+            return new TradeItLinkedBrokerAccount[size];
+        }
+    };
 }

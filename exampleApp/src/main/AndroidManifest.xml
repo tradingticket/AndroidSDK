@@ -27,7 +27,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".WebViewActivity"></activity>
-        <activity android:name=".LinkedBrokerActivity"></activity>
     </application>
 
 </manifest>

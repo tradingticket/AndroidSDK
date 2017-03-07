@@ -10,8 +10,8 @@ import java.util.List;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
 import it.trade.tradeitapi.API.TradeItApiClient;
+import it.trade.tradeitapi.model.Account;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
-import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import retrofit2.Response;
 

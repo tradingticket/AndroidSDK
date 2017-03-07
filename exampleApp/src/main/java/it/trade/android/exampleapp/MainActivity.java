@@ -43,9 +43,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(TradeItLinkedBroker linkedBroker) {
                         textViewResult.append("oAuthFlow Success: " + linkedBroker.toString());
-                        Intent i = new Intent(mainActivity, LinkedBrokerActivity.class);
-                        i.putExtra("linkedBroker", linkedBroker); // using the (String name, Parcelable value) overload!
-                        startActivity(i);
                     }
 
                     @Override

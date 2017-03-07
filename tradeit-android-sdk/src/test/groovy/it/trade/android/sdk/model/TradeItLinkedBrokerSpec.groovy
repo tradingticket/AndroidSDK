@@ -2,8 +2,8 @@ package it.trade.android.sdk.model
 
 import it.trade.android.sdk.TradeItSDK
 import it.trade.tradeitapi.API.TradeItApiClient
+import it.trade.tradeitapi.model.Account
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse
-import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account
 import it.trade.tradeitapi.model.TradeItErrorCode
 import it.trade.tradeitapi.model.TradeItResponseStatus
 import retrofit2.Call

@@ -24,10 +24,10 @@ import it.trade.android.sdk.model.TradeItLinkedBrokerAccount;
 import it.trade.android.sdk.model.TradeItOrder;
 import it.trade.android.sdk.model.TradeItSecurityQuestion;
 import it.trade.tradeitapi.API.TradeItBrokerLinker;
+import it.trade.tradeitapi.model.Position;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
-import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
 import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItResponse;
@@ -63,7 +63,7 @@ public class TradeItLinkedBrokerManagerTest {
     public void createTradeItLinkedBrokerManager() {
         instrumentationCtx = InstrumentationRegistry.getTargetContext();
         TradeItSDK.clearConfig();
-        TradeItSDK.configure(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.LOCAL);
+        TradeItSDK.configure(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
         linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     }
 
@@ -102,9 +102,9 @@ public class TradeItLinkedBrokerManagerTest {
                             @Override
                             public void onSuccess(TradeItGetAccountOverviewResponse balance) {
                                 assertThat("refreshBalance returns available cash", balance.availableCash, notNullValue());
-                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<TradeItGetPositionsResponse.Position>>() {
+                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<Position>>() {
                                     @Override
-                                    public void onSuccess(List<TradeItGetPositionsResponse.Position> positions) {
+                                    public void onSuccess(List<Position> positions) {
                                         assertThat("refresh positions is successful", !positions.isEmpty(), is(true));
                                         lock.countDown();
                                     }
