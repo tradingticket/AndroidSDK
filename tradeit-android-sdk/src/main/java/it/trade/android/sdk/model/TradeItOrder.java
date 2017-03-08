@@ -126,6 +126,9 @@ public class TradeItOrder implements Parcelable {
         this.expiration = expiration;
     }
 
+    public TradeItLinkedBrokerAccount getLinkedBrokerAccount() {
+        return linkedBrokerAccount;
+    }
 
     @Override
     public int describeContents() {

@@ -98,15 +98,19 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
 
         TradeItLinkedBrokerAccount that = (TradeItLinkedBrokerAccount) o;
 
-        if (!accountName.equals(that.accountName)) return false;
-        return accountNumber.equals(that.accountNumber);
+        if (accountName != null ? !accountName.equals(that.accountName) : that.accountName != null)
+            return false;
+        if (accountNumber != null ? !accountNumber.equals(that.accountNumber) : that.accountNumber != null)
+            return false;
+        return accountBaseCurrency != null ? accountBaseCurrency.equals(that.accountBaseCurrency) : that.accountBaseCurrency == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = accountName.hashCode();
-        result = 31 * result + accountNumber.hashCode();
+        int result = accountName != null ? accountName.hashCode() : 0;
+        result = 31 * result + (accountNumber != null ? accountNumber.hashCode() : 0);
+        result = 31 * result + (accountBaseCurrency != null ? accountBaseCurrency.hashCode() : 0);
         return result;
     }
 

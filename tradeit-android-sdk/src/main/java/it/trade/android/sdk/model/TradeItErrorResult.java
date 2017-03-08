@@ -59,6 +59,26 @@ public class TradeItErrorResult implements Parcelable {
         return httpCode;
     }
 
+    public void setErrorCode(TradeItErrorCode errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public void setShortMessage(String shortMessage) {
+        this.shortMessage = shortMessage;
+    }
+
+    public void setLongMessages(List<String> longMessages) {
+        this.longMessages = longMessages;
+    }
+
+    public void setSystemMessage(String systemMessage) {
+        this.systemMessage = systemMessage;
+    }
+
+    public void setHttpCode(int httpCode) {
+        this.httpCode = httpCode;
+    }
+
     @Override
     public String toString() {
         return "TradeItErrorResult{" +
