@@ -15,13 +15,13 @@ import java.util.List;
 
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.Account;
-import it.trade.tradeitapi.model.Position;
+import it.trade.tradeitapi.model.TradeItBrokerAccount;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
 import it.trade.tradeitapi.model.TradeItOAuthAccessTokenResponse;
+import it.trade.tradeitapi.model.TradeItPosition;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -48,7 +48,7 @@ public class TradeItLinkedBrokerAccountTest {
         TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(new TradeItLinkedLogin("MyBroker", oAuthAccessTokenRequest,
                 oAuthAccessTokenResponse), TradeItSDK.getEnvironment()));
 
-        Account account = new Account();
+        TradeItBrokerAccount account = new TradeItBrokerAccount();
         account.accountNumber = "MyAccountnumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
         account.name = "MyAccountname";
@@ -59,11 +59,11 @@ public class TradeItLinkedBrokerAccountTest {
     @Test
     public void linkedBrokerAccount_ParcelableWriteRead() {
         // Set up the Parcelable object to send and receive.
-        Position position = new Position();
+        TradeItPosition position = new TradeItPosition();
         position.quantity = 12.00;
         position.symbol = "GE";
         position.lastPrice = 29.84;
-        List<Position> positions = new ArrayList<>();
+        List<TradeItPosition> positions = new ArrayList<>();
         positions.add(position);
         linkedBrokerAccount.setPositions(positions);
 
@@ -91,7 +91,7 @@ public class TradeItLinkedBrokerAccountTest {
         String accountName = createdFromParcel.getAccountName();
         String accountNumber = createdFromParcel.getAccountNumber();
         TradeItGetAccountOverviewResponse createdBalance = createdFromParcel.getBalance();
-        List<Position> createdPositions = createdFromParcel.getPositions();
+        List<TradeItPosition> createdPositions = createdFromParcel.getPositions();
 
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue());

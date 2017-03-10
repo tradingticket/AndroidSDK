@@ -24,7 +24,7 @@ import it.trade.android.sdk.model.TradeItLinkedBrokerAccount;
 import it.trade.android.sdk.model.TradeItOrder;
 import it.trade.android.sdk.model.TradeItSecurityQuestion;
 import it.trade.tradeitapi.API.TradeItBrokerLinker;
-import it.trade.tradeitapi.model.Position;
+import it.trade.tradeitapi.model.TradeItPosition;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
@@ -102,9 +102,9 @@ public class TradeItLinkedBrokerManagerTest {
                             @Override
                             public void onSuccess(TradeItGetAccountOverviewResponse balance) {
                                 assertThat("refreshBalance returns available cash", balance.availableCash, notNullValue());
-                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<Position>>() {
+                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
                                     @Override
-                                    public void onSuccess(List<Position> positions) {
+                                    public void onSuccess(List<TradeItPosition> positions) {
                                         assertThat("refresh positions is successful", !positions.isEmpty(), is(true));
                                         lock.countDown();
                                     }

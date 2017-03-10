@@ -16,7 +16,7 @@ import java.util.List;
 
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.Account;
+import it.trade.tradeitapi.model.TradeItBrokerAccount;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
@@ -55,7 +55,7 @@ public class TradeItLinkedBrokerTest {
         Date date = new Date();
         linkedBroker.setAccountsLastUpdated(date);
         List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
-        Account account = new Account();
+        TradeItBrokerAccount account = new TradeItBrokerAccount();
         account.accountNumber = "MyAccountnumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
         account.name = "MyAccountname";

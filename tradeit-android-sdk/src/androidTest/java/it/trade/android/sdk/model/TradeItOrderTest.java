@@ -15,7 +15,7 @@ import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.Account;
+import it.trade.tradeitapi.model.TradeItBrokerAccount;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
@@ -46,7 +46,7 @@ public class TradeItOrderTest {
         TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(new TradeItLinkedLogin("MyBroker", oAuthAccessTokenRequest,
                 oAuthAccessTokenResponse), TradeItSDK.getEnvironment()));
 
-        Account account = new Account();
+        TradeItBrokerAccount account = new TradeItBrokerAccount();
         account.accountNumber = "MyAccountnumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
         account.name = "MyAccountname";

@@ -10,8 +10,8 @@ import java.util.List;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
 import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.Account;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
+import it.trade.tradeitapi.model.TradeItBrokerAccount;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import retrofit2.Response;
 
@@ -33,8 +33,8 @@ public class TradeItLinkedBroker implements Parcelable {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
                 TradeItAuthenticateResponse authResponse = response.body();
-                List<Account> accountsResult = authResponse.accounts;
-                List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = mapAccountsToLinkedBrokerAccount(accountsResult);
+                List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
+                List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
                 accounts = linkedBrokerAccounts;
                 accountsLastUpdated = new Date();
                 TradeItSDK.getLinkedBrokerCache().cache(linkedBroker);
@@ -76,9 +76,9 @@ public class TradeItLinkedBroker implements Parcelable {
         this.accountsLastUpdated = accountsLastUpdated;
     }
 
-    private List<TradeItLinkedBrokerAccount> mapAccountsToLinkedBrokerAccount(List<Account> accounts) {
+    private List<TradeItLinkedBrokerAccount> mapBrokerAccountsToLinkedBrokerAccounts(List<TradeItBrokerAccount> accounts) {
         List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = new ArrayList<>();
-        for (Account account: accounts) {
+        for (TradeItBrokerAccount account: accounts) {
             linkedBrokerAccounts.add(new TradeItLinkedBrokerAccount(this, account));
         }
         return linkedBrokerAccounts;

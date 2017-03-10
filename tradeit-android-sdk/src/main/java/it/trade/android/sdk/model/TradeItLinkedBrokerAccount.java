@@ -10,13 +10,13 @@ import java.util.List;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.DefaultCallbackWithErrorHandling;
 import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.Account;
-import it.trade.tradeitapi.model.Position;
+import it.trade.tradeitapi.model.TradeItBrokerAccount;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewRequest;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
 import it.trade.tradeitapi.model.TradeItGetPositionsRequest;
 import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
+import it.trade.tradeitapi.model.TradeItPosition;
 import retrofit2.Response;
 
 public class TradeItLinkedBrokerAccount implements Parcelable {
@@ -26,10 +26,10 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
     private String accountBaseCurrency;
     private transient TradeItLinkedBroker linkedBroker;
     private TradeItGetAccountOverviewResponse balance;
-    private List<Position> positions;
+    private List<TradeItPosition> positions;
     private TradeItLinkedLogin linkedLogin;
 
-    public TradeItLinkedBrokerAccount(TradeItLinkedBroker linkedBroker, Account account) {
+    public TradeItLinkedBrokerAccount(TradeItLinkedBroker linkedBroker, TradeItBrokerAccount account) {
         this.linkedBroker =  linkedBroker;
         this.accountName = account.name;
         this.accountNumber = account.accountNumber;
@@ -61,11 +61,11 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         this.balance = balance;
     }
 
-    public List<Position> getPositions() {
+    public List<TradeItPosition> getPositions() {
         return positions;
     }
 
-    public void setPositions(List<Position> positions) {
+    public void setPositions(List<TradeItPosition> positions) {
         this.positions = positions;
     }
 
@@ -80,9 +80,9 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         });
     }
 
-    public void refreshPositions(final TradeItCallback<List<Position>> callback) {
+    public void refreshPositions(final TradeItCallback<List<TradeItPosition>> callback) {
         TradeItGetPositionsRequest positionsRequest = new TradeItGetPositionsRequest(accountNumber, null);
-        this.getTradeItApiClient().getPositions(positionsRequest, new DefaultCallbackWithErrorHandling<TradeItGetPositionsResponse, List<Position>>(callback) {
+        this.getTradeItApiClient().getPositions(positionsRequest, new DefaultCallbackWithErrorHandling<TradeItGetPositionsResponse, List<TradeItPosition>>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItGetPositionsResponse> response) {
                 positions = response.body().positions;
@@ -144,8 +144,8 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         this.accountNumber = in.readString();
         this.accountBaseCurrency = in.readString();
         this.balance = in.readParcelable(TradeItGetAccountOverviewResponse.class.getClassLoader());
-        this.positions = new ArrayList<Position>();
-        in.readList(this.positions, Position.class.getClassLoader());
+        this.positions = new ArrayList<TradeItPosition>();
+        in.readList(this.positions, TradeItPosition.class.getClassLoader());
         this.linkedLogin = in.readParcelable(TradeItLinkedLogin.class.getClassLoader());
         this.linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(this.linkedLogin, TradeItSDK.getEnvironment()));
     }
