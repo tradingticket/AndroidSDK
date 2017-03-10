@@ -7,12 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackImpl;
 import it.trade.android.sdk.model.TradeItErrorResult;
 import it.trade.android.sdk.model.TradeItLinkedBroker;
-import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
-import it.trade.tradeitapi.exception.TradeItRetrieveLinkedLoginException;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,13 +26,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         this.textViewResult = (TextView) findViewById(R.id.textViewResult);
 
-        try {
-            linkedBrokerManager = new TradeItLinkedBrokerManager(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
-        } catch (TradeItKeystoreServiceCreateKeyException e) {
-            this.textViewResult.append("Error initializing linkedBrokerManager: " + e.getMessage());
-        } catch (TradeItRetrieveLinkedLoginException e) {
-            this.textViewResult.append("Error retreiving linked accounts: " + e.getMessage());
-        }
+        TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+        linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
+
     }
 
     @Override
@@ -43,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
             if (oAuthVerifier != null) {
+                final MainActivity mainActivity = this;
                 linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
                     @Override
                     public void onSuccess(TradeItLinkedBroker linkedBroker) {

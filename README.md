@@ -10,20 +10,17 @@ For examples usage, see the example app and tests included with the SDK.
 #Quick Start
 Add the following dependency in your project:
 ```
-compile 'it.trade.tradeit:tradeit-android-sdk:0.0.2'
+compile 'it.trade.tradeit:tradeit-android-sdk:0.0.3'
 ```
-
-You have to create one instance of a TradeItLinkedBrokerManager in your application: 
-
+You have to configure once the sdk in your application.
+In order to initialize the configuration, obtain an API key from Trade.it, or test with "tradeit-test-api-key"
+Example in the onCreate method of your main application:
 ```Java
-// In order to initialize the TradeItLinkedBrokerManager, obtain an API key from Trade.it, or test with "tradeit-test-api-key"
-try {
-    TradeItLinkedBrokerManager linkedBrokerManager = new TradeItLinkedBrokerManager(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
-} catch (TradeItKeystoreServiceCreateKeyException e) {
-    // handle the exception
-} catch (TradeItRetrieveLinkedLoginException e) {
-    // handle the exception
-}
+TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+```
+Get an instance of the TradeItLinkedBrokerManager in your application: 
+```Java
+TradeItLinkedBrokerManager linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
 ```
 Query which brokers are available for your key:
 ```Java
@@ -134,7 +131,7 @@ linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<Trade
         //there is a security question the user need to answer before being authenticated
         
         //to answer the security question call this method:
-        this.submitSecurityAnswer("my answer"); // then one of the three callback will be called (onSuccess, onSecurityQuestion, onError)
+        this.submitSecurityAnswer("my answer"); // then one of the three callbacks will be called (onSuccess, onSecurityQuestion, onError)
     }
 
     @Override

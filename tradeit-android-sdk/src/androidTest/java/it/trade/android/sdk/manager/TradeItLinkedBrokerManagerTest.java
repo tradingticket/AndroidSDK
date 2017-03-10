@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.model.TradeItCallBackImpl;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.android.sdk.model.TradeItErrorResult;
@@ -23,12 +24,10 @@ import it.trade.android.sdk.model.TradeItLinkedBrokerAccount;
 import it.trade.android.sdk.model.TradeItOrder;
 import it.trade.android.sdk.model.TradeItSecurityQuestion;
 import it.trade.tradeitapi.API.TradeItBrokerLinker;
-import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
-import it.trade.tradeitapi.exception.TradeItRetrieveLinkedLoginException;
+import it.trade.tradeitapi.model.TradeItPosition;
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
-import it.trade.tradeitapi.model.TradeItGetPositionsResponse;
 import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
 import it.trade.tradeitapi.model.TradeItResponse;
@@ -48,13 +47,7 @@ public class TradeItLinkedBrokerManagerTest {
     private CountDownLatch lock = new CountDownLatch(1);
     private TradeItLinkedBrokerManager linkedBrokerManager;
     private Context instrumentationCtx;
-
-
-    @Before
-    public void createTradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedLoginException {
-        instrumentationCtx = InstrumentationRegistry.getTargetContext();
-        linkedBrokerManager = new TradeItLinkedBrokerManager(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
-    }
+    private static long EXPIRED_TIME = 10000l;
 
     @Before
     public void cleanSharedPrefs() {
@@ -63,6 +56,15 @@ public class TradeItLinkedBrokerManagerTest {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.commit();
+
+    }
+
+    @Before
+    public void createTradeItLinkedBrokerManager() {
+        instrumentationCtx = InstrumentationRegistry.getTargetContext();
+        TradeItSDK.clearConfig();
+        TradeItSDK.configure(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+        linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     }
 
     @Test
@@ -80,7 +82,7 @@ public class TradeItLinkedBrokerManagerTest {
                 lock.countDown();
             }
         });
-        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to getAvailableBrokers is not expired", notExpired, is(true));
     }
 
@@ -100,9 +102,9 @@ public class TradeItLinkedBrokerManagerTest {
                             @Override
                             public void onSuccess(TradeItGetAccountOverviewResponse balance) {
                                 assertThat("refreshBalance returns available cash", balance.availableCash, notNullValue());
-                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<TradeItGetPositionsResponse.Position>>() {
+                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
                                     @Override
-                                    public void onSuccess(List<TradeItGetPositionsResponse.Position> positions) {
+                                    public void onSuccess(List<TradeItPosition> positions) {
                                         assertThat("refresh positions is successful", !positions.isEmpty(), is(true));
                                         lock.countDown();
                                     }
@@ -149,7 +151,7 @@ public class TradeItLinkedBrokerManagerTest {
             }
         });
 
-        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to linkBroker is not expired", notExpired, is(true));
     }
     @Test
@@ -216,7 +218,7 @@ public class TradeItLinkedBrokerManagerTest {
                 lock.countDown();
             }
         });
-        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to linkBroker is not expired", notExpired, is(true));
     }
 
@@ -256,7 +258,7 @@ public class TradeItLinkedBrokerManagerTest {
             }
         });
 
-        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to linkBrokerOldMethodAndSecurityQuestion is not expired", notExpired, is(true));
     }
 
@@ -278,7 +280,7 @@ public class TradeItLinkedBrokerManagerTest {
             }
         });
 
-        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to getOAuthLoginPopupUrlForMobile is not expired", notExpired, is(true));
     }
 
@@ -315,7 +317,7 @@ public class TradeItLinkedBrokerManagerTest {
             }
         });
 
-        boolean notExpired = lock.await(10000, TimeUnit.MILLISECONDS);
+        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to linkAndUnlinkBrokers is not expired", notExpired, is(true));
     }
 
@@ -352,7 +354,7 @@ public class TradeItLinkedBrokerManagerTest {
             }
         });
 
-        boolean notExpired = lock.await(5000, TimeUnit.MILLISECONDS);
+        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to linkBrokerAndGetOAuthLoginPopupForTokenUpdateUrl is not expired", notExpired, is(true));
     }
 }
