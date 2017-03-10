@@ -1,16 +1,7 @@
 package it.trade.android.sdk.model
 
-import it.trade.android.sdk.model.TradeItCallBackImpl
-import it.trade.android.sdk.model.TradeItErrorResult
-import it.trade.android.sdk.model.TradeItLinkedBroker
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccount
 import it.trade.tradeitapi.API.TradeItApiClient
-import it.trade.tradeitapi.model.TradeItAuthenticateResponse
-import it.trade.tradeitapi.model.TradeItErrorCode
-import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse
-import it.trade.tradeitapi.model.TradeItGetPositionsResponse
-import it.trade.tradeitapi.model.TradeItResponseStatus
-import it.trade.tradeitapi.model.TradeItGetPositionsResponse.Position
+import it.trade.tradeitapi.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,7 +9,7 @@ import spock.lang.Specification
 
 class TradeItLinkedBrokerAccountSpec extends Specification {
 
-    TradeItAuthenticateResponse.Account account = Mock(TradeItAuthenticateResponse.Account)
+    Account account = Mock(Account)
     TradeItLinkedBroker linkedBroker = Mock(TradeItLinkedBroker)
     TradeItApiClient tradeItApiClient = Mock(TradeItApiClient)
     TradeItLinkedBrokerAccount linkedBrokerAccount

@@ -1,13 +1,13 @@
 package it.trade.android.sdk.internal;
 
 
+import it.trade.android.sdk.model.TradeItCallback;
 import it.trade.android.sdk.model.TradeItErrorResult;
 import it.trade.tradeitapi.model.TradeItResponse;
 import it.trade.tradeitapi.model.TradeItResponseStatus;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import it.trade.android.sdk.model.TradeItCallback;
 
 /**
  * This class handles common error behaviors (to use inside the sdk)

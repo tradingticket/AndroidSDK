@@ -1,15 +1,9 @@
 package it.trade.android.sdk.model
 
-import android.content.Context
-import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl
-import it.trade.android.sdk.model.TradeItErrorResult
-import it.trade.android.sdk.model.TradeItLinkedBroker
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccount
-import it.trade.android.sdk.model.TradeItLinkedBrokerCache
-import it.trade.android.sdk.model.TradeItSecurityQuestion
+import it.trade.android.sdk.TradeItSDK
 import it.trade.tradeitapi.API.TradeItApiClient
+import it.trade.tradeitapi.model.Account
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse
-import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account
 import it.trade.tradeitapi.model.TradeItErrorCode
 import it.trade.tradeitapi.model.TradeItResponseStatus
 import retrofit2.Call
@@ -18,13 +12,12 @@ import retrofit2.Response
 import spock.lang.Specification
 
 class TradeItLinkedBrokerSpec extends Specification {
-    Context context = Mock(Context)
     TradeItApiClient apiClient = Mock(TradeItApiClient);
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
-    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(context, apiClient)
+    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient)
 
     void setup() {
-        linkedBroker.linkedBrokerCache = linkedBrokerCache
+        TradeItSDK.linkedBrokerCache = linkedBrokerCache
     }
 
     def "authenticate handles a successful response from trade it api"() {

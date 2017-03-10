@@ -1,28 +1,29 @@
 package it.trade.android.sdk.model;
 
-import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import it.trade.android.sdk.TradeItSDK;
+import it.trade.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
-import it.trade.tradeitapi.model.TradeItAuthenticateResponse.Account;
+import it.trade.tradeitapi.model.TradeItBrokerAccount;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import retrofit2.Response;
-import it.trade.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
 
-public class TradeItLinkedBroker {
+public class TradeItLinkedBroker implements Parcelable {
     private transient TradeItApiClient apiClient;
     private List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
     private Date accountsLastUpdated;
-    private transient TradeItLinkedBrokerCache linkedBrokerCache = new TradeItLinkedBrokerCache();
-    private transient Context context;
+    private TradeItLinkedLogin linkedLogin;
 
-    public TradeItLinkedBroker(Context context, TradeItApiClient apiClient) {
+    public TradeItLinkedBroker(TradeItApiClient apiClient) {
         this.apiClient = apiClient;
-        this.context = context;
+        this.linkedLogin = this.apiClient.getTradeItLinkedLogin();
     }
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
@@ -32,11 +33,11 @@ public class TradeItLinkedBroker {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
                 TradeItAuthenticateResponse authResponse = response.body();
-                List<Account> accountsResult = authResponse.accounts;
-                List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = mapAccountsToLinkedBrokerAccount(accountsResult);
+                List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
+                List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
                 accounts = linkedBrokerAccounts;
                 accountsLastUpdated = new Date();
-                linkedBrokerCache.cache(context, linkedBroker);
+                TradeItSDK.getLinkedBrokerCache().cache(linkedBroker);
                 callback.onSuccess(linkedBrokerAccounts);
             }
         });
@@ -75,9 +76,9 @@ public class TradeItLinkedBroker {
         this.accountsLastUpdated = accountsLastUpdated;
     }
 
-    private List<TradeItLinkedBrokerAccount> mapAccountsToLinkedBrokerAccount(List<Account> accounts) {
+    private List<TradeItLinkedBrokerAccount> mapBrokerAccountsToLinkedBrokerAccounts(List<TradeItBrokerAccount> accounts) {
         List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = new ArrayList<>();
-        for (Account account: accounts) {
+        for (TradeItBrokerAccount account: accounts) {
             linkedBrokerAccounts.add(new TradeItLinkedBrokerAccount(this, account));
         }
         return linkedBrokerAccounts;
@@ -100,8 +101,42 @@ public class TradeItLinkedBroker {
     }
 
     public void setLinkedLogin(TradeItLinkedLogin linkedLogin) {
+        this.linkedLogin = linkedLogin;
         this.apiClient.setTradeItLinkedLogin(linkedLogin);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(this.accounts);
+        dest.writeLong(this.accountsLastUpdated != null ? this.accountsLastUpdated.getTime() : -1);
+        dest.writeParcelable(this.linkedLogin, flags);
+    }
+
+    protected TradeItLinkedBroker(Parcel in) {
+        this.accounts = new ArrayList<TradeItLinkedBrokerAccount>();
+        in.readList(this.accounts, TradeItLinkedBrokerAccount.class.getClassLoader());
+        long tmpAccountsLastUpdated = in.readLong();
+        this.accountsLastUpdated = tmpAccountsLastUpdated == -1 ? null : new Date(tmpAccountsLastUpdated);
+        this.linkedLogin = in.readParcelable(TradeItLinkedLogin.class.getClassLoader());
+        this.apiClient = new TradeItApiClient(this.linkedLogin, TradeItSDK.getEnvironment());
+    }
+
+    public static final Parcelable.Creator<TradeItLinkedBroker> CREATOR = new Parcelable.Creator<TradeItLinkedBroker>() {
+        @Override
+        public TradeItLinkedBroker createFromParcel(Parcel source) {
+                return new TradeItLinkedBroker(source);
+        }
+
+        @Override
+        public TradeItLinkedBroker[] newArray(int size) {
+            return new TradeItLinkedBroker[size];
+        }
+    };
 }
 
 
