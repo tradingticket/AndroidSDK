@@ -57,7 +57,10 @@ public class TradeItLinkedBrokerManager {
     private void loadLinkedBrokersFromSharedPreferences() throws TradeItRetrieveLinkedLoginException {
         List<TradeItLinkedLogin> linkedLoginList = TradeItBrokerLinker.getLinkedLogins(context);
         for (TradeItLinkedLogin linkedLogin : linkedLoginList) {
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedLogin, environment));
+            TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, environment);
+            //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
+            apiClient.setSessionToken("trade-it-fetch-fresh-token");
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
             TradeItSDK.getLinkedBrokerCache().syncFromCache(linkedBroker);
             linkedBrokers.add(linkedBroker);
         }
