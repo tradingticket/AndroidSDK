@@ -59,7 +59,7 @@ public class TradeItLinkedBrokerManager {
         for (TradeItLinkedLogin linkedLogin : linkedLoginList) {
             TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, environment);
             //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
-            apiClient.setSessionToken("trade-it-fetch-fresh-token");
+            apiClient.setSessionToken("invalid-default-token");
             TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
             TradeItSDK.getLinkedBrokerCache().syncFromCache(linkedBroker);
             linkedBrokers.add(linkedBroker);
