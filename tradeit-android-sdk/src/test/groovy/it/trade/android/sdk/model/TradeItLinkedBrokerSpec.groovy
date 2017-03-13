@@ -2,8 +2,8 @@ package it.trade.android.sdk.model
 
 import it.trade.android.sdk.TradeItSDK
 import it.trade.tradeitapi.API.TradeItApiClient
-import it.trade.tradeitapi.model.Account
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse
+import it.trade.tradeitapi.model.TradeItBrokerAccount
 import it.trade.tradeitapi.model.TradeItErrorCode
 import it.trade.tradeitapi.model.TradeItResponseStatus
 import retrofit2.Call
@@ -25,10 +25,10 @@ class TradeItLinkedBrokerSpec extends Specification {
             int successCallBackCount = 0
             int securityQuestionCallbackCount = 0
             int errorCallBackCount = 0
-            Account account1 = new Account();
+            TradeItBrokerAccount account1 = new TradeItBrokerAccount();
             account1.accountNumber = "My account number 1"
             account1.name = "My account name 1"
-            Account account2 = new Account();
+            TradeItBrokerAccount account2 = new TradeItBrokerAccount();
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
             List<TradeItLinkedBrokerAccount> accountsExpected = [new TradeItLinkedBrokerAccount(linkedBroker, account1), new TradeItLinkedBrokerAccount(linkedBroker, account2)]
@@ -45,11 +45,11 @@ class TradeItLinkedBrokerSpec extends Specification {
             }
 
         when: "calling authenticate"
-            List<Account> accountsResult = null
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<Account>>() {
+            List<TradeItBrokerAccount> accountsResult = null
+            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
 
                 @Override
-                void onSuccess(List<Account> accounts) {
+                void onSuccess(List<TradeItBrokerAccount> accounts) {
                     successCallBackCount++
                     accountsResult = accounts
                 }
@@ -97,10 +97,10 @@ class TradeItLinkedBrokerSpec extends Specification {
 
         when: "calling authenticate"
             TradeItSecurityQuestion tradeItSecurityQuestion = null
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<Account>>() {
+            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
 
                 @Override
-                void onSuccess(List<Account> accounts) {
+                void onSuccess(List<TradeItBrokerAccount> accounts) {
                     successCallBackCount++
                 }
 
@@ -148,10 +148,10 @@ class TradeItLinkedBrokerSpec extends Specification {
 
         when: "calling authenticate"
             TradeItErrorResult tradeItErrorResult = null
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<Account>>() {
+            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
 
                 @Override
-                void onSuccess(List<Account> accounts) {
+                void onSuccess(List<TradeItBrokerAccount> accounts) {
                     successCallBackCount++
                 }
 

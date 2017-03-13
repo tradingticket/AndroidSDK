@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 class TradeItLinkedBrokerAccountSpec extends Specification {
 
-    Account account = Mock(Account)
+    TradeItBrokerAccount account = Mock(TradeItBrokerAccount)
     TradeItLinkedBroker linkedBroker = Mock(TradeItLinkedBroker)
     TradeItApiClient tradeItApiClient = Mock(TradeItApiClient)
     TradeItLinkedBrokerAccount linkedBrokerAccount
@@ -124,11 +124,11 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
         given: "a successful response from trade it api"
             int successCallbackCount = 0
             int errorCallbackCount = 0
-            Position position1 = new Position()
+            TradeItPosition position1 = new TradeItPosition()
             position1.quantity = 12
             position1.symbol = "GE"
             position1.lastPrice = 29.84
-            Position position2 = new Position()
+            TradeItPosition position2 = new TradeItPosition()
             position2.quantity = 22
             position2.symbol = "AAPL"
             position2.lastPrice = 109.84
@@ -145,10 +145,10 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
             }
 
         when: "calling refresh balance on the linked broker account"
-            List<Position> positionsResult = null
-            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<Position>>() {
+            List<TradeItPosition> positionsResult = null
+            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
                 @Override
-                void onSuccess(List<Position> positions) {
+                void onSuccess(List<TradeItPosition> positions) {
                     positionsResult = positions
                     successCallbackCount++
                 }
@@ -192,9 +192,9 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             TradeItErrorResult errorResult = null
-            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<Position>>() {
+            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
                 @Override
-                void onSuccess(List<Position> positions) {
+                void onSuccess(List<TradeItPosition> positions) {
                     successCallbackCount++
                 }
 
