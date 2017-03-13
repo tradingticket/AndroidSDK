@@ -36,7 +36,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
     def "Cache handles a linked broker not yet cached with an empty cache"() {
         given: "a linked broker with one account"
             TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
-            TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(Account));
+            TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItBrokerAccount));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
             account1.accountBaseCurrency = "My Account base currency"
@@ -85,7 +85,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
     def "Cache update a linked broker already cached"() {
         given: "a linked broker with one account"
             TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
-            TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(Account));
+            TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItBrokerAccount));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
             account1.accountBaseCurrency = "My Account base currency"
@@ -145,7 +145,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             }
             sharedPreferences.getString({it.contains(userId)}, "") >> {
                 TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient);
-                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(Account));
+                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItBrokerAccount));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
                 account1.accountBaseCurrency = "My Account base currency"
@@ -179,7 +179,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             sharedPreferences.getString({it.contains("an other userId")}, "") >> {
                 TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient);
                 linkedBrokerCached.linkedLogin.userId == "an other userId"
-                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItAuthenticateResponse.Account));
+                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItBrokerAccount));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
                 account1.accountBaseCurrency = "My Account base currency"
