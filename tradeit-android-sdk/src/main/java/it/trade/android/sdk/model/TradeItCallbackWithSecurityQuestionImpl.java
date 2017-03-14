@@ -4,11 +4,11 @@ import android.util.Log;
 
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAnswerSecurityQuestionRequest;
-import it.trade.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
+import it.trade.android.sdk.internal.AuthenticationCallback;
 
 public abstract class TradeItCallbackWithSecurityQuestionImpl<T> implements TradeItCallbackWithSecurityQuestion<T>  {
     private TradeItApiClient apiClient;
-    private AuthenticationCallbackWithErrorHandling authenticationHandler;
+    private AuthenticationCallback authenticationHandler;
 
     @Override
     public void submitSecurityAnswer(String answer) {
@@ -27,7 +27,7 @@ public abstract class TradeItCallbackWithSecurityQuestionImpl<T> implements Trad
         this.apiClient = apiClient;
     }
 
-    public void setAuthenticationHandler(AuthenticationCallbackWithErrorHandling authenticationHandler) {
+    public void setAuthenticationHandler(AuthenticationCallback authenticationHandler) {
         this.authenticationHandler = authenticationHandler;
     }
 }

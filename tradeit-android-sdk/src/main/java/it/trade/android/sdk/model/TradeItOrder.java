@@ -12,7 +12,7 @@ import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
 import retrofit2.Response;
 import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
-import it.trade.android.sdk.internal.PreviewTradeCallbackWithErrorHandling;
+import it.trade.android.sdk.internal.PreviewTradeCallback;
 
 public class TradeItOrder implements Parcelable {
 
@@ -40,12 +40,18 @@ public class TradeItOrder implements Parcelable {
                 (this.limitPrice != null ? this.limitPrice.toString() : null),
                 (this.stopPrice != null ? this.stopPrice.toString() : null),
                 this.expiration.getExpirationValue());
-
-        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new PreviewTradeCallbackWithErrorHandling<TradeItPreviewStockOrEtfOrderResponse, TradeItPreviewStockOrEtfOrderResponse>(callback) {
+        final TradeItOrder order = this;
+        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new PreviewTradeCallback<TradeItPreviewStockOrEtfOrderResponse, TradeItPreviewStockOrEtfOrderResponse>(callback) {
 
             @Override
             public void onSuccessResponse(Response<TradeItPreviewStockOrEtfOrderResponse> response) {
                 callback.onSuccess(response.body());
+            }
+
+            @Override
+            public void onErrorResponse(TradeItErrorResult errorResult) {
+                order.linkedBrokerAccount.setErrorOnLinkedBroker(errorResult);
+                callback.onError(errorResult);
             }
 
         });
