@@ -56,7 +56,7 @@ public class TradeItLinkedBroker implements Parcelable {
     public void authenticateIfNeeded(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
         if (this.error != null && this.error.requiresAuthentication()) {
             this.authenticate(callback);
-        } else if (this.error != null && this.error.requiresRelink()) {
+        } else if (this.error != null && (this.error.requiresRelink() || this.error.isConcurrentAuthenticationError() || this.error.isTooManyLoginAttemptsError())) {
             callback.onError(this.error);
         } else {
             callback.onSuccess(this.accounts);

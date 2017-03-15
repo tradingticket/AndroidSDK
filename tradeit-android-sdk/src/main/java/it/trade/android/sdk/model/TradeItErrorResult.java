@@ -48,6 +48,14 @@ public class TradeItErrorResult implements Parcelable {
         return errorCode == TradeItErrorCode.BROKER_AUTHENTICATION_ERROR || errorCode == TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED;
     }
 
+    public boolean isConcurrentAuthenticationError() {
+        return errorCode == TradeItErrorCode.CONCURRENT_AUTHENTICATION_ERROR;
+    }
+
+    public boolean isTooManyLoginAttemptsError() {
+        return errorCode == TradeItErrorCode.TOO_MANY_LOGIN_ATTEMPTS;
+    }
+
     public TradeItErrorCode getErrorCode() {
         return errorCode;
     }
