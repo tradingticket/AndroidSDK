@@ -41,17 +41,11 @@ public class TradeItErrorResult implements Parcelable {
     }
 
     public boolean requiresAuthentication() {
-        if (errorCode == TradeItErrorCode.SESSION_EXPIRED || errorCode == TradeItErrorCode.BROKER_ACCOUNT_ERROR) {
-            return true;
-        }
-        return false;
+        return errorCode == TradeItErrorCode.SESSION_EXPIRED || errorCode == TradeItErrorCode.BROKER_ACCOUNT_ERROR;
     }
 
     public boolean requiresRelink() {
-        if (errorCode == TradeItErrorCode.BROKER_AUTHENTICATION_ERROR || errorCode == TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED) {
-            return true;
-        }
-        return false;
+        return errorCode == TradeItErrorCode.BROKER_AUTHENTICATION_ERROR || errorCode == TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED;
     }
 
     public TradeItErrorCode getErrorCode() {
