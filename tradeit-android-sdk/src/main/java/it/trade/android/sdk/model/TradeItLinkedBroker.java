@@ -129,9 +129,9 @@ public class TradeItLinkedBroker implements Parcelable {
     }
 
     public void setLinkedLogin(TradeItLinkedLogin linkedLogin) {
-        this.linkedLogin = linkedLogin;
         this.apiClient.setTradeItLinkedLogin(linkedLogin);
     }
+
 
     @Override
     public int describeContents() {
@@ -140,24 +140,22 @@ public class TradeItLinkedBroker implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeList(this.accounts);
+        dest.writeParcelable(this.apiClient, flags);
+        dest.writeTypedList(this.accounts);
         dest.writeLong(this.accountsLastUpdated != null ? this.accountsLastUpdated.getTime() : -1);
-        dest.writeParcelable(this.linkedLogin, flags);
     }
 
     protected TradeItLinkedBroker(Parcel in) {
-        this.accounts = new ArrayList<TradeItLinkedBrokerAccount>();
-        in.readList(this.accounts, TradeItLinkedBrokerAccount.class.getClassLoader());
+        this.apiClient = in.readParcelable(TradeItApiClient.class.getClassLoader());
+        this.accounts = in.createTypedArrayList(TradeItLinkedBrokerAccount.CREATOR);
         long tmpAccountsLastUpdated = in.readLong();
         this.accountsLastUpdated = tmpAccountsLastUpdated == -1 ? null : new Date(tmpAccountsLastUpdated);
-        this.linkedLogin = in.readParcelable(TradeItLinkedLogin.class.getClassLoader());
-        this.apiClient = new TradeItApiClient(this.linkedLogin, TradeItSDK.getEnvironment());
     }
 
     public static final Parcelable.Creator<TradeItLinkedBroker> CREATOR = new Parcelable.Creator<TradeItLinkedBroker>() {
         @Override
         public TradeItLinkedBroker createFromParcel(Parcel source) {
-                return new TradeItLinkedBroker(source);
+            return new TradeItLinkedBroker(source);
         }
 
         @Override

@@ -5,7 +5,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.DefaultCallback;
@@ -20,7 +22,7 @@ import it.trade.tradeitapi.model.TradeItPosition;
 import retrofit2.Response;
 
 public class TradeItLinkedBrokerAccount implements Parcelable {
-
+    private static Map<String, TradeItLinkedBroker> linkedBrokersMap = new HashMap<>(); //used for parcelable
     private String accountName;
     private String accountNumber;
     private String accountBaseCurrency;
@@ -156,6 +158,7 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         dest.writeParcelable(this.balance, flags);
         dest.writeList(this.positions);
         dest.writeParcelable(this.linkedLogin, flags);
+        linkedBrokersMap.put(this.linkedLogin.userId, linkedBroker);
     }
 
     protected TradeItLinkedBrokerAccount(Parcel in) {
@@ -166,7 +169,7 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         this.positions = new ArrayList<TradeItPosition>();
         in.readList(this.positions, TradeItPosition.class.getClassLoader());
         this.linkedLogin = in.readParcelable(TradeItLinkedLogin.class.getClassLoader());
-        this.linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(this.linkedLogin, TradeItSDK.getEnvironment()));
+        this.linkedBroker = linkedBrokersMap.get(this.linkedLogin.userId);
     }
 
     public static final Parcelable.Creator<TradeItLinkedBrokerAccount> CREATOR = new Parcelable.Creator<TradeItLinkedBrokerAccount>() {
