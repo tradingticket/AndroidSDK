@@ -4,14 +4,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import it.trade.android.sdk.TradeItSDK;
-import it.trade.android.sdk.internal.AuthenticationCallbackWithErrorHandling;
+import it.trade.android.sdk.internal.AuthenticationCallback;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
 import it.trade.tradeitapi.model.TradeItBrokerAccount;
+import it.trade.tradeitapi.model.TradeItErrorCode;
 import it.trade.tradeitapi.model.TradeItLinkedLogin;
 import retrofit2.Response;
 
@@ -19,17 +21,21 @@ public class TradeItLinkedBroker implements Parcelable {
     private transient TradeItApiClient apiClient;
     private List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
     private Date accountsLastUpdated;
+    private TradeItLinkedLogin linkedLogin;
+    private TradeItErrorResult error;
 
     public TradeItLinkedBroker(TradeItApiClient apiClient) {
         this.apiClient = apiClient;
+        this.linkedLogin = this.apiClient.getTradeItLinkedLogin();
+        setUnauthenticated();
     }
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
         final TradeItLinkedBroker linkedBroker = this;
-
-        this.apiClient.authenticate(new AuthenticationCallbackWithErrorHandling<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback, apiClient) {
+        this.apiClient.authenticate(new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback, apiClient) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
+                linkedBroker.error = null;
                 TradeItAuthenticateResponse authResponse = response.body();
                 List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
                 List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
@@ -38,7 +44,31 @@ public class TradeItLinkedBroker implements Parcelable {
                 TradeItSDK.getLinkedBrokerCache().cache(linkedBroker);
                 callback.onSuccess(linkedBrokerAccounts);
             }
+
+            @Override
+            public void onErrorResponse(TradeItErrorResult errorResult) {
+                linkedBroker.error = errorResult;
+                callback.onError(errorResult);
+            }
         });
+    }
+
+    public void authenticateIfNeeded(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
+        if (this.error != null && this.error.requiresAuthentication()) {
+            this.authenticate(callback);
+        } else if (this.error != null && (this.error.requiresRelink() || this.error.isConcurrentAuthenticationError() || this.error.isTooManyLoginAttemptsError())) {
+            callback.onError(this.error);
+        } else {
+            callback.onSuccess(this.accounts);
+        }
+    }
+
+    private void setUnauthenticated() {
+        this.setError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "Authentication required", Arrays.asList("Linked broker was not authenticated after initializing.")));
+    }
+
+    void setError(TradeItErrorResult error) {
+        this.error = error;
     }
 
     @Override

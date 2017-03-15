@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.trade.android.sdk.internal.DefaultCallbackWithErrorHandling;
+import it.trade.android.sdk.TradeItSDK;
+import it.trade.android.sdk.internal.DefaultCallback;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItBrokerAccount;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewRequest;
@@ -25,6 +26,7 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
     private String accountName;
     private String accountNumber;
     private String accountBaseCurrency;
+
     private transient TradeItLinkedBroker linkedBroker;
     private TradeItGetAccountOverviewResponse balance;
     private List<TradeItPosition> positions;
@@ -40,6 +42,10 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
 
     protected TradeItApiClient getTradeItApiClient() {
         return this.linkedBroker.getTradeItApiClient();
+    }
+
+    protected void setErrorOnLinkedBroker(TradeItErrorResult errorResult) {
+        this.linkedBroker.setError(errorResult);
     }
 
     public String getAccountName() {
@@ -58,7 +64,7 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         return balance;
     }
 
-    public void setBalance(TradeItGetAccountOverviewResponse balance) {
+    void setBalance(TradeItGetAccountOverviewResponse balance) {
         this.balance = balance;
     }
 
@@ -66,28 +72,42 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         return positions;
     }
 
-    public void setPositions(List<TradeItPosition> positions) {
+    void setPositions(List<TradeItPosition> positions) {
         this.positions = positions;
     }
 
     public void refreshBalance(final TradeItCallback<TradeItGetAccountOverviewResponse> callback) {
         TradeItGetAccountOverviewRequest balanceRequest = new TradeItGetAccountOverviewRequest(accountNumber);
-        this.getTradeItApiClient().getAccountOverview(balanceRequest, new DefaultCallbackWithErrorHandling<TradeItGetAccountOverviewResponse, TradeItGetAccountOverviewResponse>(callback) {
+        final TradeItLinkedBrokerAccount linkedBrokerAccount = this;
+        this.getTradeItApiClient().getAccountOverview(balanceRequest, new DefaultCallback<TradeItGetAccountOverviewResponse, TradeItGetAccountOverviewResponse>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItGetAccountOverviewResponse> response) {
                 balance = response.body();
                 callback.onSuccess(response.body());
+            }
+
+            @Override
+            public void onErrorResponse(TradeItErrorResult errorResult) {
+                linkedBrokerAccount.setErrorOnLinkedBroker(errorResult);
+                callback.onError(errorResult);
             }
         });
     }
 
     public void refreshPositions(final TradeItCallback<List<TradeItPosition>> callback) {
         TradeItGetPositionsRequest positionsRequest = new TradeItGetPositionsRequest(accountNumber, null);
-        this.getTradeItApiClient().getPositions(positionsRequest, new DefaultCallbackWithErrorHandling<TradeItGetPositionsResponse, List<TradeItPosition>>(callback) {
+        final TradeItLinkedBrokerAccount linkedBrokerAccount = this;
+        this.getTradeItApiClient().getPositions(positionsRequest, new DefaultCallback<TradeItGetPositionsResponse, List<TradeItPosition>>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItGetPositionsResponse> response) {
                 positions = response.body().positions;
                 callback.onSuccess(positions);
+            }
+
+            @Override
+            public void onErrorResponse(TradeItErrorResult errorResult) {
+                linkedBrokerAccount.setErrorOnLinkedBroker(errorResult);
+                callback.onError(errorResult);
             }
         });
     }

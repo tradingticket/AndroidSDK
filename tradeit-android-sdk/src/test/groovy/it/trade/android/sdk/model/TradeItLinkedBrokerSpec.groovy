@@ -121,7 +121,7 @@ class TradeItLinkedBrokerSpec extends Specification {
             securityQuestionCallbackCount == 1
             errorCallBackCount == 0
 
-        and: "expects a securoty question"
+        and: "expects a security question"
             tradeItSecurityQuestion.securityQuestionOptions[0] == "My security question"
     }
 
@@ -177,6 +177,158 @@ class TradeItLinkedBrokerSpec extends Specification {
             tradeItErrorResult.longMessages == ["My long error message"]
             tradeItErrorResult.errorCode == TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
             tradeItErrorResult.httpCode == 200
+    }
+
+    def "authenticateIfNeeded calls authenticate if there is an error that requires authentication"() {
+        given: "An error that requires authentication"
+            int successCallbackCount = 0
+            int securityQuestionCallbackCount = 0
+            int errorCallbackCount = 0
+            TradeItErrorResult errorResult = new TradeItErrorResult()
+            errorResult.errorCode = TradeItErrorCode.BROKER_ACCOUNT_ERROR
+            linkedBroker.error = errorResult
+
+            TradeItBrokerAccount account1 = new TradeItBrokerAccount();
+            account1.accountNumber = "My account number 1"
+            account1.name = "My account name 1"
+            TradeItBrokerAccount account2 = new TradeItBrokerAccount();
+            account2.accountNumber = "My account number 2"
+            account2.name = "My account name 2"
+            List<TradeItLinkedBrokerAccount> accountsExpected = [new TradeItLinkedBrokerAccount(linkedBroker, account1), new TradeItLinkedBrokerAccount(linkedBroker, account2)]
+
+            1 * apiClient.authenticate(_) >> { args ->
+                Callback<TradeItAuthenticateResponse> callback = args[0]
+                Call<TradeItAuthenticateResponse> call = Mock(Call)
+                TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
+                tradeItAuthenticateResponse.sessionToken = "My session token"
+                tradeItAuthenticateResponse.longMessages = null
+                tradeItAuthenticateResponse.status = TradeItResponseStatus.SUCCESS
+                tradeItAuthenticateResponse.accounts = [account1, account2]
+                Response<TradeItAuthenticateResponse> response = Response.success(tradeItAuthenticateResponse);
+                callback.onResponse(call, response);
+            }
+
+        when: "calling authenticateIfNeeded"
+            List<TradeItBrokerAccount> accountsResult = null
+            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+
+                @Override
+                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                    successCallbackCount++
+                    accountsResult = accounts
+                }
+
+                @Override
+                void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                    securityQuestionCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the successCallBackCount called once"
+            successCallbackCount == 1
+            securityQuestionCallbackCount == 0
+            errorCallbackCount == 0
+
+        and: "expects a list of TradeItLinkedBrokerAccount"
+            accountsResult == accountsExpected
+
+        and: "the list is kept in memory"
+            linkedBroker.getAccounts() == accountsExpected
+
+        and: "the error is set to null"
+            linkedBroker.error == null
+
+    }
+
+    def "authenticateIfNeeded return an error if there is an error that requires relink"() {
+        given: "An error that requires relink"
+            int successCallbackCount = 0
+            int securityQuestionCallbackCount = 0
+            int errorCallbackCount = 0
+            TradeItErrorResult errorResult = new TradeItErrorResult()
+            errorResult.errorCode = TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED
+            linkedBroker.error = errorResult
+
+        when: "calling authenticateIfNeeded"
+            TradeItErrorResult expectedError = null
+            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+                @Override
+                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                    successCallbackCount++
+                    accountsResult = accounts
+                }
+
+                @Override
+                void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                    securityQuestionCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    expectedError = error
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the successCallBackCount called once"
+            successCallbackCount == 0
+            securityQuestionCallbackCount == 0
+            errorCallbackCount == 1
+
+        and: "expects a relink error"
+            expectedError == errorResult
+
+        and: "the error is still set to relink error"
+            linkedBroker.error == errorResult
+
+    }
+
+    def "authenticateIfNeeded is successfull if it is an other error than requires authentication or relink"() {
+        given: "An error that doesn't require authentication or relink"
+            int successCallbackCount = 0
+            int securityQuestionCallbackCount = 0
+            int errorCallbackCount = 0
+            TradeItErrorResult errorResult = new TradeItErrorResult()
+            errorResult.errorCode = TradeItErrorCode.BROKER_EXECUTION_ERROR
+            linkedBroker.error = errorResult
+
+        when: "calling authenticateIfNeeded"
+            List<TradeItBrokerAccount> accountsResult = null
+            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+
+                @Override
+                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                    successCallbackCount++
+                    accountsResult = accounts
+                }
+
+                @Override
+                void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                    securityQuestionCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the successCallBackCount called once"
+            successCallbackCount == 1
+            securityQuestionCallbackCount == 0
+            errorCallbackCount == 0
+
+        and: "authenticate has not been called"
+            0 * apiClient.authenticate(_) >> {}
+
+        and: "the error is still set"
+            linkedBroker.error == errorResult
+
     }
 
 }

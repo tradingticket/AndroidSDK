@@ -93,7 +93,7 @@ public class TradeItLinkedBrokerManagerTest {
             public void onSuccess(final TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
                 assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
+                linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
 
                     @Override
                     public void onSuccess(final List<TradeItLinkedBrokerAccount> accounts) {
@@ -161,7 +161,7 @@ public class TradeItLinkedBrokerManagerTest {
             public void onSuccess(final TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
                 assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
+                linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
                         assertThat("The authentication is successful",  !accounts.isEmpty(), is(true));
@@ -229,7 +229,7 @@ public class TradeItLinkedBrokerManagerTest {
             public void onSuccess(final TradeItLinkedBroker linkedBroker) {
                 assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
                 assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userToken , notNullValue());
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
+                linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                     @Override
                     public void onSuccess(List<TradeItLinkedBrokerAccount> accounts) {
                         assertThat("successful authentication after answering security question security question",  accounts, notNullValue());
