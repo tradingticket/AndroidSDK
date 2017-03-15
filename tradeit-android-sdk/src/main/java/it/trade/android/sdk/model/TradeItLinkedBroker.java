@@ -64,7 +64,7 @@ public class TradeItLinkedBroker implements Parcelable {
     }
 
     private void setUnauthenticated() {
-        this.setError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "Linked Broker initialized from keychain", Arrays.asList("This linked broker needs to authenticate.")));
+        this.setError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "Authentication required", Arrays.asList("Linked broker was not authenticated after initializing.")));
     }
 
     void setError(TradeItErrorResult error) {
