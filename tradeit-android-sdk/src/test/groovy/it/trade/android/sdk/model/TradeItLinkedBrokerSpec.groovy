@@ -122,7 +122,7 @@ class TradeItLinkedBrokerSpec extends Specification {
             errorCallBackCount == 0
 
         and: "expects a security question"
-            tradeItSecurityQuestion.securityQuestionOptions[0] == "My security question"
+            tradeItSecurityQuestion.securityQuestion == "My security question"
     }
 
     def "authenticate handles an error response from trade it api"() {

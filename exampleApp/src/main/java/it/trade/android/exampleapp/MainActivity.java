@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-                                Log.d("ASDF", "AUTH SECURITY QUESTION!: " + securityQuestion.getSecurityQuestionOptions().get(0));
+                                Log.d("ASDF", "AUTH SECURITY QUESTION!: " + securityQuestion.getSecurityQuestion());
 
                                 // this.submitSecurityAnswer("my answer");
                             }
