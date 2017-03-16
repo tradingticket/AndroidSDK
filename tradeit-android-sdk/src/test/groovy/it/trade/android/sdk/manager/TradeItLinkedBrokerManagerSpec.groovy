@@ -5,6 +5,7 @@ import it.trade.android.sdk.TradeItSDK
 import it.trade.android.sdk.model.TradeItCallBackImpl
 import it.trade.android.sdk.model.TradeItErrorResult
 import it.trade.android.sdk.model.TradeItLinkedBroker
+import it.trade.android.sdk.model.TradeItLinkedBrokerCache
 import it.trade.tradeitapi.API.TradeItApiClient
 import it.trade.tradeitapi.API.TradeItBrokerLinker
 import it.trade.tradeitapi.model.*
@@ -39,6 +40,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         TradeItSDK.context = context
         TradeItSDK.apiKey = "test api key"
         TradeItSDK.environment = TradeItEnvironment.QA
+        TradeItSDK.linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
     }
 
     def "GetAvailableBrokers handles a successful response from trade it api"() {
@@ -555,6 +557,9 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         and: "the delete brokerLinker static method was called"
             PowerMockito.verifyStatic()
             TradeItBrokerLinker.deleteLinkedLogin(Mockito.anyObject(), Mockito.anyObject())
+
+        and: "The linkedBroker is removed from cache"
+            1 * TradeItSDK.getLinkedBrokerCache().removeFromCache(linkedBroker)
 
         and: "the linkedbrokers list is empty"
             linkedBrokerManager.linkedBrokers.size() == 0
