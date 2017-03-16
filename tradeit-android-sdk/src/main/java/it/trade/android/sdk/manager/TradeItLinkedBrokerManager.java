@@ -138,6 +138,7 @@ public class TradeItLinkedBrokerManager {
         try {
             TradeItBrokerLinker.deleteLinkedLogin(context, linkedBroker.getLinkedLogin());
             linkedBrokers.remove(linkedBroker);
+            TradeItSDK.getLinkedBrokerCache().removeFromCache(linkedBroker);
             this.brokerLinker.unlinkBrokerAccount(linkedBroker.getLinkedLogin(), new DefaultCallbackWithErrorHandling<TradeItResponse, TradeItResponse>(callback) {
                 @Override
                 public void onSuccessResponse(Response<TradeItResponse> response) {
