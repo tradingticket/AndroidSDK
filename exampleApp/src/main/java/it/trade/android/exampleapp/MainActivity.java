@@ -4,14 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.List;
 
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackImpl;
+import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.android.sdk.model.TradeItErrorResult;
 import it.trade.android.sdk.model.TradeItLinkedBroker;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccount;
+import it.trade.android.sdk.model.TradeItSecurityQuestion;
 import it.trade.tradeitapi.model.TradeItEnvironment;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
         linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
 
+
     }
 
     @Override
@@ -43,6 +50,30 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(TradeItLinkedBroker linkedBroker) {
                         textViewResult.append("oAuthFlow Success: " + linkedBroker.toString());
+
+                        // TEST TRADING
+                        linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
+                            @Override
+                            public void onSuccess(final List<TradeItLinkedBrokerAccount> accounts) {
+                                Log.d("ASDF", "AUTH SUCCESS: " + accounts.size() + " accounts");
+
+                                Intent intent = new Intent(mainActivity, WebViewActivity.class);
+                                intent.putExtra("it.trade.android.exampleapp.LINKED_BROKER_ACCOUNT", accounts.get(0));
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                                Log.d("ASDF", "AUTH SECURITY QUESTION!: " + securityQuestion.getSecurityQuestionOptions().get(0));
+
+                                // this.submitSecurityAnswer("my answer");
+                            }
+
+                            @Override
+                            public void onError(TradeItErrorResult error) {
+                                Log.d("ASDF", "AUTH FAIL: " + error.getShortMessage() + " - " + error.getLongMessages().get(0));
+                            }
+                        });
                     }
 
                     @Override
