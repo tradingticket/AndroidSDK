@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.DefaultCallback;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItBrokerAccount;
@@ -70,6 +69,10 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
 
     public List<TradeItPosition> getPositions() {
         return positions;
+    }
+
+    void setLinkedBroker(TradeItLinkedBroker linkedBroker) {
+        this.linkedBroker = linkedBroker;
     }
 
     void setPositions(List<TradeItPosition> positions) {

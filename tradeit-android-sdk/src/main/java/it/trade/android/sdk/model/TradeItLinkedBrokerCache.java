@@ -50,6 +50,9 @@ public class TradeItLinkedBrokerCache {
             TradeItLinkedBroker linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBroker.class);
             linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
             linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
+            for (TradeItLinkedBrokerAccount linkedBrokerAccount: linkedBroker.getAccounts()) {
+                linkedBrokerAccount.setLinkedBroker(linkedBroker);
+            }
         }
     }
 
