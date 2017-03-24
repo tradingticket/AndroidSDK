@@ -3,24 +3,34 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TradeItSecurityQuestion implements Parcelable {
 
-    private List<String>  securityQuestionOptions = null;
+    private String securityQuestion = "";
+    private List<String>  securityQuestionOptions = new ArrayList<>();
 
     public TradeItSecurityQuestion(String securityQuestion, List<String> securityQuestionOptions) {
-        if (securityQuestion != null) {
-            securityQuestionOptions = Arrays.asList(securityQuestion);
-        }
-        this.securityQuestionOptions = securityQuestionOptions;
+        this.securityQuestion = securityQuestion;
+        this.securityQuestionOptions = (securityQuestionOptions != null ? securityQuestionOptions : this.securityQuestionOptions);
+    }
+
+    public String getSecurityQuestion() {
+        return securityQuestion;
     }
 
     public List<String> getSecurityQuestionOptions() {
         return securityQuestionOptions;
     }
 
+    @Override
+    public String toString() {
+        return "TradeItSecurityQuestion{" +
+                "securityQuestion='" + securityQuestion + '\'' +
+                ", securityQuestionOptions=" + securityQuestionOptions +
+                '}';
+    }
 
     @Override
     public int describeContents() {
@@ -29,10 +39,12 @@ public class TradeItSecurityQuestion implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.securityQuestion);
         dest.writeStringList(this.securityQuestionOptions);
     }
 
     protected TradeItSecurityQuestion(Parcel in) {
+        this.securityQuestion = in.readString();
         this.securityQuestionOptions = in.createStringArrayList();
     }
 
