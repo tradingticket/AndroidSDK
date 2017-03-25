@@ -21,12 +21,10 @@ public class TradeItLinkedBroker implements Parcelable {
     private transient TradeItApiClient apiClient;
     private List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
     private Date accountsLastUpdated;
-    private TradeItLinkedLogin linkedLogin;
     private TradeItErrorResult error;
 
     public TradeItLinkedBroker(TradeItApiClient apiClient) {
         this.apiClient = apiClient;
-        this.linkedLogin = this.apiClient.getTradeItLinkedLogin();
         setUnauthenticated();
     }
 

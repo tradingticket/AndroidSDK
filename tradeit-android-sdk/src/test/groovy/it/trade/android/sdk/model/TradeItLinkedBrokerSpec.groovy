@@ -5,6 +5,7 @@ import it.trade.tradeitapi.API.TradeItApiClient
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse
 import it.trade.tradeitapi.model.TradeItBrokerAccount
 import it.trade.tradeitapi.model.TradeItErrorCode
+import it.trade.tradeitapi.model.TradeItLinkedLogin
 import it.trade.tradeitapi.model.TradeItResponseStatus
 import retrofit2.Call
 import retrofit2.Callback
@@ -13,10 +14,13 @@ import spock.lang.Specification
 
 class TradeItLinkedBrokerSpec extends Specification {
     TradeItApiClient apiClient = Mock(TradeItApiClient);
+    TradeItLinkedLogin linkedLogin = Mock(TradeItLinkedLogin)
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
     TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient)
 
+
     void setup() {
+        apiClient.getTradeItLinkedLogin() >> linkedLogin
         TradeItSDK.linkedBrokerCache = linkedBrokerCache
     }
 

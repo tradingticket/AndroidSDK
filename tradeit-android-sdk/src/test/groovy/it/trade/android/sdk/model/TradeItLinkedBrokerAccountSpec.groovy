@@ -11,6 +11,7 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
 
     TradeItBrokerAccount account = Mock(TradeItBrokerAccount)
     TradeItLinkedBroker linkedBroker = Mock(TradeItLinkedBroker)
+    TradeItLinkedLogin linkedLogin = Mock(TradeItLinkedLogin)
     TradeItApiClient tradeItApiClient = Mock(TradeItApiClient)
     TradeItLinkedBrokerAccount linkedBrokerAccount
 
@@ -19,6 +20,8 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
         account.accountNumber >> "My account number"
         account.name >> "My account name"
         linkedBroker.getTradeItApiClient() >> tradeItApiClient
+        linkedBroker.getLinkedLogin() >> linkedLogin
+        linkedLogin.userId >> "My user ID"
 
         linkedBrokerAccount = new TradeItLinkedBrokerAccount(linkedBroker, account)
     }
