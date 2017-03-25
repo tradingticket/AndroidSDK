@@ -164,6 +164,9 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             linkedBroker.accountsLastUpdated != null
             linkedBroker.accounts.size() == 1
             linkedBroker.accounts[0].balance.availableCash == 20000
+
+        and: "the linked broker is set on the linked broekr account"
+            linkedBroker.accounts[0].linkedBroker == linkedBroker
     }
 
     def "SyncFromCache handles a linkedBroker non cached"() {

@@ -72,7 +72,7 @@ public class TradeItLinkedBrokerTest {
 
         // Read the data.
         TradeItLinkedBroker createdFromParcel = TradeItLinkedBroker.CREATOR.createFromParcel(parcel);
-        TradeItApiClient apiClient = createdFromParcel.getTradeItApiClient();
+        TradeItApiClient apiClient = createdFromParcel.getApiClient();
         TradeItLinkedLogin linkedLogin = createdFromParcel.getLinkedLogin();
         List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = createdFromParcel.getAccounts();
         Date accountLastUpdated = createdFromParcel.getAccountsLastUpdated();
