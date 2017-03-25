@@ -39,11 +39,15 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
     }
 
     protected TradeItApiClient getTradeItApiClient() {
-        return this.linkedBroker.getTradeItApiClient();
+        return this.linkedBroker.getApiClient();
     }
 
     protected void setErrorOnLinkedBroker(TradeItErrorResult errorResult) {
         this.linkedBroker.setError(errorResult);
+    }
+
+    public String getBrokerName() {
+        return this.linkedBroker.getBrokerName();
     }
 
     public String getAccountName() {

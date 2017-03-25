@@ -19,7 +19,7 @@ class TradeItLinkedBrokerAccountSpec extends Specification {
         account.accountBaseCurrency >> "My account base currency"
         account.accountNumber >> "My account number"
         account.name >> "My account name"
-        linkedBroker.getTradeItApiClient() >> tradeItApiClient
+        linkedBroker.getApiClient() >> tradeItApiClient
         linkedBroker.getLinkedLogin() >> linkedLogin
         linkedLogin.userId >> "My user ID"
 

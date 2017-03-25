@@ -82,7 +82,11 @@ public class TradeItLinkedBroker implements Parcelable {
         return this.apiClient.getTradeItLinkedLogin();
     }
 
-    TradeItApiClient getTradeItApiClient() {
+    public String getBrokerName() {
+        return this.apiClient.getTradeItLinkedLogin().broker;
+    }
+
+    TradeItApiClient getApiClient() {
         return this.apiClient;
     }
 
