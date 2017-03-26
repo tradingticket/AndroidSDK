@@ -8,9 +8,9 @@ import retrofit2.Call;
 import retrofit2.Response;
 import it.trade.android.sdk.model.TradeItCallback;
 
-public abstract class PreviewTradeCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> extends DefaultCallbackWithErrorHandling<TradeItResponseType, TradeItCallBackType> {
+public abstract class PreviewTradeCallback<TradeItResponseType, TradeItCallBackType> extends DefaultCallback<TradeItResponseType, TradeItCallBackType> {
 
-    protected PreviewTradeCallbackWithErrorHandling(TradeItCallback<TradeItCallBackType> callback) {
+    protected PreviewTradeCallback(TradeItCallback<TradeItCallBackType> callback) {
         super(callback);
     }
 
@@ -20,14 +20,14 @@ public abstract class PreviewTradeCallbackWithErrorHandling<TradeItResponseType,
             TradeItResponseType responseType = response.body();
             TradeItResponse tradeItResponse = responseType instanceof TradeItResponse ? (TradeItResponse) responseType : null;
             if (tradeItResponse == null) {
-                super.callback.onError(new TradeItErrorResult());
+                onErrorResponse(new TradeItErrorResult());
             } else if (tradeItResponse.status == TradeItResponseStatus.REVIEW_ORDER) {
                 onSuccessResponse(response);
             } else {
-                super.callback.onError(new TradeItErrorResult(tradeItResponse.code, tradeItResponse.shortMessage, tradeItResponse.longMessages));
+                onErrorResponse(new TradeItErrorResult(tradeItResponse.code, tradeItResponse.shortMessage, tradeItResponse.longMessages));
             }
         } else {
-            super.callback.onError(new TradeItErrorResult(response.code()));
+            onErrorResponse(new TradeItErrorResult(response.code()));
         }
     }
 }

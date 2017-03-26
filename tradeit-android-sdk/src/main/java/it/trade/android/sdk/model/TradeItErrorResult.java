@@ -11,6 +11,7 @@ import it.trade.tradeitapi.model.TradeItErrorCode;
 
 public class TradeItErrorResult implements Parcelable {
 
+
     private TradeItErrorCode errorCode = null;
     private String shortMessage = null;
     private List<String> longMessages = Arrays.asList("Trading is temporarily unavailable. Please try again in a few minutes.");
@@ -37,6 +38,22 @@ public class TradeItErrorResult implements Parcelable {
     }
 
     public TradeItErrorResult() {
+    }
+
+    public boolean requiresAuthentication() {
+        return errorCode == TradeItErrorCode.SESSION_EXPIRED || errorCode == TradeItErrorCode.BROKER_ACCOUNT_ERROR;
+    }
+
+    public boolean requiresRelink() {
+        return errorCode == TradeItErrorCode.BROKER_AUTHENTICATION_ERROR || errorCode == TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED;
+    }
+
+    public boolean isConcurrentAuthenticationError() {
+        return errorCode == TradeItErrorCode.CONCURRENT_AUTHENTICATION_ERROR;
+    }
+
+    public boolean isTooManyLoginAttemptsError() {
+        return errorCode == TradeItErrorCode.TOO_MANY_LOGIN_ATTEMPTS;
     }
 
     public TradeItErrorCode getErrorCode() {

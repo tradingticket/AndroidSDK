@@ -10,7 +10,7 @@ For examples usage, see the example app and tests included with the SDK.
 #Quick Start
 Add the following dependency in your project:
 ```
-compile 'it.trade.tradeit:tradeit-android-sdk:0.0.3'
+compile 'it.trade.tradeit:tradeit-android-sdk:0.0.6'
 ```
 You have to configure once the sdk in your application.
 In order to initialize the configuration, obtain an API key from Trade.it, or test with "tradeit-test-api-key"

@@ -15,7 +15,16 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-
+            </intent-filter>
+        </activity>
+        <activity android:name=".WebViewActivity" />
+        <activity
+            android:name=".LinkedBrokersActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".OauthLinkBrokerActivity"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -26,7 +35,18 @@
                     android:scheme="exampleapp" />
             </intent-filter>
         </activity>
-        <activity android:name=".WebViewActivity"></activity>
+        <activity
+            android:name=".LinkedBrokerAccountsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".BalancesActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".PositionsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".PreviewOrderActivity"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

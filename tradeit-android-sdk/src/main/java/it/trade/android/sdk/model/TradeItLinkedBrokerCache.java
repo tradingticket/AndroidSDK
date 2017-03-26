@@ -50,6 +50,25 @@ public class TradeItLinkedBrokerCache {
             TradeItLinkedBroker linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBroker.class);
             linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
             linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
+            for (TradeItLinkedBrokerAccount linkedBrokerAccount: linkedBroker.getAccounts()) {
+                linkedBrokerAccount.setLinkedBroker(linkedBroker);
+            }
         }
     }
+
+    public void removeFromCache(TradeItLinkedBroker linkedBroker) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY, new HashSet<String>());
+        String userId = linkedBroker.getLinkedLogin().userId;
+
+        if (linkedBrokerCache.contains(userId)) {
+            editor.remove(LINKED_BROKER_CACHE_KEY + userId);
+            linkedBrokerCache.remove(userId);
+            editor.putStringSet(LINKED_BROKER_CACHE_KEY, linkedBrokerCache);
+            editor.apply();
+        }
+    }
+
 }

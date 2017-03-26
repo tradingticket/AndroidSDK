@@ -44,9 +44,10 @@ public class TradeItLinkedBrokerTest {
         TradeItOAuthAccessTokenResponse oAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse();
         oAuthAccessTokenResponse.userId = "MyUserId";
         oAuthAccessTokenResponse.userToken = "MyUserToken";
-
-        linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(new TradeItLinkedLogin("MyBroker", oAuthAccessTokenRequest,
-                oAuthAccessTokenResponse), TradeItSDK.getEnvironment()));
+        TradeItApiClient apiClient = new TradeItApiClient(new TradeItLinkedLogin("MyBroker", oAuthAccessTokenRequest,
+                oAuthAccessTokenResponse), TradeItSDK.getEnvironment());
+        apiClient.setSessionToken("MySessionToken");
+        linkedBroker = new TradeItLinkedBroker(apiClient);
     }
 
     @Test
@@ -71,12 +72,13 @@ public class TradeItLinkedBrokerTest {
 
         // Read the data.
         TradeItLinkedBroker createdFromParcel = TradeItLinkedBroker.CREATOR.createFromParcel(parcel);
-        TradeItApiClient apiClient = createdFromParcel.getTradeItApiClient();
+        TradeItApiClient apiClient = createdFromParcel.getApiClient();
         TradeItLinkedLogin linkedLogin = createdFromParcel.getLinkedLogin();
         List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = createdFromParcel.getAccounts();
         Date accountLastUpdated = createdFromParcel.getAccountsLastUpdated();
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue());
+        assertThat(apiClient.getSessionToken(), is("MySessionToken"));
 
         assertThat(linkedLogin, notNullValue());
         assertThat(linkedLogin.apiKey, is("MyApiKey"));

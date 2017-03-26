@@ -164,6 +164,9 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             linkedBroker.accountsLastUpdated != null
             linkedBroker.accounts.size() == 1
             linkedBroker.accounts[0].balance.availableCash == 20000
+
+        and: "the linked broker is set on the linked broekr account"
+            linkedBroker.accounts[0].linkedBroker == linkedBroker
     }
 
     def "SyncFromCache handles a linkedBroker non cached"() {
@@ -197,5 +200,41 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             linkedBroker.linkedLogin.userId == userId
             linkedBroker.accountsLastUpdated == null
             linkedBroker.accounts.size() == 0
+    }
+
+    def "removeFromCache handles a linkedBroker cached"() {
+        given: "a linked broker loaded from the keystore"
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+
+        and: "a linkedBroker cached"
+            Set<String> set = new HashSet<>()
+            sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
+                set.add(userId)
+                return set
+            }
+
+            sharedPreferences.getString({it.contains(userId)}, "") >> {
+                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient);
+                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItBrokerAccount));
+                account1.accountName = "My Account Name"
+                account1.accountNumber = "My Account Number"
+                account1.accountBaseCurrency = "My Account base currency"
+                account1.balance = new TradeItGetAccountOverviewResponse()
+                account1.balance.availableCash = 20000
+                linkedBrokerCached.accountsLastUpdated = new Date()
+                linkedBrokerCached.accounts = [account1]
+                return new Gson().toJson(linkedBrokerCached)
+            }
+
+        when: "removing from cache"
+            linkedBrokerCache.removeFromCache(linkedBroker)
+
+        then: "linkedBroker was removed from the set of string"
+            set.size() == 0
+
+        and: "expects the following method called"
+            1 * editor.putStringSet('TRADE_IT_LINKED_BROKER_CACHE', set)
+            1 * editor.remove("TRADE_IT_LINKED_BROKER_CACHE" + userId)
+            1 * editor.apply();
     }
 }
