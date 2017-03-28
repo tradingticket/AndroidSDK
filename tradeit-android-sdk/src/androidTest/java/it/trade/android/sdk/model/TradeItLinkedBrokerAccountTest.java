@@ -44,7 +44,8 @@ public class TradeItLinkedBrokerAccountTest {
         TradeItOAuthAccessTokenResponse oAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse();
         oAuthAccessTokenResponse.userId = "MyUserId";
         oAuthAccessTokenResponse.userToken = "MyUserToken";
-        TradeItApiClient apiClient = new TradeItApiClient(new TradeItLinkedLogin("MyBroker", oAuthAccessTokenRequest, oAuthAccessTokenResponse), TradeItSDK.getEnvironment());
+        oAuthAccessTokenResponse.broker = "MyBroker";
+        TradeItApiClient apiClient = new TradeItApiClient(new TradeItLinkedLogin(oAuthAccessTokenRequest, oAuthAccessTokenResponse), TradeItSDK.getEnvironment());
         apiClient.setSessionToken("MyToken");
         TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
 
