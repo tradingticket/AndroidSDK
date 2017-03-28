@@ -68,5 +68,5 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.6'
 }
 
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+apply from: 'https://raw.githubusercontent.com/tradingticket/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/tradingticket/JCenter/master/bintrayv1.gradle'
