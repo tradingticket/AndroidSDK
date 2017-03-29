@@ -38,6 +38,10 @@ public class TradeItSdk2 {
         }
     }
 
+    public boolean isConfigured() {
+        return linkedBrokerManager != null;
+    }
+
     public TradeItLinkedBrokerManager getLinkedBrokerManager() throws TradeItSDKConfigurationException {
         if (linkedBrokerManager == null) {
             throw new TradeItSDKConfigurationException("ERROR: TradeItSDK2.linkedBrokerManager referenced before calling TradeItSDK2.configure()!");
