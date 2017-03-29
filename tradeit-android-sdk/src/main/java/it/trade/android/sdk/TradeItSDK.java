@@ -27,7 +27,7 @@ public class TradeItSDK {
             TradeItSDK.environment = environment;
             linkedBrokerCache = new TradeItLinkedBrokerCache(context);
             try {
-                linkedBrokerManager = new TradeItLinkedBrokerManager();
+                linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             } catch (TradeItKeystoreServiceCreateKeyException e) {
                 throw new TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e);
             } catch (TradeItRetrieveLinkedLoginException e) {

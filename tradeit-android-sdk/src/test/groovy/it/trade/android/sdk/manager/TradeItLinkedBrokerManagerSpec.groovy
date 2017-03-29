@@ -72,7 +72,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getAvailableBrokers"
@@ -123,7 +123,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getAvailableBrokers"
@@ -168,7 +168,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
 
@@ -223,7 +223,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling linkBroker"
@@ -268,7 +268,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getOAuthLoginPopupUrlForMobile"
@@ -317,7 +317,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getOAuthLoginPopupUrlForMobile"
@@ -363,7 +363,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
 
@@ -414,7 +414,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         and: "an already linked broker with this user id"
@@ -485,7 +485,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling linkBrokerWithOauthVerifier"
@@ -533,7 +533,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
             linkedBrokerManager.linkedBrokers = [linkedBroker]
 
@@ -582,7 +582,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
             PowerMockito.mockStatic(TradeItBrokerLinker.class)
-            linkedBrokerManager = new TradeItLinkedBrokerManager();
+            linkedBrokerManager = new TradeItLinkedBrokerManager(context);
             linkedBrokerManager.brokerLinker = brokerLinker
 
         when: "calling getOAuthLoginPopupForTokenUpdateUrl"
