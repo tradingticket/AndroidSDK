@@ -109,7 +109,7 @@ public class TradeItLinkedBrokerManager {
         brokerLinker.getOAuthAccessToken(request, new DefaultCallbackWithErrorHandling<TradeItOAuthAccessTokenResponse, TradeItLinkedBroker>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItOAuthAccessTokenResponse> response) {
-                TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(broker, request, response.body());
+                TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(request, response.body());
                 try {
                     TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedLogin, environment));
                     int indexOfLinkedBroker = linkedBrokers.indexOf(linkedBroker);
