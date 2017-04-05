@@ -44,8 +44,10 @@ public class TradeItLinkedBrokerTest {
         TradeItOAuthAccessTokenResponse oAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse();
         oAuthAccessTokenResponse.userId = "MyUserId";
         oAuthAccessTokenResponse.userToken = "MyUserToken";
-        TradeItApiClient apiClient = new TradeItApiClient(new TradeItLinkedLogin("MyBroker", oAuthAccessTokenRequest,
-                oAuthAccessTokenResponse), TradeItSDK.getEnvironment());
+        oAuthAccessTokenResponse.broker = "MyBroker";
+        TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
+        TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItSDK.getEnvironment());
+
         apiClient.setSessionToken("MySessionToken");
         linkedBroker = new TradeItLinkedBroker(apiClient);
     }
@@ -57,9 +59,9 @@ public class TradeItLinkedBrokerTest {
         linkedBroker.setAccountsLastUpdated(date);
         List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
         TradeItBrokerAccount account = new TradeItBrokerAccount();
-        account.accountNumber = "MyAccountnumber";
+        account.accountNumber = "MyAccountNumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
-        account.name = "MyAccountname";
+        account.name = "MyAccountName";
         accounts.add(new TradeItLinkedBrokerAccount(linkedBroker, account));
         linkedBroker.setAccounts(accounts);
 
@@ -87,9 +89,9 @@ public class TradeItLinkedBrokerTest {
 
         assertThat(linkedBrokerAccounts, notNullValue());
         assertThat(linkedBrokerAccounts.size(), is(1));
-        assertThat(linkedBrokerAccounts.get(0).getAccountName(), is("MyAccountname"));
+        assertThat(linkedBrokerAccounts.get(0).getAccountName(), is("MyAccountName"));
         assertThat(linkedBrokerAccounts.get(0).getAccountBaseCurrency(), is("MyAccountBaseCurrency"));
-        assertThat(linkedBrokerAccounts.get(0).getAccountNumber(), is("MyAccountnumber"));
+        assertThat(linkedBrokerAccounts.get(0).getAccountNumber(), is("MyAccountNumber"));
 
         assertThat(accountLastUpdated, is(date));
     }

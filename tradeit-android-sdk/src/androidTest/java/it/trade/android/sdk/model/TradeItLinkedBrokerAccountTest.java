@@ -44,14 +44,17 @@ public class TradeItLinkedBrokerAccountTest {
         TradeItOAuthAccessTokenResponse oAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse();
         oAuthAccessTokenResponse.userId = "MyUserId";
         oAuthAccessTokenResponse.userToken = "MyUserToken";
-        TradeItApiClient apiClient = new TradeItApiClient(new TradeItLinkedLogin("MyBroker", oAuthAccessTokenRequest, oAuthAccessTokenResponse), TradeItSDK.getEnvironment());
+        oAuthAccessTokenResponse.broker = "MyBroker";
+        TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
+        TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItSDK.getEnvironment());
+
         apiClient.setSessionToken("MyToken");
         TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
 
         TradeItBrokerAccount account = new TradeItBrokerAccount();
-        account.accountNumber = "MyAccountnumber";
+        account.accountNumber = "MyAccountNumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
-        account.name = "MyAccountname";
+        account.name = "MyAccountName";
 
         linkedBrokerAccount = new TradeItLinkedBrokerAccount(linkedBroker, account);
     }
@@ -98,8 +101,8 @@ public class TradeItLinkedBrokerAccountTest {
         assertThat(apiClient.getSessionToken(), is("MyToken"));
 
         assertThat(accountBaseCurrency, is("MyAccountBaseCurrency"));
-        assertThat(accountName, is("MyAccountname"));
-        assertThat(accountNumber, is("MyAccountnumber"));
+        assertThat(accountName, is("MyAccountName"));
+        assertThat(accountNumber, is("MyAccountNumber"));
 
         assertThat(createdBalance, is(balance));
         assertThat(createdPositions, is(positions));
