@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.trade.android.sdk.TradeItSDK;
+import it.trade.android.sdk.TradeItSdk2;
 import it.trade.android.sdk.internal.DefaultCallbackWithErrorHandling;
 import it.trade.android.sdk.model.TradeItCallback;
 import it.trade.android.sdk.model.TradeItErrorResult;
@@ -44,11 +45,23 @@ public class TradeItLinkedBrokerManager {
     protected TradeItBrokerLinker brokerLinker;
 
     private List<TradeItLinkedBroker> linkedBrokers = new ArrayList<>();
-    private Context context = TradeItSDK.getContext();
-    private String apiKey =  TradeItSDK.getApiKey();
-    private TradeItEnvironment environment = TradeItSDK.getEnvironment();
+    private final Context context;
+    private final String apiKey;
+    private final TradeItEnvironment environment;
 
-    public TradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedLoginException {
+    public TradeItLinkedBrokerManager(Context context) throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedLoginException {
+        this.context = context;
+        this.apiKey =  TradeItSDK.getApiKey();
+        this.environment = TradeItSDK.getEnvironment();
+        this.brokerLinker = new TradeItBrokerLinker(apiKey, environment);
+        TradeItBrokerLinker.initKeyStore(context);
+        this.loadLinkedBrokersFromSharedPreferences();
+    }
+
+    public TradeItLinkedBrokerManager(Context context, TradeItSdk2 sdk) throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedLoginException {
+        this.context = context;
+        this.apiKey =  sdk.getApiKey();
+        this.environment = sdk.getEnvironment();
         this.brokerLinker = new TradeItBrokerLinker(apiKey, environment);
         TradeItBrokerLinker.initKeyStore(context);
         this.loadLinkedBrokersFromSharedPreferences();
