@@ -25,7 +25,7 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
     private String accountNumber;
     private String accountBaseCurrency;
 
-    private transient TradeItLinkedBroker linkedBroker;
+    public transient TradeItLinkedBroker linkedBroker;
     private TradeItGetAccountOverviewResponse balance;
     private List<TradeItPosition> positions;
     private String userId;
