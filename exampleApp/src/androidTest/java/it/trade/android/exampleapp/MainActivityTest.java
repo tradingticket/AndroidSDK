@@ -15,6 +15,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import it.trade.tradeitapi.API.TradeItBrokerLinker;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -43,7 +45,7 @@ public class MainActivityTest {
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<MainActivity>(MainActivity.class) {
         @Override
         protected void beforeActivityLaunched() {
-            clearSharedPrefs(InstrumentationRegistry.getTargetContext(), "TRADE_IT_SHARED_PREFS_KEY");
+            clearSharedPrefs(InstrumentationRegistry.getTargetContext(), TradeItBrokerLinker.TRADE_IT_SHARED_PREFS_KEY);
             super.beforeActivityLaunched();
         }
     };
