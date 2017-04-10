@@ -32,7 +32,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Link broker via oAuth flow"
+        android:text="Link broker"
         android:id="@+id/button_test_oauth"
         android:onClick="processOauthFlow"
         android:layout_below="@+id/brokers_spinner"

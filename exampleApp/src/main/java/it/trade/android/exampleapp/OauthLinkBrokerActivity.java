@@ -62,8 +62,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
             if (oAuthVerifier != null) {
-                //TODO see if broker is returned in the response, label usefull ?
-                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
+                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
                     @Override
                     public void onSuccess(TradeItLinkedBroker linkedBroker) {
                         oAuthResultTextView.setText("oAuthFlow Success: " + linkedBroker.toString() + "\n");
