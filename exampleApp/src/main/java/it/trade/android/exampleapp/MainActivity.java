@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         addRow(tableLayout, "Authenticate first linked broker", AUTHENTICATE_FIRST_LINKED_BROKER.ordinal());
         addRow(tableLayout, "Authenticate all linked brokers", AUTHENTICATE_ALL_LINKED_BROKERS.ordinal());
         addRow(tableLayout, "Get balances for first linked broker account", GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
-        addRow(tableLayout, "Get positions first linked broker account", GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
+        addRow(tableLayout, "Get positions for first linked broker account", GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
         addRow(tableLayout, "Preview trade for first linked broker account", PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
         addRow(tableLayout, "Simple security question", AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.ordinal());
         addRow(tableLayout, "Security question with options", AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.ordinal());

@@ -85,9 +85,9 @@ public class MainActivityTest {
 
     @Test
     public void testDummySecurity() throws InterruptedException {
-        tapOnText("SimpleSecurityQuestion");
+        tapOnText("Simple security question");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "What is your mother's maiden name");
 
@@ -100,7 +100,7 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummySecurity");
 
@@ -110,10 +110,10 @@ public class MainActivityTest {
     @Test
     public void testDummyMultiple() throws InterruptedException {
         ViewInteraction textView = onView(
-                allOf(withText("SecurityQuestionWithOptions"), isDisplayed()));
+                allOf(withText("Security question with options"), isDisplayed()));
         textView.perform(click());
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "Select an option from the following");
 
@@ -128,7 +128,7 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummyOption");
 
@@ -172,9 +172,9 @@ public class MainActivityTest {
     }
 
     private void testAuthenticateFirstLinkedBroker() throws InterruptedException {
-        tapOnText("authenticateFirstLinkedBroker");
+        tapOnText("Authenticate first linked broker");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_broker_accounts_textview, "# of linkedBroker accounts: 1 : [TradeItLinkedBrokerAccount{accountBaseCurrency='USD', accountName='Individual Account', accountNumber='SINGLE-ACCT-0001'}]");
 
@@ -182,9 +182,9 @@ public class MainActivityTest {
     }
 
     private void testGetBalancesFirstLinkedBroker() throws InterruptedException {
-        tapOnText("GetBalancesFirstLinkedBroker");
+        tapOnText("Get balances for first linked broker account");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.account_overview_textview, "TradeItGetAccountOverviewResponse{availableCash=1204.06, buyingPower=2408.12, dayAbsoluteReturn=78.42, dayPercentReturn=3.25, totalAbsoluteReturn=14486.67, totalPercentReturn=22.84, totalValue=76489.23}, TradeItResponse{code=null, longMessages=[], shortMessage='null', status='null', token='null'}");
 
@@ -192,9 +192,9 @@ public class MainActivityTest {
     }
 
     private void testPositionsFirstLinkedBroker() throws InterruptedException {
-        tapOnText("GetPositionsFirstLinkedBroker");
+        tapOnText("Get positions for first linked broker account");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.positions_textview, "[TradeItPosition{costbasis=103.34, holdingType='LONG', lastPrice=112.34, quantity=1.0, symbol='AAPL', symbolClass='EQUITY_OR_ETF'");
 
@@ -202,9 +202,9 @@ public class MainActivityTest {
     }
 
     private void testPreviewAndPlaceTradeFirstLinkedBroker() throws InterruptedException {
-        tapOnText("PreviewAndPlaceTradeFirstLinkedBrokerAccount");
+        tapOnText("Preview trade for first linked broker account");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponse{ackWarningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00',");
         checkFieldContainsText(R.id.preview_order_textview,"status='REVIEW_ORDER'");
@@ -212,7 +212,7 @@ public class MainActivityTest {
         //place trade
         tapOnText("Place trade");
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview,"TradeItResponse{code=null, longMessages=[Transmitted successfully to Dummy], shortMessage='Order Successfully Submitted', status='SUCCESS'");
 
@@ -220,7 +220,7 @@ public class MainActivityTest {
     }
 
     private void testDeleteAllLinkedBrokers() {
-        tapOnText("deleteAllLinkedBrokers");
+        tapOnText("Delete all linked brokers");
 
         checkFieldContainsText(android.R.id.message, "# of linkedBrokers after deletion: 0");
 
