@@ -49,7 +49,7 @@ public class TradeItLinkedBrokerTest {
         TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItSDK.getEnvironment());
 
         apiClient.setSessionToken("MySessionToken");
-        linkedBroker = new TradeItLinkedBroker(apiClient);
+        linkedBroker = new TradeItLinkedBroker(apiClient, TradeItSDK.getLinkedBrokerCache());
     }
 
     @Test

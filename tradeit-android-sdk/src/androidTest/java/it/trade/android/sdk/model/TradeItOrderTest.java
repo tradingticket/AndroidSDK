@@ -47,7 +47,7 @@ public class TradeItOrderTest {
         TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItSDK.getEnvironment());
 
         apiClient.setSessionToken("MySessionToken");
-        TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+        TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, TradeItSDK.getLinkedBrokerCache());
 
         TradeItBrokerAccount account = new TradeItBrokerAccount();
         account.accountNumber = "MyAccountNumber";
