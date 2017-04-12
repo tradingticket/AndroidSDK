@@ -1,20 +1,18 @@
 package it.trade.android.sdk.manager;
 
-import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.DefaultCallbackWithErrorHandling;
 import it.trade.android.sdk.model.TradeItCallback;
 import it.trade.android.sdk.model.TradeItErrorResult;
 import it.trade.android.sdk.model.TradeItLinkedBroker;
+import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.API.TradeItBrokerLinker;
 import it.trade.tradeitapi.exception.TradeItDeleteLinkedLoginException;
-import it.trade.tradeitapi.exception.TradeItKeystoreServiceCreateKeyException;
 import it.trade.tradeitapi.exception.TradeItRetrieveLinkedLoginException;
 import it.trade.tradeitapi.exception.TradeItSaveLinkedLoginException;
 import it.trade.tradeitapi.exception.TradeItUpdateLinkedLoginException;
@@ -36,32 +34,30 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static it.trade.tradeitapi.API.TradeItBrokerLinker.saveLinkedLogin;
-import static it.trade.tradeitapi.API.TradeItBrokerLinker.updateLinkedLogin;
-
 public class TradeItLinkedBrokerManager {
 
     protected TradeItBrokerLinker brokerLinker;
 
     private List<TradeItLinkedBroker> linkedBrokers = new ArrayList<>();
-    private Context context = TradeItSDK.getContext();
-    private String apiKey =  TradeItSDK.getApiKey();
-    private TradeItEnvironment environment = TradeItSDK.getEnvironment();
+    private TradeItEnvironment environment;
+    private TradeItLinkedBrokerCache linkedBrokerCache;
 
-    public TradeItLinkedBrokerManager() throws TradeItKeystoreServiceCreateKeyException, TradeItRetrieveLinkedLoginException {
-        this.brokerLinker = new TradeItBrokerLinker(apiKey, environment);
-        TradeItBrokerLinker.initKeyStore(context);
+    public TradeItLinkedBrokerManager(TradeItEnvironment environment, TradeItLinkedBrokerCache linkedBrokerCache, TradeItBrokerLinker brokerLinker) throws TradeItRetrieveLinkedLoginException {
+        this.environment = environment;
+        this.linkedBrokerCache = linkedBrokerCache;
+        this.brokerLinker = brokerLinker;
         this.loadLinkedBrokersFromSharedPreferences();
     }
 
     private void loadLinkedBrokersFromSharedPreferences() throws TradeItRetrieveLinkedLoginException {
-        List<TradeItLinkedLogin> linkedLoginList = TradeItBrokerLinker.getLinkedLogins(context);
+        List<TradeItLinkedLogin> linkedLoginList = brokerLinker.getLinkedLogins();
         for (TradeItLinkedLogin linkedLogin : linkedLoginList) {
             TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, environment);
             //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
             apiClient.setSessionToken("invalid-default-token");
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
-            TradeItSDK.getLinkedBrokerCache().syncFromCache(linkedBroker);
+
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache);
+            linkedBrokerCache.syncFromCache(linkedBroker);
             linkedBrokers.add(linkedBroker);
         }
     }
@@ -104,22 +100,22 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
-    public void linkBrokerWithOauthVerifier(final String accountLabel, final String broker, String oAuthVerifier, final TradeItCallback<TradeItLinkedBroker> callback) {
+    public void linkBrokerWithOauthVerifier(final String accountLabel, String oAuthVerifier, final TradeItCallback<TradeItLinkedBroker> callback) {
         final TradeItOAuthAccessTokenRequest request = new TradeItOAuthAccessTokenRequest(oAuthVerifier);
         brokerLinker.getOAuthAccessToken(request, new DefaultCallbackWithErrorHandling<TradeItOAuthAccessTokenResponse, TradeItLinkedBroker>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItOAuthAccessTokenResponse> response) {
-                TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(broker, request, response.body());
+                TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(request, response.body());
                 try {
-                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedLogin, environment));
+                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedLogin, environment), linkedBrokerCache);
                     int indexOfLinkedBroker = linkedBrokers.indexOf(linkedBroker);
                     if (indexOfLinkedBroker != -1) { //linked broker for this user id already exists, this is a token update
                         TradeItLinkedBroker linkedBrokerToUpdate = linkedBrokers.get(indexOfLinkedBroker);
                         linkedBrokerToUpdate.setLinkedLogin(linkedLogin);
                         linkedBroker = linkedBrokerToUpdate;
-                        updateLinkedLogin(context, linkedLogin);
+                        brokerLinker.updateLinkedLogin(linkedLogin);
                     } else {
-                        saveLinkedLogin(context, linkedLogin, accountLabel);
+                        brokerLinker.saveLinkedLogin(linkedLogin, accountLabel);
                         linkedBrokers.add(linkedBroker);
                     }
                     callback.onSuccess(linkedBroker);
@@ -136,9 +132,9 @@ public class TradeItLinkedBrokerManager {
 
     public void unlinkBroker(final TradeItLinkedBroker linkedBroker, TradeItCallback callback) {
         try {
-            TradeItBrokerLinker.deleteLinkedLogin(context, linkedBroker.getLinkedLogin());
+            brokerLinker.deleteLinkedLogin(linkedBroker.getLinkedLogin());
             linkedBrokers.remove(linkedBroker);
-            TradeItSDK.getLinkedBrokerCache().removeFromCache(linkedBroker);
+            linkedBrokerCache.removeFromCache(linkedBroker);
             this.brokerLinker.unlinkBrokerAccount(linkedBroker.getLinkedLogin(), new DefaultCallbackWithErrorHandling<TradeItResponse, TradeItResponse>(callback) {
                 @Override
                 public void onSuccessResponse(Response<TradeItResponse> response) {
@@ -152,7 +148,7 @@ public class TradeItLinkedBrokerManager {
     }
 
     /**
-     * @deprecated Use the new OAuth flow and the {@link #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback)} method instead
+     * @deprecated Use the new OAuth flow and the #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback) method instead
      */
     @Deprecated
     public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBroker> callback) {
@@ -162,8 +158,8 @@ public class TradeItLinkedBrokerManager {
             public void onSuccessResponse(Response<TradeItLinkLoginResponse> response) {
                 TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(linkLoginRequest, response.body());
                 try {
-                    saveLinkedLogin(context, linkedLogin, accountLabel);
-                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedLogin, environment));
+                    brokerLinker.saveLinkedLogin(linkedLogin, accountLabel);
+                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(linkedLogin, environment), linkedBrokerCache);
                     linkedBrokers.add(linkedBroker);
                     callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedLoginException e) {

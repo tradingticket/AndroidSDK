@@ -359,6 +359,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 tradeItOAuthAccessTokenResponse.status = TradeItResponseStatus.SUCCESS
                 tradeItOAuthAccessTokenResponse.userId = myUserId
                 tradeItOAuthAccessTokenResponse.userToken = myUserToken
+                tradeItOAuthAccessTokenResponse.broker = "My broker 1"
                 Response<TradeItLinkLoginResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
                 callback.onResponse(call, response);
             }
@@ -369,7 +370,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBrokerWithOauthVerifier"
             TradeItLinkedBroker linkedBrokerResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBroker linkedBroker) {
@@ -410,6 +411,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 tradeItOAuthAccessTokenResponse.status = TradeItResponseStatus.SUCCESS
                 tradeItOAuthAccessTokenResponse.userId = myUserId
                 tradeItOAuthAccessTokenResponse.userToken = myUserToken
+                tradeItOAuthAccessTokenResponse.broker = "My broker 1"
                 Response<TradeItLinkLoginResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
                 callback.onResponse(call, response);
             }
@@ -422,7 +424,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             TradeItOAuthAccessTokenResponse response = new TradeItOAuthAccessTokenResponse()
             response.userId = myUserId
             response.userToken = "My old userToken"
-            TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin("My broker 1", request, response);
+            response.broker = "My broker 1"
+            TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(request, response);
             TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItEnvironment.QA)
             TradeItLinkedBroker existingLinkedBroker = new TradeItLinkedBroker(apiClient)
             linkedBrokerManager.linkedBrokers = [existingLinkedBroker]
@@ -431,7 +434,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBrokerWithOauthVerifier"
             TradeItLinkedBroker linkedBrokerResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBroker linkedBroker) {
@@ -490,7 +493,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBrokerWithOauthVerifier"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My broker 1", "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBroker linkedBroker) {

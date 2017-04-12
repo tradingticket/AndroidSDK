@@ -34,6 +34,8 @@ import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
 import it.trade.tradeitapi.model.TradeItPosition;
 
+import static it.trade.android.exampleapp.MainActivity.actions.*;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
 
@@ -45,15 +47,19 @@ public class MainActivity extends AppCompatActivity {
 
     private TradeItLinkedBrokerManager linkedBrokerManager;
 
-    private static final int OAUTH_LINKED_A_BROKER_ID = 0;
-    private static final int GET_LINKED_BROKERS_ID = 1;
-    private static final int DELETE_ALL_LINKED_BROKERS_ID = 2;
-    private static final int AUTHENTICATE_FIRST_LINKED_BROKER = 3;
-    private static final int AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE = 4;
-    private static final int AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS = 5;
-    private static final int GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT = 6;
-    private static final int GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT = 7;
-    private static final int PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT = 8;
+    protected enum actions {
+        OAUTH_LINKED_A_BROKER_ID,
+        GET_LINKED_BROKERS_ID,
+        DELETE_ALL_LINKED_BROKERS_ID,
+        AUTHENTICATE_FIRST_LINKED_BROKER,
+        AUTHENTICATE_ALL_LINKED_BROKERS,
+        AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE,
+        AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS,
+        GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT,
+        GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT,
+        PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT,
+        SEPARATOR
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
         linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
-
     }
 
     private void initTable() {
@@ -84,15 +89,16 @@ public class MainActivity extends AppCompatActivity {
         rowHeader.addView(tv);
         tableLayout.addView(rowHeader);
 
-        addRow(tableLayout, "Link a broker via the oAuth flow", OAUTH_LINKED_A_BROKER_ID);
-        addRow(tableLayout, "getLinkedBrokers", GET_LINKED_BROKERS_ID);
-        addRow(tableLayout, "deleteAllLinkedBrokers", DELETE_ALL_LINKED_BROKERS_ID);
-        addRow(tableLayout, "authenticateFirstLinkedBroker", AUTHENTICATE_FIRST_LINKED_BROKER);
-        addRow(tableLayout, "SimpleSecurityQuestion", AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE);
-        addRow(tableLayout, "SecurityQuestionWithOptions", AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS);
-        addRow(tableLayout, "GetBalancesFirstLinkedBroker", GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT);
-        addRow(tableLayout, "GetPositionsFirstLinkedBroker", GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT);
-        addRow(tableLayout, "PreviewAndPlaceTradeFirstLinkedBrokerAccount", PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT);
+        addRow(tableLayout, "Link a broker via the oAuth flow", OAUTH_LINKED_A_BROKER_ID.ordinal());
+        addRow(tableLayout, "getLinkedBrokers", GET_LINKED_BROKERS_ID.ordinal());
+        addRow(tableLayout, "Delete all linked brokers", DELETE_ALL_LINKED_BROKERS_ID.ordinal());
+        addRow(tableLayout, "Authenticate first linked broker", AUTHENTICATE_FIRST_LINKED_BROKER.ordinal());
+        addRow(tableLayout, "Authenticate all linked brokers", AUTHENTICATE_ALL_LINKED_BROKERS.ordinal());
+        addRow(tableLayout, "Get balances for first linked broker account", GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
+        addRow(tableLayout, "Get positions first linked broker account", GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
+        addRow(tableLayout, "Preview trade for first linked broker account", PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
+        addRow(tableLayout, "Simple security question", AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.ordinal());
+        addRow(tableLayout, "Security question with options", AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.ordinal());
 
     }
 
@@ -113,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
     View.OnClickListener rowListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            switch(view.getId()) {
+            switch(actions.values()[view.getId()]) {
                 case OAUTH_LINKED_A_BROKER_ID:
                     Log.d(TAG, "Link a broker tapped!");
                     Intent intentOauth = new Intent(view.getContext(), OauthLinkBrokerActivity.class);
@@ -132,7 +138,14 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case AUTHENTICATE_FIRST_LINKED_BROKER:
                     Log.d(TAG, "Authenticate first linked broker tapped!");
-                    authenticateFirstLinkedBroker();
+                    authenticateLinkedBroker(0);
+                    break;
+                case AUTHENTICATE_ALL_LINKED_BROKERS:
+                    Log.d(TAG, "Authenticate all linked brokers tapped!");
+                    int numLinkedBrokers = linkedBrokerManager.getLinkedBrokers().size();
+                    for (int index = 0; index < numLinkedBrokers; ++index) {
+                        authenticateLinkedBroker(index);
+                    }
                     break;
                 case AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE:
                     Log.d(TAG, "Simple security question was tapped!");
@@ -215,13 +228,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void authenticateFirstLinkedBroker() {
+    private void authenticateLinkedBroker(int index) {
         List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
-        if (linkedBrokers.isEmpty()) {
-            String message = "No linked brokers to authenticate!: " + linkedBrokers.size();
+        if (linkedBrokers.isEmpty() || linkedBrokers.size() < (index + 1)) {
+            String message = "No linked broker to authenticate! Index: " + index + ", linked broker count: " + linkedBrokers.size();
             showAlert("Authenticate linked broker", message);
         } else {
-            TradeItLinkedBroker linkedBroker = linkedBrokers.get(0);
+            TradeItLinkedBroker linkedBroker = linkedBrokers.get(index);
             final MainActivity mainActivity = this;
             linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
                 @Override
@@ -313,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
         if (linkedBrokers.isEmpty()) {
             showAlert("getBalancesFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
-            showAlert("getBalancesFirstLinkedBroker", "No linked broker accounts! Did you authenticate before ?");
+            showAlert("getBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             TradeItLinkedBroker linkedBroker = linkedBrokers.get(0);
             TradeItLinkedBrokerAccount linkedBrokerAccount = linkedBroker.getAccounts().get(0);
@@ -339,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
         if (linkedBrokers.isEmpty()) {
             showAlert("getPositionsFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
-            showAlert("getPositionsFirstLinkedBroker", "No linked broker accounts! Did you authenticate before ?");
+            showAlert("getPositionsFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             TradeItLinkedBroker linkedBroker = linkedBrokers.get(0);
             TradeItLinkedBrokerAccount linkedBrokerAccount = linkedBroker.getAccounts().get(0);
@@ -365,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
         if (linkedBrokers.isEmpty()) {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
-            showAlert("previewTradeFirstLinkedBroker", "No linked broker accounts! Did you authenticate before ?");
+            showAlert("previewTradeFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             final TradeItOrder order = new TradeItOrder(linkedBrokers.get(0).getAccounts().get(0), "GE");
             order.setLimitPrice(20.0);

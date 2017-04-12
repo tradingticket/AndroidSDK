@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.AuthenticationCallback;
 import it.trade.tradeitapi.API.TradeItApiClient;
 import it.trade.tradeitapi.model.TradeItAuthenticateResponse;
@@ -22,9 +21,11 @@ public class TradeItLinkedBroker implements Parcelable {
     private List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
     private Date accountsLastUpdated;
     private TradeItErrorResult error;
+    private transient TradeItLinkedBrokerCache linkedBrokerCache;
 
-    public TradeItLinkedBroker(TradeItApiClient apiClient) {
+    public TradeItLinkedBroker(TradeItApiClient apiClient, TradeItLinkedBrokerCache linkedBrokerCache) {
         this.apiClient = apiClient;
+        this.linkedBrokerCache = linkedBrokerCache;
         setUnauthenticated();
     }
 
@@ -39,7 +40,7 @@ public class TradeItLinkedBroker implements Parcelable {
                 List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
                 accounts = linkedBrokerAccounts;
                 accountsLastUpdated = new Date();
-                TradeItSDK.getLinkedBrokerCache().cache(linkedBroker);
+                linkedBrokerCache.cache(linkedBroker);
                 callback.onSuccess(linkedBrokerAccounts);
             }
 
