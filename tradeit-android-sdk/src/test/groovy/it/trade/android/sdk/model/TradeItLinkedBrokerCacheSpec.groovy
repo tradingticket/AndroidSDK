@@ -35,7 +35,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "Cache handles a linked broker not yet cached with an empty cache"() {
         given: "a linked broker with one account"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache);
             TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItBrokerAccount));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
@@ -84,7 +84,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "Cache update a linked broker already cached"() {
         given: "a linked broker with one account"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache);
             TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItBrokerAccount));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
@@ -135,7 +135,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "SyncFromCache handles a linkedBroker cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache);
 
         and: "a linkedBroker cached"
             sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
@@ -144,7 +144,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
                 return set
             }
             sharedPreferences.getString({it.contains(userId)}, "") >> {
-                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient);
+                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient, linkedBrokerCache);
                 TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItBrokerAccount));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
@@ -171,7 +171,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "SyncFromCache handles a linkedBroker non cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache);
 
         and: "This linkedBroker is not cached"
             sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
@@ -204,7 +204,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "removeFromCache handles a linkedBroker cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache);
 
         and: "a linkedBroker cached"
             Set<String> set = new HashSet<>()
