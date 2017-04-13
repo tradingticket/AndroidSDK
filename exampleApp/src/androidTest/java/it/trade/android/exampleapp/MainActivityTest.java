@@ -28,7 +28,6 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -108,6 +107,7 @@ public class MainActivityTest {
 
     @Test
     public void oAuthFlowToTradeTest() throws InterruptedException {
+        Thread.sleep(15000);
         testOauthFlow();
         testGetLinkedBrokers();
         testAuthenticateFirstLinkedBroker();
@@ -119,6 +119,7 @@ public class MainActivityTest {
 
     @Test
     public void testDummySecurity() throws InterruptedException {
+        Thread.sleep(15000);
         tapOnText("Simple security question");
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
@@ -143,10 +144,9 @@ public class MainActivityTest {
 
     @Test
     public void testDummyMultiple() throws InterruptedException {
+        Thread.sleep(15000);
         ViewInteraction textView = onView(
-                allOf(withText("Security question with options"), isDisplayed())).inRoot(withDecorView(
-                is(mActivity.
-                        getWindow().getDecorView())));
+                allOf(withText("Security question with options"), isDisplayed()));
         textView.perform(click());
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
@@ -172,6 +172,7 @@ public class MainActivityTest {
     }
 
     private void testOauthFlow() throws InterruptedException {
+        Thread.sleep(15000);
         tapOnText("Link a broker via the oAuth flow");
 
         Thread.sleep(2000l); //TODO there should be a better way for waiting
@@ -192,7 +193,7 @@ public class MainActivityTest {
                 .withElement(findElement(Locator.TAG_NAME, "button"))
                 .perform(webClick());
 
-        Thread.sleep(5000l); //TODO there should be a better way for waiting
+        Thread.sleep(15000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "oAuthFlow Success:");
 
