@@ -29,6 +29,14 @@ public class TradeItLinkedBroker implements Parcelable {
         setUnauthenticated();
     }
 
+    protected void cache() {
+        linkedBrokerCache.cache(this);
+    }
+
+//    public void refreshBalancesForAllAccounts() {
+//
+//    }
+
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
         final TradeItLinkedBroker linkedBroker = this;
         this.apiClient.authenticate(new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback, apiClient) {

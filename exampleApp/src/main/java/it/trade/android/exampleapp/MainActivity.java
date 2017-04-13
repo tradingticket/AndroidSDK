@@ -34,7 +34,16 @@ import it.trade.tradeitapi.model.TradeItEnvironment;
 import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
 import it.trade.tradeitapi.model.TradeItPosition;
 
-import static it.trade.android.exampleapp.MainActivity.actions.*;
+import static it.trade.android.exampleapp.MainActivity.actions.AUTHENTICATE_ALL_LINKED_BROKERS;
+import static it.trade.android.exampleapp.MainActivity.actions.AUTHENTICATE_FIRST_LINKED_BROKER;
+import static it.trade.android.exampleapp.MainActivity.actions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS;
+import static it.trade.android.exampleapp.MainActivity.actions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE;
+import static it.trade.android.exampleapp.MainActivity.actions.DELETE_ALL_LINKED_BROKERS;
+import static it.trade.android.exampleapp.MainActivity.actions.GET_BALANCES_FIRST_LINKED_BROKER;
+import static it.trade.android.exampleapp.MainActivity.actions.GET_LINKED_BROKERS;
+import static it.trade.android.exampleapp.MainActivity.actions.GET_POSITIONS_FIRST_LINKED_BROKER;
+import static it.trade.android.exampleapp.MainActivity.actions.OAUTH_LINKED_A_BROKER;
+import static it.trade.android.exampleapp.MainActivity.actions.PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
@@ -48,15 +57,15 @@ public class MainActivity extends AppCompatActivity {
     private TradeItLinkedBrokerManager linkedBrokerManager;
 
     protected enum actions {
-        OAUTH_LINKED_A_BROKER_ID,
-        GET_LINKED_BROKERS_ID,
-        DELETE_ALL_LINKED_BROKERS_ID,
+        OAUTH_LINKED_A_BROKER,
+        GET_LINKED_BROKERS,
+        DELETE_ALL_LINKED_BROKERS,
         AUTHENTICATE_FIRST_LINKED_BROKER,
         AUTHENTICATE_ALL_LINKED_BROKERS,
         AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE,
         AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS,
-        GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT,
-        GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT,
+        GET_BALANCES_FIRST_LINKED_BROKER,
+        GET_POSITIONS_FIRST_LINKED_BROKER,
         PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT,
         SEPARATOR
     }
@@ -77,33 +86,32 @@ public class MainActivity extends AppCompatActivity {
         TableRow rowHeader = new TableRow(this);
         rowHeader.setBackgroundColor(Color.parseColor("#c0c0c0"));
         rowHeader.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
-                TableLayout.LayoutParams.WRAP_CONTENT));
+                                                               TableLayout.LayoutParams.WRAP_CONTENT));
         String headerText = "TradeIt ExampleApp";
 
         TextView tv = new TextView(this);
         tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT));
+                                                     TableRow.LayoutParams.WRAP_CONTENT));
         tv.setGravity(Gravity.CENTER);
         tv.setTextSize(18);
         tv.setText(headerText);
         rowHeader.addView(tv);
         tableLayout.addView(rowHeader);
 
-        addRow(tableLayout, "Link a broker via the oAuth flow", OAUTH_LINKED_A_BROKER_ID.ordinal());
-        addRow(tableLayout, "getLinkedBrokers", GET_LINKED_BROKERS_ID.ordinal());
-        addRow(tableLayout, "Delete all linked brokers", DELETE_ALL_LINKED_BROKERS_ID.ordinal());
+        addRow(tableLayout, "Link a broker via the oAuth flow", OAUTH_LINKED_A_BROKER.ordinal());
+        addRow(tableLayout, "getLinkedBrokers", GET_LINKED_BROKERS.ordinal());
+        addRow(tableLayout, "Delete all linked brokers", DELETE_ALL_LINKED_BROKERS.ordinal());
         addRow(tableLayout, "Authenticate first linked broker", AUTHENTICATE_FIRST_LINKED_BROKER.ordinal());
         addRow(tableLayout, "Authenticate all linked brokers", AUTHENTICATE_ALL_LINKED_BROKERS.ordinal());
-        addRow(tableLayout, "Get balances for first linked broker account", GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
-        addRow(tableLayout, "Get positions for first linked broker account", GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
+        addRow(tableLayout, "Get balances for first linked broker", GET_BALANCES_FIRST_LINKED_BROKER.ordinal());
+        addRow(tableLayout, "Get positions first linked broker", GET_POSITIONS_FIRST_LINKED_BROKER.ordinal());
         addRow(tableLayout, "Preview trade for first linked broker account", PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
         addRow(tableLayout, "Simple security question", AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.ordinal());
         addRow(tableLayout, "Security question with options", AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.ordinal());
-
     }
 
     private void addRow(TableLayout tableLayout, String label, int id) {
-        TableRow row= new TableRow(this);
+        TableRow row = new TableRow(this);
         row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         row.setBackgroundResource(R.drawable.row_border);
         TextView textView = new TextView(this);
@@ -119,20 +127,20 @@ public class MainActivity extends AppCompatActivity {
     View.OnClickListener rowListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            switch(actions.values()[view.getId()]) {
-                case OAUTH_LINKED_A_BROKER_ID:
+            switch (actions.values()[view.getId()]) {
+                case OAUTH_LINKED_A_BROKER:
                     Log.d(TAG, "Link a broker tapped!");
                     Intent intentOauth = new Intent(view.getContext(), OauthLinkBrokerActivity.class);
                     startActivity(intentOauth);
                     break;
-                case GET_LINKED_BROKERS_ID:
+                case GET_LINKED_BROKERS:
                     Log.d(TAG, "Get linked brokers tapped!");
                     List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
                     Intent intent = new Intent(view.getContext(), LinkedBrokersActivity.class);
                     intent.putParcelableArrayListExtra(LINKED_BROKERS_PARAMETER, (ArrayList<? extends Parcelable>) linkedBrokers);
                     startActivity(intent);
                     break;
-                case DELETE_ALL_LINKED_BROKERS_ID:
+                case DELETE_ALL_LINKED_BROKERS:
                     Log.d(TAG, "Delete all linked brokers tapped!");
                     deleteLinkedBrokers();
                     break;
@@ -155,12 +163,12 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Security question with options was tapped!");
                     authenticateWithSecurityQuestionOptions();
                     break;
-                case GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT:
-                    Log.d(TAG, "get balances first linked broker account was tapped!");
-                    getBalancesFirstLinkedBrokerAccount();
+                case GET_BALANCES_FIRST_LINKED_BROKER:
+                    Log.d(TAG, "get balances for first linked broker was tapped!");
+                    getBalancesForFirstLinkedBroker();
                     break;
-                case GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT:
-                    Log.d(TAG, "get positions first linked broker account was tapped!");
+                case GET_POSITIONS_FIRST_LINKED_BROKER:
+                    Log.d(TAG, "get positions first linked broker was tapped!");
                     getPositionsFirstLinkedBroker();
                     break;
                 case PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT:
@@ -210,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "# of linkedBrokers before deletion: " + linkedBrokersToDelete.size());
 
-            for (final TradeItLinkedBroker linkedBroker: linkedBrokersToDelete) {
+            for (final TradeItLinkedBroker linkedBroker : linkedBrokersToDelete) {
                 linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl() {
                     @Override
                     public void onSuccess(Object type) {
@@ -223,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-            //TODO see how to wait for all calls to be finished before calling the alert
+            //TODO: see how to wait for all calls to be finished before calling the alert
             showAlert("Delete linked brokers", "# of linkedBrokers after deletion: " + linkedBrokerManager.getLinkedBrokers().size());
         }
     }
@@ -240,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(final List<TradeItLinkedBrokerAccount> accounts) {
                     Intent intent = new Intent(mainActivity, LinkedBrokerAccountsActivity.class);
-                    intent.putParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER, (ArrayList<? extends Parcelable>)accounts);
+                    intent.putParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER, (ArrayList<? extends Parcelable>) accounts);
                     startActivity(intent);
                 }
 
@@ -313,14 +321,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
             @Override
             public void onError(TradeItErrorResult error) {
-                showAlert("authenticate " + dummyLogin, "Error linking "+ dummyLogin +": " + error);
+                showAlert("authenticate " + dummyLogin, "Error linking " + dummyLogin + ": " + error);
             }
         });
     }
 
-    private void getBalancesFirstLinkedBrokerAccount() {
+    private void getBalancesForFirstLinkedBroker() {
         final MainActivity mainActivity = this;
         List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty()) {
@@ -329,20 +338,21 @@ public class MainActivity extends AppCompatActivity {
             showAlert("getBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             TradeItLinkedBroker linkedBroker = linkedBrokers.get(0);
-            TradeItLinkedBrokerAccount linkedBrokerAccount = linkedBroker.getAccounts().get(0);
-            linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItGetAccountOverviewResponse>() {
-                @Override
-                public void onSuccess(TradeItGetAccountOverviewResponse accountOverviewResponse) {
-                    Intent intent = new Intent(mainActivity, BalancesActivity.class);
-                    intent.putExtra(BALANCES_PARAMETER, accountOverviewResponse);
-                    startActivity(intent);
-                }
+            for (TradeItLinkedBrokerAccount linkedBrokerAccount : linkedBroker.getAccounts()) {
+                linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItGetAccountOverviewResponse>() {
+                    @Override
+                    public void onSuccess(TradeItGetAccountOverviewResponse accountOverviewResponse) {
+                        Intent intent = new Intent(mainActivity, BalancesActivity.class);
+                        intent.putExtra(BALANCES_PARAMETER, accountOverviewResponse);
+                        startActivity(intent);
+                    }
 
-                @Override
-                public void onError(TradeItErrorResult error) {
-                    showAlert("getBalancesFirstLinkedBroker", "Error refreshing balances: " + error);
-                }
-            });
+                    @Override
+                    public void onError(TradeItErrorResult error) {
+                        showAlert("getBalancesFirstLinkedBroker", "Error refreshing balances: " + error);
+                    }
+                });
+            }
         }
     }
 
@@ -355,20 +365,21 @@ public class MainActivity extends AppCompatActivity {
             showAlert("getPositionsFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             TradeItLinkedBroker linkedBroker = linkedBrokers.get(0);
-            TradeItLinkedBrokerAccount linkedBrokerAccount = linkedBroker.getAccounts().get(0);
-            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
-                @Override
-                public void onSuccess(List<TradeItPosition> positions) {
-                    Intent intent = new Intent(mainActivity, PositionsActivity.class);
-                    intent.putParcelableArrayListExtra(POSITIONS_PARAMETER, (ArrayList<? extends Parcelable>) positions);
-                    startActivity(intent);
-                }
+            for (TradeItLinkedBrokerAccount linkedBrokerAccount : linkedBroker.getAccounts()) {
+                linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
+                    @Override
+                    public void onSuccess(List<TradeItPosition> positions) {
+                        Intent intent = new Intent(mainActivity, PositionsActivity.class);
+                        intent.putParcelableArrayListExtra(POSITIONS_PARAMETER, (ArrayList<? extends Parcelable>) positions);
+                        startActivity(intent);
+                    }
 
-                @Override
-                public void onError(TradeItErrorResult error) {
-                    showAlert("getBalancesFirstLinkedBroker", "Error refreshing balances: " + error);
-                }
-            });
+                    @Override
+                    public void onError(TradeItErrorResult error) {
+                        showAlert("getBalancesFirstLinkedBroker", "Error refreshing balances: " + error);
+                    }
+                });
+            }
         }
     }
 

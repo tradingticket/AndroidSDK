@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TradeItLinkedBrokerCache {
-    private static final String LINKED_BROKER_CACHE_KEY = "TRADE_IT_LINKED_BROKER_CACHE";
+    private static final String LINKED_BROKER_CACHE_KEY_PREFIX = "TRADE_IT_LINKED_BROKER_CACHE_";
     public static final String TRADE_IT_SDK_SHARED_PREFS_KEY = "TRADE_IT_SDK_SHARED_PREFS_KEY";
     Gson gson = new Gson();
     private Context context;
@@ -25,29 +25,31 @@ public class TradeItLinkedBrokerCache {
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY, new HashSet<String>());
+        Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, new HashSet<String>());
         String userId = linkedBroker.getLinkedLogin().userId;
 
         if (linkedBrokerCache.contains(userId)) {
-            editor.putString(LINKED_BROKER_CACHE_KEY + userId, linkedBrokerSerializedJson);
+            editor.putString(LINKED_BROKER_CACHE_KEY_PREFIX + userId, linkedBrokerSerializedJson);
         } else {
             linkedBrokerCache.add(userId);
-            editor.putString(LINKED_BROKER_CACHE_KEY + userId, linkedBrokerSerializedJson);
+            editor.putString(LINKED_BROKER_CACHE_KEY_PREFIX + userId, linkedBrokerSerializedJson);
         }
 
-        editor.putStringSet(LINKED_BROKER_CACHE_KEY, linkedBrokerCache);
+        editor.putStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, linkedBrokerCache);
         editor.apply();
     }
 
     public void syncFromCache(TradeItLinkedBroker linkedBroker) {
         String userId = linkedBroker.getLinkedLogin().userId;
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
-        Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY, new HashSet<String>());
+        Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, new HashSet<String>());
+
         if (linkedBrokerCache.contains(userId)) {
-            String linkedBrokerSerialized = sharedPreferences.getString(LINKED_BROKER_CACHE_KEY + userId, "");
+            String linkedBrokerSerialized = sharedPreferences.getString(LINKED_BROKER_CACHE_KEY_PREFIX + userId, "");
             TradeItLinkedBroker linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBroker.class);
             linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
             linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
+
             for (TradeItLinkedBrokerAccount linkedBrokerAccount: linkedBroker.getAccounts()) {
                 linkedBrokerAccount.setLinkedBroker(linkedBroker);
             }
@@ -58,13 +60,13 @@ public class TradeItLinkedBrokerCache {
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY, new HashSet<String>());
+        Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, new HashSet<String>());
         String userId = linkedBroker.getLinkedLogin().userId;
 
         if (linkedBrokerCache.contains(userId)) {
-            editor.remove(LINKED_BROKER_CACHE_KEY + userId);
+            editor.remove(LINKED_BROKER_CACHE_KEY_PREFIX + userId);
             linkedBrokerCache.remove(userId);
-            editor.putStringSet(LINKED_BROKER_CACHE_KEY, linkedBrokerCache);
+            editor.putStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, linkedBrokerCache);
             editor.apply();
         }
     }
