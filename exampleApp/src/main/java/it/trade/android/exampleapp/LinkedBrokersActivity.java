@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -26,7 +29,19 @@ public class LinkedBrokersActivity extends AppCompatActivity {
         if (linkedBrokers.isEmpty()) {
             textView.setText("No linked brokers!");
         } else {
-            textView.setText("# of linkedBrokers: " + linkedBrokers.size() + " : " + linkedBrokers.toString());
+            String output = "";
+
+            output += "=== " + linkedBrokers.size() + " PARCELED LINKED BROKERS ===\n\n";
+
+            Gson gson = new Gson();
+            for (TradeItLinkedBroker linkedBroker : linkedBrokers) {
+                String json = "LINKED LOGIN: " + gson.toJson(linkedBroker.getLinkedLogin());
+                json += "\nLINKED BROKER: " + gson.toJson(linkedBroker);
+                output += json + "\n\n===\n\n";
+                Log.d("TEST", json);
+            }
+            textView.setText(output);
+            Log.d("TEST", "==========");
         }
     }
 }
