@@ -28,6 +28,7 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -41,7 +42,6 @@ import static android.support.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -75,6 +75,13 @@ public class MainActivityTest {
                         | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
             }
         });
+    }
+
+    private MainActivity mActivity = null;
+
+    @Before
+    public void setActivity() {
+        mActivity = mActivityTestRule.getActivity();
     }
 
     private void clearSharedPrefs(Context context, String name) {
@@ -137,7 +144,9 @@ public class MainActivityTest {
     @Test
     public void testDummyMultiple() throws InterruptedException {
         ViewInteraction textView = onView(
-                allOf(withText("Security question with options"), isDisplayed()));
+                allOf(withText("Security question with options"), isDisplayed())).inRoot(withDecorView(
+                is(mActivity.
+                        getWindow().getDecorView())));
         textView.perform(click());
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
