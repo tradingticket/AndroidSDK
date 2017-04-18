@@ -233,8 +233,8 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             set.size() == 0
 
         and: "expects the following method called"
-            1 * editor.putStringSet('TRADE_IT_LINKED_BROKER_CACHE', set)
-            1 * editor.remove("TRADE_IT_LINKED_BROKER_CACHE" + userId)
+            1 * editor.putStringSet(TradeItLinkedBrokerCache.LINKED_BROKER_CACHE_KEY_PREFIX, set)
+            1 * editor.remove(TradeItLinkedBrokerCache.LINKED_BROKER_CACHE_KEY_PREFIX + userId)
             1 * editor.apply();
     }
 }

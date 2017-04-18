@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TradeItLinkedBrokerCache {
-    private static final String LINKED_BROKER_CACHE_KEY_PREFIX = "TRADE_IT_LINKED_BROKER_CACHE_";
+    public static final String LINKED_BROKER_CACHE_KEY_PREFIX = "TRADE_IT_LINKED_BROKER_CACHE_";
     public static final String TRADE_IT_SDK_SHARED_PREFS_KEY = "TRADE_IT_SDK_SHARED_PREFS_KEY";
     Gson gson = new Gson();
     private Context context;
