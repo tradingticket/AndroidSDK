@@ -15,8 +15,7 @@ class TradeItLinkedBrokerSpec extends Specification {
 
 
     void setup() {
-        apiClient.getTradeItLinkedLogin() >> linkedLogin
-        linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache)
+        linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache)
     }
 
     def "authenticate handles a successful response from trade it api"() {
@@ -31,8 +30,8 @@ class TradeItLinkedBrokerSpec extends Specification {
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
             List<TradeItLinkedBrokerAccount> accountsExpected = [new TradeItLinkedBrokerAccount(linkedBroker, account1), new TradeItLinkedBrokerAccount(linkedBroker, account2)]
-            1 * apiClient.authenticate(_) >> { args ->
-                Callback<TradeItAuthenticateResponse> callback = args[0]
+            1 * apiClient.authenticate(linkedLogin, _) >> { args ->
+                Callback<TradeItAuthenticateResponse> callback = args[1]
                 Call<TradeItAuthenticateResponse> call = Mock(Call)
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
@@ -82,8 +81,8 @@ class TradeItLinkedBrokerSpec extends Specification {
             int securityQuestionCallbackCount = 0
             int errorCallBackCount = 0
 
-            1 * apiClient.authenticate(_) >> { args ->
-                Callback<TradeItAuthenticateResponse> callback = args[0]
+            1 * apiClient.authenticate(linkedLogin, _) >> { args ->
+                Callback<TradeItAuthenticateResponse> callback = args[1]
                 Call<TradeItAuthenticateResponse> call = Mock(Call)
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
@@ -130,8 +129,8 @@ class TradeItLinkedBrokerSpec extends Specification {
             int securityQuestionCallbackCount = 0
             int errorCallBackCount = 0
 
-            1 * apiClient.authenticate(_) >> { args ->
-                Callback<TradeItAuthenticateResponse> callback = args[0]
+            1 * apiClient.authenticate(linkedLogin, _) >> { args ->
+                Callback<TradeItAuthenticateResponse> callback = args[1]
                 Call<TradeItAuthenticateResponse> call = Mock(Call)
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
@@ -195,8 +194,8 @@ class TradeItLinkedBrokerSpec extends Specification {
             account2.name = "My account name 2"
             List<TradeItLinkedBrokerAccount> accountsExpected = [new TradeItLinkedBrokerAccount(linkedBroker, account1), new TradeItLinkedBrokerAccount(linkedBroker, account2)]
 
-            1 * apiClient.authenticate(_) >> { args ->
-                Callback<TradeItAuthenticateResponse> callback = args[0]
+            1 * apiClient.authenticate(linkedLogin, _) >> { args ->
+                Callback<TradeItAuthenticateResponse> callback = args[1]
                 Call<TradeItAuthenticateResponse> call = Mock(Call)
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
