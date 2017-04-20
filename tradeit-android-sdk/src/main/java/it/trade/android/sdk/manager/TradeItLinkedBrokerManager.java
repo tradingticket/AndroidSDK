@@ -92,8 +92,8 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
-    public void getOAuthLoginPopupForTokenUpdateUrl(String broker, String userId, String deepLinkCallback, final TradeItCallback<String> callback) {
-        TradeItOAuthLoginPopupUrlForTokenUpdateRequest request = new TradeItOAuthLoginPopupUrlForTokenUpdateRequest(broker, deepLinkCallback, userId);
+    public void getOAuthLoginPopupForTokenUpdateUrl(TradeItLinkedBroker linkedBroker, String deepLinkCallback, final TradeItCallback<String> callback) {
+        TradeItOAuthLoginPopupUrlForTokenUpdateRequest request = new TradeItOAuthLoginPopupUrlForTokenUpdateRequest(linkedBroker.getBrokerName(), deepLinkCallback, linkedBroker.getLinkedLogin().userId);
         brokerLinker.getOAuthLoginPopupUrlForTokenUpdate(request, new DefaultCallbackWithErrorHandling<TradeItOAuthLoginPopupUrlForTokenUpdateResponse, String>(callback) {
             @Override
             public void onSuccessResponse(Response<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> response) {

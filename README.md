@@ -90,9 +90,9 @@ To get the linked brokers:
 ```Java
 linkedBrokerManager.getLinkedBrokers();
 ```
-To update the credentials of a linked broker, you have to follow the same steps as if it was a new link, but call the getOAuthLoginPopupForTokenUpdateUrl method in the first step with the userId:
+To update the credentials of a linked broker, you have to follow the same steps as if it was a new link, but call the getOAuthLoginPopupForTokenUpdateUrl method in the first step with the linked broker to relink:
 ```Java
-linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl("Dummy", userId, "yourSpecificApp://yourSpecificHost", new TradeItCallBackImpl<String>() {
+linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "yourSpecificApp://yourSpecificHost", new TradeItCallBackImpl<String>() {
      @Override
      public void onSuccess(String oAuthUrl) {
         // display the url in a webview in order to the user complete his brokerage login.

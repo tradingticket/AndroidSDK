@@ -526,8 +526,21 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int successCallBackCount = 0
             int errorCallBackCount = 0
             String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
-            1 * brokerLinker.getOAuthLoginPopupUrlForTokenUpdate(_, _) >> { args ->
-                Callback<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> callback = args[1]
+
+            TradeItLinkedLogin linkedLogin = Mock(TradeItLinkedLogin.class)
+            linkedLogin.userId = "My userId"
+
+            TradeItLinkedBroker linkedBroker = Mock(TradeItLinkedBroker.class)
+            1 * linkedBroker.getBrokerName() >> "My broker 1"
+            1 * linkedBroker.getLinkedLogin() >> linkedLogin
+
+            1 * brokerLinker.getOAuthLoginPopupUrlForTokenUpdate(
+                    { TradeItOAuthLoginPopupUrlForTokenUpdateRequest request ->
+                        (request.userId == "My userId"
+                                && request.broker == "My broker 1"
+                                && request.interAppAddressCallback == "my internal app callback")
+                    },
+                    _) >> { _, Callback<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> callback ->
                 Call<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> call = Mock(Call)
                 TradeItOAuthLoginPopupUrlForTokenUpdateResponse tradeItOAuthLoginPopupUrlForTokenUpdateResponse = new TradeItOAuthLoginPopupUrlForTokenUpdateResponse()
                 tradeItOAuthLoginPopupUrlForTokenUpdateResponse.sessionToken = "My session token"
@@ -540,7 +553,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling getOAuthLoginPopupForTokenUpdateUrl"
             String oAuthUrlResult = null
-            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl("My broker 1", "userId", "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "my internal app callback", new TradeItCallBackImpl<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {
