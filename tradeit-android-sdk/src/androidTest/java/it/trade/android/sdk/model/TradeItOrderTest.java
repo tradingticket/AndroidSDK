@@ -44,10 +44,10 @@ public class TradeItOrderTest {
         oAuthAccessTokenResponse.userToken = "MyUserToken";
         oAuthAccessTokenResponse.broker = "MyBroker";
         TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
-        TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItSDK.getEnvironment());
+        TradeItApiClient apiClient = new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment());
 
         apiClient.setSessionToken("MySessionToken");
-        TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient);
+        TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());
 
         TradeItBrokerAccount account = new TradeItBrokerAccount();
         account.accountNumber = "MyAccountNumber";

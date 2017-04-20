@@ -31,7 +31,7 @@ public class TradeItSdkInstance {
         }
 
         try {
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
+            linkedBrokerManager = new TradeItLinkedBrokerManager(apiKey, environment, linkedBrokerCache, brokerLinker);
         } catch (TradeItRetrieveLinkedLoginException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e);
         }

@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
 
     public transient TradeItLinkedBroker linkedBroker;
     private TradeItGetAccountOverviewResponse balance;
+    private Date balanceLastUpdated;
     private List<TradeItPosition> positions;
     private String userId;
 
@@ -66,8 +68,14 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         return balance;
     }
 
-    void setBalance(TradeItGetAccountOverviewResponse balance) {
+    public void setBalance(TradeItGetAccountOverviewResponse balance) {
         this.balance = balance;
+    }
+
+    public Date getBalanceLastUpdated() { return this.balanceLastUpdated; }
+
+    public void setBalanceLastUpdated(Date balanceLastUpdated) {
+        this.balanceLastUpdated = balanceLastUpdated;
     }
 
     public List<TradeItPosition> getPositions() {
@@ -89,6 +97,8 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
             @Override
             public void onSuccessResponse(Response<TradeItGetAccountOverviewResponse> response) {
                 balance = response.body();
+                balanceLastUpdated = new Date();
+                linkedBroker.cache();
                 callback.onSuccess(response.body());
             }
 
@@ -150,7 +160,6 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
                 '}';
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -162,6 +171,7 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         dest.writeString(this.accountNumber);
         dest.writeString(this.accountBaseCurrency);
         dest.writeParcelable(this.balance, flags);
+        dest.writeLong(this.balanceLastUpdated != null ? this.balanceLastUpdated.getTime() : -1);
         dest.writeList(this.positions);
         dest.writeString(this.userId);
         linkedBrokersMap.put(this.userId, linkedBroker);
@@ -172,6 +182,8 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         this.accountNumber = in.readString();
         this.accountBaseCurrency = in.readString();
         this.balance = in.readParcelable(TradeItGetAccountOverviewResponse.class.getClassLoader());
+        long tmpBalanceLastUpdated = in.readLong();
+        this.balanceLastUpdated = tmpBalanceLastUpdated == -1 ? null : new Date(tmpBalanceLastUpdated);
         this.positions = new ArrayList<TradeItPosition>();
         in.readList(this.positions, TradeItPosition.class.getClassLoader());
         this.userId = in.readString();

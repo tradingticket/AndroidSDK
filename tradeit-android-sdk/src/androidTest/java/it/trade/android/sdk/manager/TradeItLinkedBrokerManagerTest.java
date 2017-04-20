@@ -264,7 +264,7 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void getOAuthLoginPopupUrlForMobile() throws InterruptedException {
-        linkedBrokerManager.getOAuthLoginPopupUrlForMobile("Dummy", "myinternalappcallback", new TradeItCallBackImpl<String>() {
+        linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "myinternalappcallback", new TradeItCallBackImpl<String>() {
 
             @Override
             public void onSuccess(String oAuthUrl) {
@@ -281,7 +281,7 @@ public class TradeItLinkedBrokerManagerTest {
         });
 
         boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
-        assertThat("The call to getOAuthLoginPopupUrlForMobile is not expired", notExpired, is(true));
+        assertThat("The call to getOAuthLoginPopupUrl is not expired", notExpired, is(true));
     }
 
     @Test
