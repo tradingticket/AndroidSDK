@@ -18,13 +18,15 @@ import retrofit2.Response;
 
 public class TradeItLinkedBroker implements Parcelable {
     private transient TradeItApiClient apiClient;
+    private transient TradeItLinkedLogin linkedLogin;
     private List<TradeItLinkedBrokerAccount> accounts = new ArrayList<>();
     private Date accountsLastUpdated;
     private TradeItErrorResult error;
     private transient TradeItLinkedBrokerCache linkedBrokerCache;
 
-    public TradeItLinkedBroker(TradeItApiClient apiClient, TradeItLinkedBrokerCache linkedBrokerCache) {
+    public TradeItLinkedBroker(TradeItApiClient apiClient, TradeItLinkedLogin linkedLogin, TradeItLinkedBrokerCache linkedBrokerCache) {
         this.apiClient = apiClient;
+        this.linkedLogin = linkedLogin;
         this.linkedBrokerCache = linkedBrokerCache;
         setUnauthenticated();
     }
@@ -39,7 +41,7 @@ public class TradeItLinkedBroker implements Parcelable {
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccount>> callback) {
         final TradeItLinkedBroker linkedBroker = this;
-        this.apiClient.authenticate(new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback, apiClient) {
+        this.apiClient.authenticate(this.linkedLogin, new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccount>>(callback, apiClient) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
                 linkedBroker.error = null;
@@ -81,18 +83,14 @@ public class TradeItLinkedBroker implements Parcelable {
     @Override
     public String toString() {
         return "TradeItLinkedBroker{" +
-                "TradeItLinkedLogin=" + getLinkedLogin().toString() +
+                "TradeItLinkedLogin=" + this.linkedLogin.toString() +
                 ", accounts=" + getAccounts().toString() +
                 ", accountsLastUpdated=" + getAccountsLastUpdated() +
                 '}';
     }
 
-    public TradeItLinkedLogin getLinkedLogin() {
-        return this.apiClient.getTradeItLinkedLogin();
-    }
-
     public String getBrokerName() {
-        return this.apiClient.getTradeItLinkedLogin().broker;
+        return this.linkedLogin.broker;
     }
 
     TradeItApiClient getApiClient() {
@@ -130,17 +128,21 @@ public class TradeItLinkedBroker implements Parcelable {
 
         TradeItLinkedBroker that = (TradeItLinkedBroker) o;
 
-        return apiClient.getTradeItLinkedLogin().userId.equals(that.apiClient.getTradeItLinkedLogin().userId);
+        return linkedLogin.userId.equals(that.linkedLogin.userId);
 
     }
 
     @Override
     public int hashCode() {
-        return apiClient.getTradeItLinkedLogin().userId.hashCode();
+        return linkedLogin.userId.hashCode();
+    }
+
+    public TradeItLinkedLogin getLinkedLogin() {
+        return linkedLogin;
     }
 
     public void setLinkedLogin(TradeItLinkedLogin linkedLogin) {
-        this.apiClient.setTradeItLinkedLogin(linkedLogin);
+        this.linkedLogin = linkedLogin;
     }
 
 
@@ -152,15 +154,19 @@ public class TradeItLinkedBroker implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.apiClient, flags);
+        dest.writeParcelable(this.linkedLogin, flags);
         dest.writeTypedList(this.accounts);
         dest.writeLong(this.accountsLastUpdated != null ? this.accountsLastUpdated.getTime() : -1);
+        dest.writeParcelable(this.error, flags);
     }
 
     protected TradeItLinkedBroker(Parcel in) {
         this.apiClient = in.readParcelable(TradeItApiClient.class.getClassLoader());
+        this.linkedLogin = in.readParcelable(TradeItLinkedLogin.class.getClassLoader());
         this.accounts = in.createTypedArrayList(TradeItLinkedBrokerAccount.CREATOR);
         long tmpAccountsLastUpdated = in.readLong();
         this.accountsLastUpdated = tmpAccountsLastUpdated == -1 ? null : new Date(tmpAccountsLastUpdated);
+        this.error = in.readParcelable(TradeItErrorResult.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<TradeItLinkedBroker> CREATOR = new Parcelable.Creator<TradeItLinkedBroker>() {

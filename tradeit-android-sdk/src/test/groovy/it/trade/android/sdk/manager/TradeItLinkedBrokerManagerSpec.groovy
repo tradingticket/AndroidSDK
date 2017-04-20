@@ -1,6 +1,5 @@
 package it.trade.android.sdk.manager
 
-import android.content.Context
 import it.trade.android.sdk.model.TradeItCallBackImpl
 import it.trade.android.sdk.model.TradeItErrorResult
 import it.trade.android.sdk.model.TradeItLinkedBroker
@@ -9,20 +8,13 @@ import it.trade.tradeitapi.API.TradeItApiClient
 import it.trade.tradeitapi.API.TradeItBrokerLinker
 import it.trade.tradeitapi.model.*
 import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker
-import org.junit.Rule
-import org.powermock.core.classloader.annotations.PrepareForTest
-import org.powermock.modules.junit4.rule.PowerMockRule
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import spock.lang.Specification
-/**
- * Note: if you run this with android studio, you may need to add '-noverify' in the VM options because of a bug in PowerMock
- */
-@PrepareForTest([TradeItBrokerLinker.class])
+
 class TradeItLinkedBrokerManagerSpec extends Specification {
 
-    Context context = Mock(Context)
     TradeItBrokerLinker brokerLinker = Mock(TradeItBrokerLinker)
     TradeItLinkedBrokerManager linkedBrokerManager
     String accountLabel = "My account label"
@@ -32,12 +24,10 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     TradeItEnvironment environment = TradeItEnvironment.QA
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
 
-    @Rule
-    PowerMockRule powerMockRule = new PowerMockRule();
-
     void setup() {
         brokerLinker.getTradeItEnvironment() >> TradeItEnvironment.QA
         brokerLinker.getLinkedLogins() >> []
+        linkedBrokerManager = new TradeItLinkedBrokerManager(apiKey, environment, linkedBrokerCache, brokerLinker);
     }
 
     def "GetAvailableBrokers handles a successful response from trade it api"() {
@@ -68,8 +58,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItAvailableBrokersResponse> response = Response.success(tradeItAvailableBrokersResponse);
                 callback.onResponse(call, response);
             }
-
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
 
         when: "calling getAvailableBrokers"
@@ -119,7 +107,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItAvailableBrokersResponse> response = Response.success(tradeItAvailableBrokersResponse);
                 callback.onResponse(call, response);
             }
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
         when: "calling getAvailableBrokers"
             int successCallBackCount = 0
@@ -162,8 +149,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItLinkLoginResponse> response = Response.success(tradeItLinkLoginResponse);
                 callback.onResponse(call, response);
             }
-
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
         when: "calling linkBroker"
             TradeItLinkedBroker linkedBrokerResult = null
@@ -214,7 +199,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItLinkLoginResponse> response = Response.success(tradeItLinkLoginResponse);
                 callback.onResponse(call, response);
             }
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
         when: "calling linkBroker"
             TradeItErrorResult errorResult = null
@@ -257,8 +241,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItOAuthLoginPopupUrlForMobileResponse> response = Response.success(tradeItOAuthLoginPopupUrlForMobileResponse);
                 callback.onResponse(call, response);
             }
-
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
         when: "calling getOAuthLoginPopupUrlForMobile"
             TradeItErrorResult errorResult = null
@@ -305,7 +287,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItOAuthLoginPopupUrlForMobileResponse> response = Response.success(tradeItOAuthLoginPopupUrlForMobileResponse);
                 callback.onResponse(call, response);
             }
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
         when: "calling getOAuthLoginPopupUrlForMobile"
             TradeItErrorResult errorResult = null
@@ -350,7 +331,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItLinkLoginResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
                 callback.onResponse(call, response);
             }
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
 
         when: "calling linkBrokerWithOauthVerifier"
@@ -399,7 +379,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItLinkLoginResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
                 callback.onResponse(call, response);
             }
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
         and: "an already linked broker with this user id"
             TradeItOAuthAccessTokenRequest request = new TradeItOAuthAccessTokenRequest()
@@ -408,8 +387,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             response.userToken = "My old userToken"
             response.broker = "My broker 1"
             TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(request, response);
-            TradeItApiClient apiClient = new TradeItApiClient(linkedLogin, TradeItEnvironment.QA)
-            TradeItLinkedBroker existingLinkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache)
+            TradeItApiClient apiClient = new TradeItApiClient(apiKey, TradeItEnvironment.QA)
+            TradeItLinkedBroker existingLinkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache)
             linkedBrokerManager.linkedBrokers = [existingLinkedBroker]
 
 
@@ -469,8 +448,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
 
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
-
         when: "calling linkBrokerWithOauthVerifier"
             TradeItErrorResult errorResult = null
             linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
@@ -499,8 +476,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     def "unlinkBroker handles a successful response from trade it api "() {
         given: "a linked broker to unlink"
             TradeItApiClient apiClient = Mock(TradeItApiClient)
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedBrokerCache)
-            apiClient.getTradeItLinkedLogin() >> Mock(TradeItLinkedLogin)
+            TradeItLinkedLogin linkedLogin = Mock(TradeItLinkedLogin)
+            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache)
 
         and: "a successful response from trade it api"
             int successCallBackCount = 0
@@ -515,7 +492,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItResponse> response = Response.success(tradeItResponse);
                 callback.onResponse(call, response);
             }
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
             linkedBrokerManager.linkedBrokers = [linkedBroker]
 
         when: "calling unlinkBroker"
@@ -561,8 +537,6 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 Response<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> response = Response.success(tradeItOAuthLoginPopupUrlForTokenUpdateResponse);
                 callback.onResponse(call, response);
             }
-
-            linkedBrokerManager = new TradeItLinkedBrokerManager(environment, linkedBrokerCache, brokerLinker);
 
         when: "calling getOAuthLoginPopupForTokenUpdateUrl"
             String oAuthUrlResult = null
