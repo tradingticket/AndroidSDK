@@ -39,7 +39,7 @@ linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvai
 Link (authorize) a user's broker account: There are several steps to follow:
 ```Java
 // get the oauthURL
-linkedBrokerManager.getOAuthLoginPopupUrlForMobile("Dummy", "yourSpecificApp://yourSpecificHost", new TradeItCallBackImpl<String>() {
+linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "yourSpecificApp://yourSpecificHost", new TradeItCallBackImpl<String>() {
     @Override
     public void onSuccess(String oAuthUrl) {
         // display the url in a webview in order to the user complete his brokerage login. 

@@ -80,7 +80,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
     public void processOauthFlow(View view) {
         final Context context = this;
         Broker brokerSelected = (Broker) brokersSpinner.getSelectedItem();
-        linkedBrokerManager.getOAuthLoginPopupUrlForMobile(brokerSelected.shortName, "exampleapp://tradeit", new TradeItCallBackImpl<String>() {
+        linkedBrokerManager.getOAuthLoginPopupUrl(brokerSelected.shortName, "exampleapp://tradeit", new TradeItCallBackImpl<String>() {
             @Override
             public void onSuccess(String oAuthUrl) {
                 Intent intent = new Intent(context, WebViewActivity.class);
@@ -90,7 +90,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
 
             @Override
             public void onError(TradeItErrorResult error) {
-                oAuthResultTextView.setText("getOAuthLoginPopupUrlForMobile Error: " + error + "\n");
+                oAuthResultTextView.setText("getOAuthLoginPopupUrl Error: " + error + "\n");
             }
         });
     }

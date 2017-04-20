@@ -242,10 +242,10 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
 
-        when: "calling getOAuthLoginPopupUrlForMobile"
+        when: "calling getOAuthLoginPopupUrl"
             TradeItErrorResult errorResult = null
             String oAuthUrlResult = null
-            linkedBrokerManager.getOAuthLoginPopupUrlForMobile("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {
@@ -288,9 +288,9 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 callback.onResponse(call, response);
             }
 
-        when: "calling getOAuthLoginPopupUrlForMobile"
+        when: "calling getOAuthLoginPopupUrl"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.getOAuthLoginPopupUrlForMobile("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {
