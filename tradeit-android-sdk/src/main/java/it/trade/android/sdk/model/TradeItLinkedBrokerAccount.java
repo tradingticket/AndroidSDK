@@ -68,8 +68,14 @@ public class TradeItLinkedBrokerAccount implements Parcelable {
         return balance;
     }
 
-    void setBalance(TradeItGetAccountOverviewResponse balance) {
+    public void setBalance(TradeItGetAccountOverviewResponse balance) {
         this.balance = balance;
+    }
+
+    public Date getBalanceLastUpdated() { return this.balanceLastUpdated; }
+
+    public void setBalanceLastUpdated(Date balanceLastUpdated) {
+        this.balanceLastUpdated = balanceLastUpdated;
     }
 
     public List<TradeItPosition> getPositions() {
