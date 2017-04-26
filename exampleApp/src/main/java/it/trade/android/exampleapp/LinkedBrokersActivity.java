@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-import it.trade.android.sdk.model.TradeItLinkedBroker;
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 
 import static it.trade.android.exampleapp.MainActivity.LINKED_BROKERS_PARAMETER;
 
@@ -24,7 +24,7 @@ public class LinkedBrokersActivity extends AppCompatActivity {
         final TextView textView = (TextView) this.findViewById(R.id.linked_brokers_textview);
         textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        List<TradeItLinkedBroker> linkedBrokers = intent.getParcelableArrayListExtra(LINKED_BROKERS_PARAMETER);
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = intent.getParcelableArrayListExtra(LINKED_BROKERS_PARAMETER);
 
         if (linkedBrokers.isEmpty()) {
             textView.setText("No linked brokers!");
@@ -34,7 +34,7 @@ public class LinkedBrokersActivity extends AppCompatActivity {
             output += "=== " + linkedBrokers.size() + " PARCELED LINKED BROKERS ===\n\n";
 
             Gson gson = new Gson();
-            for (TradeItLinkedBroker linkedBroker : linkedBrokers) {
+            for (TradeItLinkedBrokerParcelable linkedBroker : linkedBrokers) {
                 String json = "LINKED LOGIN: " + gson.toJson(linkedBroker.getLinkedLogin());
                 json += "\nLINKED BROKER: " + gson.toJson(linkedBroker);
                 output += json + "\n\n===\n\n";

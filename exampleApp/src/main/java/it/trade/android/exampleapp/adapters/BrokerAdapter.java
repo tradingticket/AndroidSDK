@@ -9,10 +9,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker;
+import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker;
 
-public class BrokerAdapter extends ArrayAdapter<TradeItAvailableBrokersResponse.Broker> {
+public class BrokerAdapter extends ArrayAdapter<Broker> {
 
     public BrokerAdapter(Context context, List<Broker> items) {
         super(context, android.R.layout.simple_spinner_item, items);

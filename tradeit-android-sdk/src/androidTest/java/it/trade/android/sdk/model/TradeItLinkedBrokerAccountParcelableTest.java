@@ -14,14 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.trade.android.sdk.TradeItSDK;
-import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.TradeItBrokerAccount;
-import it.trade.tradeitapi.model.TradeItEnvironment;
-import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
-import it.trade.tradeitapi.model.TradeItLinkedLogin;
-import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
-import it.trade.tradeitapi.model.TradeItOAuthAccessTokenResponse;
-import it.trade.tradeitapi.model.TradeItPosition;
+import it.trade.api.TradeItApiClient;
+import it.trade.model.reponse.TradeItBrokerAccount;
+import it.trade.model.reponse.TradeItOAuthAccessTokenResponse;
+import it.trade.model.request.TradeItEnvironment;
+import it.trade.model.request.TradeItOAuthAccessTokenRequest;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -29,9 +26,9 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class TradeItLinkedBrokerAccountTest {
+public class TradeItLinkedBrokerAccountParcelableTest {
 
-    private TradeItLinkedBrokerAccount linkedBrokerAccount;
+    private TradeItLinkedBrokerAccountParcelable linkedBrokerAccount;
 
     @Before
     public void createTradeItLinkedBrokerAccount() {
@@ -45,32 +42,32 @@ public class TradeItLinkedBrokerAccountTest {
         oAuthAccessTokenResponse.userId = "MyUserId";
         oAuthAccessTokenResponse.userToken = "MyUserToken";
         oAuthAccessTokenResponse.broker = "MyBroker";
-        TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
-        TradeItApiClient apiClient = new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment());
+        TradeItLinkedLoginParcelable linkedLogin = new TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
+        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable(new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment()));
 
         apiClient.setSessionToken("MyToken");
-        TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());
+        TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());
 
         TradeItBrokerAccount account = new TradeItBrokerAccount();
         account.accountNumber = "MyAccountNumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
         account.name = "MyAccountName";
 
-        linkedBrokerAccount = new TradeItLinkedBrokerAccount(linkedBroker, account);
+        linkedBrokerAccount = new TradeItLinkedBrokerAccountParcelable(linkedBroker, account);
     }
 
     @Test
     public void linkedBrokerAccount_ParcelableWriteRead() {
         // Set up the Parcelable object to send and receive.
-        TradeItPosition position = new TradeItPosition();
+        TradeItPositionParcelable position = new TradeItPositionParcelable();
         position.quantity = 12.00;
         position.symbol = "GE";
         position.lastPrice = 29.84;
-        List<TradeItPosition> positions = new ArrayList<>();
+        List<TradeItPositionParcelable> positions = new ArrayList<>();
         positions.add(position);
         linkedBrokerAccount.setPositions(positions);
 
-        TradeItGetAccountOverviewResponse balance = new TradeItGetAccountOverviewResponse();
+        TradeItBalanceParcelable balance = new TradeItBalanceParcelable();
         balance.availableCash = 1200.54;
         balance.buyingPower = 2604.45;
         balance.dayAbsoluteReturn = 100.00;
@@ -88,13 +85,13 @@ public class TradeItLinkedBrokerAccountTest {
         parcel.setDataPosition(0);
 
         // Read the data.
-        TradeItLinkedBrokerAccount createdFromParcel = TradeItLinkedBrokerAccount.CREATOR.createFromParcel(parcel);
+        TradeItLinkedBrokerAccountParcelable createdFromParcel = TradeItLinkedBrokerAccountParcelable.CREATOR.createFromParcel(parcel);
         TradeItApiClient apiClient = createdFromParcel.getTradeItApiClient();
         String accountBaseCurrency = createdFromParcel.getAccountBaseCurrency();
         String accountName = createdFromParcel.getAccountName();
         String accountNumber = createdFromParcel.getAccountNumber();
-        TradeItGetAccountOverviewResponse createdBalance = createdFromParcel.getBalance();
-        List<TradeItPosition> createdPositions = createdFromParcel.getPositions();
+        TradeItBalanceParcelable createdBalance = createdFromParcel.getBalance();
+        List<TradeItPositionParcelable> createdPositions = createdFromParcel.getPositions();
 
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue());

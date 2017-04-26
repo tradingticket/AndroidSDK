@@ -23,16 +23,16 @@ import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
-import it.trade.android.sdk.model.TradeItCallBackImpl;
-import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionImpl;
-import it.trade.android.sdk.model.TradeItErrorResult;
-import it.trade.android.sdk.model.TradeItLinkedBroker;
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccount;
-import it.trade.android.sdk.model.TradeItOrder;
-import it.trade.android.sdk.model.TradeItSecurityQuestion;
-import it.trade.tradeitapi.model.TradeItEnvironment;
-import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
-import it.trade.tradeitapi.model.TradeItPosition;
+import it.trade.android.sdk.model.TradeItBalanceParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
+import it.trade.android.sdk.model.TradeItOrderParcelable;
+import it.trade.android.sdk.model.TradeItPositionParcelable;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.TradeItSecurityQuestion;
+import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
+import it.trade.model.request.TradeItEnvironment;
 
 import static it.trade.android.exampleapp.MainActivity.actions.AUTHENTICATE_ALL_LINKED_BROKERS;
 import static it.trade.android.exampleapp.MainActivity.actions.AUTHENTICATE_FIRST_LINKED_BROKER;
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case GET_LINKED_BROKERS:
                     Log.d(TAG, "Get linked brokers tapped!");
-                    List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+                    List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
                     Intent intent = new Intent(view.getContext(), LinkedBrokersActivity.class);
                     intent.putParcelableArrayListExtra(LINKED_BROKERS_PARAMETER, (ArrayList<? extends Parcelable>) linkedBrokers);
                     startActivity(intent);
@@ -211,14 +211,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deleteLinkedBrokers() {
-        List<TradeItLinkedBroker> linkedBrokersToDelete = linkedBrokerManager.getLinkedBrokers();
+        List<TradeItLinkedBrokerParcelable> linkedBrokersToDelete = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokersToDelete.isEmpty()) {
             String message = "No linked brokers to delete!: " + linkedBrokersToDelete.size();
             showAlert("Delete linked brokers", message);
         } else {
             Log.d(TAG, "# of linkedBrokers before deletion: " + linkedBrokersToDelete.size());
 
-            for (final TradeItLinkedBroker linkedBroker : linkedBrokersToDelete) {
+            for (final TradeItLinkedBrokerParcelable linkedBroker : linkedBrokersToDelete) {
                 linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl() {
                     @Override
                     public void onSuccess(Object type) {
@@ -237,16 +237,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void authenticateLinkedBroker(int index) {
-        List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty() || linkedBrokers.size() < (index + 1)) {
             String message = "No linked broker to authenticate! Index: " + index + ", linked broker count: " + linkedBrokers.size();
             showAlert("Authenticate linked broker", message);
         } else {
-            TradeItLinkedBroker linkedBroker = linkedBrokers.get(index);
+            TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(index);
             final MainActivity mainActivity = this;
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
+                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
                 @Override
-                public void onSuccess(final List<TradeItLinkedBrokerAccount> accounts) {
+                public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
                     Intent intent = new Intent(mainActivity, LinkedBrokerAccountsActivity.class);
                     intent.putParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER, (ArrayList<? extends Parcelable>) accounts);
                     startActivity(intent);
@@ -283,12 +283,12 @@ public class MainActivity extends AppCompatActivity {
     private void authenticateWithSecurityQuestion(String dummySecurityQuestionLogin) {
         final MainActivity mainActivity = this;
         final String dummyLogin = dummySecurityQuestionLogin;
-        linkedBrokerManager.linkBroker(dummyLogin, "Dummy", dummyLogin, "dummy", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+        linkedBrokerManager.linkBroker(dummyLogin, "Dummy", dummyLogin, "dummy", new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
             @Override
-            public void onSuccess(final TradeItLinkedBroker linkedBroker) {
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
+            public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
+                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
                     @Override
-                    public void onSuccess(final List<TradeItLinkedBrokerAccount> accounts) {
+                    public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
                         showAlert("Dummy security", "Successfully Authenticate " + dummyLogin);
                         linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl() {
                             @Override
@@ -331,19 +331,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void getBalancesForFirstLinkedBroker() {
         final MainActivity mainActivity = this;
-        List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty()) {
             showAlert("getBalancesFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
             showAlert("getBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
-            TradeItLinkedBroker linkedBroker = linkedBrokers.get(0);
-            for (TradeItLinkedBrokerAccount linkedBrokerAccount : linkedBroker.getAccounts()) {
-                linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItGetAccountOverviewResponse>() {
+            TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
+            for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
+                linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItBalanceParcelable>() {
                     @Override
-                    public void onSuccess(TradeItGetAccountOverviewResponse accountOverviewResponse) {
+                    public void onSuccess(TradeItBalanceParcelable balance) {
                         Intent intent = new Intent(mainActivity, BalancesActivity.class);
-                        intent.putExtra(BALANCES_PARAMETER, accountOverviewResponse);
+                        intent.putExtra(BALANCES_PARAMETER, balance);
                         startActivity(intent);
                     }
 
@@ -358,17 +358,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void getPositionsFirstLinkedBroker() {
         final MainActivity mainActivity = this;
-        List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty()) {
             showAlert("getPositionsFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
             showAlert("getPositionsFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
-            TradeItLinkedBroker linkedBroker = linkedBrokers.get(0);
-            for (TradeItLinkedBrokerAccount linkedBrokerAccount : linkedBroker.getAccounts()) {
-                linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
+            TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
+            for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
+                linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPositionParcelable>>() {
                     @Override
-                    public void onSuccess(List<TradeItPosition> positions) {
+                    public void onSuccess(List<TradeItPositionParcelable> positions) {
                         Intent intent = new Intent(mainActivity, PositionsActivity.class);
                         intent.putParcelableArrayListExtra(POSITIONS_PARAMETER, (ArrayList<? extends Parcelable>) positions);
                         startActivity(intent);
@@ -385,13 +385,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void previewTradeFirstLinkedBroker() {
         final MainActivity mainActivity = this;
-        List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty()) {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
-            final TradeItOrder order = new TradeItOrder(linkedBrokers.get(0).getAccounts().get(0), "GE");
+            final TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokers.get(0).getAccounts().get(0), "GE");
             order.setLimitPrice(20.0);
             order.setExpiration(TradeItOrderExpiration.GOOD_FOR_DAY);
             order.setPriceType(TradeItOrderPriceType.LIMIT);

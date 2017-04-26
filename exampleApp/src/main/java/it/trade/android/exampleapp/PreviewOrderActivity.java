@@ -9,18 +9,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import it.trade.android.sdk.model.TradeItCallBackImpl;
-import it.trade.android.sdk.model.TradeItErrorResult;
-import it.trade.android.sdk.model.TradeItOrder;
-import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
-import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
+import it.trade.android.sdk.model.TradeItOrderParcelable;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
+import it.trade.model.reponse.TradeItPreviewStockOrEtfOrderResponse;
 
 import static it.trade.android.exampleapp.MainActivity.PREVIEW_ORDER_PARAMETER;
 
 public class PreviewOrderActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
     private String orderId;
-    private TradeItOrder order;
+    private TradeItOrderParcelable order;
     private TextView textView;
 
     @Override

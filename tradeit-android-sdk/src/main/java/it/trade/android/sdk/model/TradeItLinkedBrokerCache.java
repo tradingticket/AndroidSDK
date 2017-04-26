@@ -19,7 +19,7 @@ public class TradeItLinkedBrokerCache {
         this.context = context;
     }
 
-    void cache(TradeItLinkedBroker linkedBroker) {
+    void cache(TradeItLinkedBrokerParcelable linkedBroker) {
         String linkedBrokerSerializedJson = gson.toJson(linkedBroker);
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
@@ -39,24 +39,24 @@ public class TradeItLinkedBrokerCache {
         editor.apply();
     }
 
-    public void syncFromCache(TradeItLinkedBroker linkedBroker) {
+    public void syncFromCache(TradeItLinkedBrokerParcelable linkedBroker) {
         String userId = linkedBroker.getLinkedLogin().userId;
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, new HashSet<String>());
 
         if (linkedBrokerCache.contains(userId)) {
             String linkedBrokerSerialized = sharedPreferences.getString(LINKED_BROKER_CACHE_KEY_PREFIX + userId, "");
-            TradeItLinkedBroker linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBroker.class);
+            TradeItLinkedBrokerParcelable linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBrokerParcelable.class);
             linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
             linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
 
-            for (TradeItLinkedBrokerAccount linkedBrokerAccount: linkedBroker.getAccounts()) {
+            for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount: linkedBroker.getAccounts()) {
                 linkedBrokerAccount.setLinkedBroker(linkedBroker);
             }
         }
     }
 
-    public void removeFromCache(TradeItLinkedBroker linkedBroker) {
+    public void removeFromCache(TradeItLinkedBrokerParcelable linkedBroker) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 

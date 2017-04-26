@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccount;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 
 import static it.trade.android.exampleapp.MainActivity.LINKED_BROKER_ACCOUNTS_PARAMETER;
 
@@ -20,7 +20,7 @@ public class LinkedBrokerAccountsActivity extends AppCompatActivity {
         TextView textView = (TextView) this.findViewById(R.id.linked_broker_accounts_textview);
 
         Intent intent = getIntent();
-        List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = intent.getParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER);
+        List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = intent.getParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER);
 
         if (linkedBrokerAccounts.isEmpty()) {
             textView.setText("No linked broker accounts!");

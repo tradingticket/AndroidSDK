@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 
-import it.trade.tradeitapi.model.TradeItGetAccountOverviewResponse;
+import it.trade.android.sdk.model.TradeItBalanceParcelable;
 
 import static it.trade.android.exampleapp.MainActivity.BALANCES_PARAMETER;
 
@@ -19,7 +19,7 @@ public class BalancesActivity extends AppCompatActivity {
         TextView textView = (TextView) this.findViewById(R.id.account_overview_textview);
         textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        TradeItGetAccountOverviewResponse accountOverviewResponse = intent.getParcelableExtra(BALANCES_PARAMETER);
-        textView.setText(accountOverviewResponse.toString());
+        TradeItBalanceParcelable balance = intent.getParcelableExtra(BALANCES_PARAMETER);
+        textView.setText(balance.toString());
     }
 }

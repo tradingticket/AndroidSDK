@@ -15,7 +15,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import it.trade.tradeitapi.API.TradeItBrokerLinker;
+
+import it.trade.android.sdk.internal.TradeItKeystoreService;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -45,7 +46,7 @@ public class MainActivityTest {
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<MainActivity>(MainActivity.class) {
         @Override
         protected void beforeActivityLaunched() {
-            clearSharedPrefs(InstrumentationRegistry.getTargetContext(), TradeItBrokerLinker.TRADE_IT_SHARED_PREFS_KEY);
+            clearSharedPrefs(InstrumentationRegistry.getTargetContext(), TradeItKeystoreService.TRADE_IT_SHARED_PREFS_KEY);
             super.beforeActivityLaunched();
         }
     };
@@ -176,7 +177,7 @@ public class MainActivityTest {
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.linked_broker_accounts_textview, "# of linkedBroker accounts: 1 : [TradeItLinkedBrokerAccount{accountBaseCurrency='USD', accountName='Individual Account', accountNumber='SINGLE-ACCT-0001'}]");
+        checkFieldContainsText(R.id.linked_broker_accounts_textview, "# of linkedBroker accounts: 1 : [TradeItLinkedBrokerAccountParcelable{accountBaseCurrency='USD', accountName='Individual Account', accountNumber='SINGLE-ACCT-0001'}]");
 
         navigateUp();
     }
@@ -186,7 +187,7 @@ public class MainActivityTest {
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.account_overview_textview, "TradeItGetAccountOverviewResponse{availableCash=1204.06, buyingPower=2408.12, dayAbsoluteReturn=78.42, dayPercentReturn=3.25, totalAbsoluteReturn=14486.67, totalPercentReturn=22.84, totalValue=76489.23}, TradeItResponse{code=null, longMessages=[], shortMessage='null', status='null', token='null'}");
+        checkFieldContainsText(R.id.account_overview_textview, "TradeItBalanceParcelable{availableCash=1204.06, buyingPower=2408.12, dayAbsoluteReturn=78.42, dayPercentReturn=3.25, totalAbsoluteReturn=14486.67, totalPercentReturn=22.84, totalValue=76489.23}");
 
         navigateUp();
     }

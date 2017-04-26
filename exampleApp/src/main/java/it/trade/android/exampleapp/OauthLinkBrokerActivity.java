@@ -15,11 +15,10 @@ import java.util.List;
 import it.trade.android.exampleapp.adapters.BrokerAdapter;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
-import it.trade.android.sdk.model.TradeItCallBackImpl;
-import it.trade.android.sdk.model.TradeItErrorResult;
-import it.trade.android.sdk.model.TradeItLinkedBroker;
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker;
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker;
 
 public class OauthLinkBrokerActivity extends AppCompatActivity {
 
@@ -38,9 +37,9 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
         brokersSpinner = (Spinner) this.findViewById(R.id.brokers_spinner);
         final OauthLinkBrokerActivity oauthLinkBrokerActivity = this;
 
-        linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
+        linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<Broker>>() {
             @Override
-            public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {
+            public void onSuccess(List<Broker> brokersList) {
                 linkBrokerButton.setEnabled(true);
                 oAuthResultTextView.setText("Brokers available: " + brokersList + "\n");
                 BrokerAdapter adapter = new BrokerAdapter(oauthLinkBrokerActivity, brokersList);
@@ -62,9 +61,9 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
             if (oAuthVerifier != null) {
-                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
+                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
                     @Override
-                    public void onSuccess(TradeItLinkedBroker linkedBroker) {
+                    public void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
                         oAuthResultTextView.setText("oAuthFlow Success: " + linkedBroker.toString() + "\n");
                     }
 

@@ -1,5 +1,5 @@
 #Android Trade.it SDK 
-Android SDK that wraps the Trade.it Android API (https://github.com/tradingticket/AndroidAPI).
+Android SDK that wraps the Trade.it Java API (https://github.com/tradingticket/JavaApi).
 
 Detailed Trade It API documentation can be found here: https://www.trade.it/api.
 
@@ -10,7 +10,7 @@ For examples usage, see the example app and tests included with the SDK.
 #Quick Start
 Add the following dependency in your project:
 ```
-compile 'it.trade.tradeit:tradeit-android-sdk:0.0.6'
+compile 'it.trade.tradeit:tradeit-android-sdk:1.0.0'
 ```
 You have to configure once the sdk in your application.
 In order to initialize the configuration, obtain an API key from Trade.it, or test with "tradeit-test-api-key"
@@ -26,7 +26,7 @@ Query which brokers are available for your key:
 ```Java
 linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
     @Override
-    public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
+    public void onSuccess(List<Broker> brokerList) {
         // a list of broker is returned 
     }
     
@@ -74,7 +74,7 @@ String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
 ```
 And the last step is to link the broker thanks to the oAuthVerifier. 
 ```Java
-linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
+linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
     @Override
     public void onSuccess(TradeItLinkedBroker linkedBroker) {
         // successfully linked broker
