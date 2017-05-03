@@ -1,5 +1,6 @@
 package it.trade.android.exampleapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
     TradeItLinkedBrokerManager linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     TextView oAuthResultTextView;
     Spinner brokersSpinner;
+    private static final int REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,36 +57,36 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Intent intent = getIntent();
-        if (intent != null && intent.getData() != null) {
-            String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
-            if (oAuthVerifier != null) {
-                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallback<TradeItLinkedBrokerParcelable>() {
-                    @Override
-                    public void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
-                        oAuthResultTextView.setText("oAuthFlow Success: " + linkedBroker.toString() + "\n");
-                    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
+                if (oAuthVerifier != null) {
+                    linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallback<TradeItLinkedBrokerParcelable>() {
+                        @Override
+                        public void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
+                            oAuthResultTextView.setText("oAuthFlow Success: " + linkedBroker.toString() + "\n");
+                        }
 
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        oAuthResultTextView.setText("linkBrokerWithOauthVerifier Error: " + error + "\n");
-                    }
-                });
+                        @Override
+                        public void onError(TradeItErrorResult error) {
+                            oAuthResultTextView.setText("linkBrokerWithOauthVerifier Error: " + error + "\n");
+                        }
+                    });
+                }
             }
         }
     }
 
     public void processOauthFlow(View view) {
-        final Context context = this;
+        final Context context = this.getApplicationContext();
         Broker brokerSelected = (Broker) brokersSpinner.getSelectedItem();
         linkedBrokerManager.getOAuthLoginPopupUrl(brokerSelected.shortName, "exampleapp://tradeit", new TradeItCallback<String>() {
             @Override
             public void onSuccess(String oAuthUrl) {
                 Intent intent = new Intent(context, WebViewActivity.class);
                 intent.putExtra(OAUTH_URL_PARAMETER, oAuthUrl);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
             }
 
             @Override

@@ -1,11 +1,11 @@
 package it.trade.android.exampleapp;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -18,27 +18,27 @@ public class WebViewActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         Intent intent = getIntent();
         String urlParam = intent.getStringExtra(OAUTH_URL_PARAMETER);
 
         WebView myWebView = (WebView) findViewById(R.id.webview);
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-
+        myWebView.loadUrl(urlParam);
         myWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView webView, String url) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
                 intent.setData(Uri.parse(url));
-                startActivity(intent);
+                setResult(Activity.RESULT_OK, intent);
+                finish();
                 return true;
             }
         });
-
-        myWebView.loadUrl(urlParam);
     }
 }

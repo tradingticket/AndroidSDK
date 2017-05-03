@@ -165,6 +165,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
                 "accountBaseCurrency='" + accountBaseCurrency + '\'' +
                 ", accountName='" + accountName + '\'' +
                 ", accountNumber='" + accountNumber + '\'' +
+                ", balance='" + balance + '\'' +
                 '}';
     }
 

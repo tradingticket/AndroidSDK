@@ -15,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
 import it.trade.android.sdk.internal.TradeItKeystoreService;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -75,20 +74,30 @@ public class MainActivityTest {
 
     @Test
     public void oAuthFlowToTradeTest() throws InterruptedException {
-        testOauthFlow();
-        testGetLinkedBrokers();
+        testOauthFlow("dummy");
+        testGetLinkedBrokers(1);
         testAuthenticateFirstLinkedBroker();
         testGetBalancesFirstLinkedBroker();
-        testPositionsFirstLinkedBroker();
-        testPreviewAndPlaceTradeFirstLinkedBroker();
+        testPositionsFirstLinkedBrokerAccount();
+        testPreviewAndPlaceTradeFirstLinkedBrokerAccount();
+        testDeleteAllLinkedBrokers();
+    }
+
+    @Test
+    public void oAuthFlowMultipleLinkedBrokerTest() throws InterruptedException {
+        testOauthFlow("dummyMultiple");
+        testOauthFlow("dummy");
+        testGetLinkedBrokers(2);
+        testAuthenticateAllLinkedBroker(2);
+        testRefreshAllBalanceForAllLinkedBroker();
         testDeleteAllLinkedBrokers();
     }
 
     @Test
     public void testDummySecurity() throws InterruptedException {
-        tapOnText("Simple security question");
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.getLabel());
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(1200l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "What is your mother's maiden name");
 
@@ -101,7 +110,7 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummySecurity");
 
@@ -111,10 +120,10 @@ public class MainActivityTest {
     @Test
     public void testDummyMultiple() throws InterruptedException {
         ViewInteraction textView = onView(
-                allOf(withText("Security question with options"), isDisplayed()));
+                allOf(withText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.getLabel()), isDisplayed()));
         textView.perform(click());
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(1200l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "Select an option from the following");
 
@@ -129,55 +138,77 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummyOption");
 
         tapOnText("OK");
     }
 
-    private void testOauthFlow() throws InterruptedException {
-        tapOnText("Link a broker via the oAuth flow");
+    private void testOauthFlow(String dummyLogin) throws InterruptedException {
+        tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.getLabel());
 
-        Thread.sleep(2000l); //TODO there should be a better way for waiting
+        Thread.sleep(500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "Brokers available:");
 
         tapOnText("Link broker");
 
-        Thread.sleep(3000l); //TODO there should be a better way for waiting
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         onWebView()
                 .withElement(findElement(Locator.NAME, "id"))
                 .perform(clearElement())
-                .perform(DriverAtoms.webKeys("dummy"))
+                .perform(DriverAtoms.webKeys(dummyLogin))
                 .withElement(findElement(Locator.NAME, "password"))
                 .perform(clearElement())
                 .perform(DriverAtoms.webKeys("dummy"))
                 .withElement(findElement(Locator.TAG_NAME, "button"))
                 .perform(webClick());
 
-        Thread.sleep(5000l); //TODO there should be a better way for waiting
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "oAuthFlow Success:");
 
         navigateUp();
     }
 
-    private void testGetLinkedBrokers() {
-        tapOnText("getLinkedBrokers");
+    private void testGetLinkedBrokers(int number) throws InterruptedException {
+        tapOnText(MainActivity.MainActivityActions.GET_LINKED_BROKERS.getLabel());
 
-        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS");
+        Thread.sleep(1000l); //TODO there should be a better way for waiting
+
+        checkFieldContainsText(R.id.linked_brokers_textview, number + " PARCELED LINKED BROKERS");
 
         navigateUp();
     }
 
     private void testAuthenticateFirstLinkedBroker() throws InterruptedException {
-        tapOnText("Authenticate first linked broker");
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.getLabel());
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(1000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.linked_broker_accounts_textview, "# of linkedBroker accounts: 1 : [TradeItLinkedBrokerAccountParcelable{accountBaseCurrency='USD', accountName='Individual Account', accountNumber='SINGLE-ACCT-0001'}]");
+        checkFieldContainsText(R.id.linked_broker_accounts_textview, "# of linkedBroker accounts: 1 : [TradeItLinkedBrokerAccountParcelable{accountBaseCurrency='USD', accountName='Individual Account', accountNumber='SINGLE-ACCT-0001', balance='null'}]");
+
+        navigateUp();
+    }
+
+    private void testAuthenticateAllLinkedBroker(int number) throws InterruptedException {
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_ALL_LINKED_BROKERS.getLabel());
+
+        Thread.sleep(1000l); //TODO there should be a better way for waiting
+
+        checkFieldContainsText(R.id.linked_brokers_textview, number + " PARCELED LINKED BROKERS");
+
+        navigateUp();
+    }
+
+    private void testRefreshAllBalanceForAllLinkedBroker() throws InterruptedException {
+        tapOnText(MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.getLabel());
+
+        Thread.sleep(1000l); //TODO there should be a better way for waiting
+
+        checkFieldContainsText(R.id.linked_broker_accounts_textview, "balance='TradeItBalanceParcelable");
 
         navigateUp();
     }
@@ -185,27 +216,27 @@ public class MainActivityTest {
     private void testGetBalancesFirstLinkedBroker() throws InterruptedException {
         tapOnText("Get balances for first linked broker account");
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(1000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.account_overview_textview, "TradeItBalanceParcelable{availableCash=1204.06, buyingPower=2408.12, dayAbsoluteReturn=78.42, dayPercentReturn=3.25, totalAbsoluteReturn=14486.67, totalPercentReturn=22.84, totalValue=76489.23}");
 
         navigateUp();
     }
 
-    private void testPositionsFirstLinkedBroker() throws InterruptedException {
-        tapOnText("Get positions for first linked broker account");
+    private void testPositionsFirstLinkedBrokerAccount() throws InterruptedException {
+        tapOnText(MainActivity.MainActivityActions.GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.getLabel());
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(1000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.positions_textview, "[TradeItPosition{costbasis=103.34, holdingType='LONG', lastPrice=112.34, quantity=1.0, symbol='AAPL', symbolClass='EQUITY_OR_ETF'");
 
         navigateUp();
     }
 
-    private void testPreviewAndPlaceTradeFirstLinkedBroker() throws InterruptedException {
-        tapOnText("Preview trade for first linked broker account");
+    private void testPreviewAndPlaceTradeFirstLinkedBrokerAccount() throws InterruptedException {
+        tapOnText(MainActivity.MainActivityActions.PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.getLabel());
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(1000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponse{ackWarningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00',");
         checkFieldContainsText(R.id.preview_order_textview,"status='REVIEW_ORDER'");
@@ -213,15 +244,13 @@ public class MainActivityTest {
         //place trade
         tapOnText("Place trade");
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
-
         checkFieldContainsText(R.id.preview_order_textview,"TradeItResponse{code=null, longMessages=[Transmitted successfully to Dummy], shortMessage='Order Successfully Submitted', status='SUCCESS'");
 
         navigateUp();
     }
 
     private void testDeleteAllLinkedBrokers() {
-        tapOnText("Delete all linked brokers");
+        tapOnText(MainActivity.MainActivityActions.DELETE_ALL_LINKED_BROKERS.getLabel());
 
         checkFieldContainsText(android.R.id.message, "# of linkedBrokers after deletion: 0");
 

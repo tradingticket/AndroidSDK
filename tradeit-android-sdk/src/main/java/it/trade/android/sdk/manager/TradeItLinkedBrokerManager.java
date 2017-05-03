@@ -2,23 +2,42 @@ package it.trade.android.sdk.manager;
 
 import android.util.Log;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.exceptions.UndeliverableException;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.schedulers.Schedulers;
 import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItUpdateLinkedLoginException;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
 import it.trade.android.sdk.model.TradeItApiClientParcelable;
+import it.trade.android.sdk.model.TradeItCallBackCompletion;
+import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
 import it.trade.android.sdk.model.TradeItErrorResultParcelable;
-import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
-import it.trade.model.callback.TradeItCallback;
+import it.trade.model.TradeItSecurityQuestion;;
+import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse;
 import it.trade.model.reponse.TradeItResponse;
 import it.trade.model.request.TradeItLinkedLogin;
@@ -29,6 +48,7 @@ public class TradeItLinkedBrokerManager {
     private TradeItKeystoreService keystoreService;
     private TradeItLinkedBrokerCache linkedBrokerCache;
     private TradeItApiClient apiClient;
+    private static final String TAG = TradeItLinkedBrokerManager.class.getName();
 
     public TradeItLinkedBrokerManager(TradeItApiClient apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
         this.keystoreService = keystoreService;
@@ -49,6 +69,146 @@ public class TradeItLinkedBrokerManager {
             linkedBrokerCache.syncFromCache(linkedBroker);
             linkedBrokers.add(linkedBroker);
         }
+    }
+
+    public void authenticateAll(final TradeItCallbackWithSecurityQuestionAndCompletion callback) {
+        RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
+            @Override
+            public void accept(@NonNull Throwable e) throws Exception {
+                if (e instanceof UndeliverableException) {
+                    e = e.getCause();
+                }
+                if ((e instanceof IOException) || (e instanceof SocketException)) {
+                    // fine, irrelevant network problem or API that throws on cancellation
+                    return;
+                }
+                if (e instanceof InterruptedException) {
+                    // fine, some blocking code was interrupted by a dispose call
+                    return;
+                }
+                if ((e instanceof NullPointerException) || (e instanceof IllegalArgumentException)) {
+                    // that's likely a bug in the application
+                    Thread.currentThread().getUncaughtExceptionHandler()
+                            .uncaughtException(Thread.currentThread(), e);
+                    return;
+                }
+                if (e instanceof IllegalStateException) {
+                    // that's a bug in RxJava or in a custom operator
+                    Thread.currentThread().getUncaughtExceptionHandler()
+                            .uncaughtException(Thread.currentThread(), e);
+                    return;
+                }
+                Log.w(TAG, "Undeliverable exception received, not sure what to do", e);
+            }
+        });
+        Observable.fromArray(this.getLinkedBrokers())
+            .observeOn(AndroidSchedulers.mainThread(), true)
+            .subscribeOn(Schedulers.io())
+            .flatMapIterable(new Function<List<TradeItLinkedBrokerParcelable>, Iterable<TradeItLinkedBrokerParcelable>>() {
+                @Override
+                public Iterable<TradeItLinkedBrokerParcelable> apply(@NonNull List<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelables) throws Exception {
+                    return tradeItLinkedBrokerParcelables;
+                }
+            }).map(new Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>>() {
+                @Override
+                public Single<TradeItLinkedBrokerParcelable> apply(@NonNull final TradeItLinkedBrokerParcelable linkedBrokerParcelable) throws Exception {
+                    return Single.create(new SingleOnSubscribe<TradeItLinkedBrokerParcelable>() {
+                        @Override
+                        public void subscribe(@NonNull final SingleEmitter<TradeItLinkedBrokerParcelable> emmiter) throws Exception {
+                            linkedBrokerParcelable.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+                                @Override
+                                public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                                    callback.onSecurityQuestion(securityQuestion, this);
+                                }
+
+                                @Override
+                                public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> type) {
+                                    emmiter.onSuccess(linkedBrokerParcelable);
+                                }
+
+                                @Override
+                                public void onError(TradeItErrorResult error) {
+                                    Log.e(TAG, error.toString());
+                                    emmiter.onError(new RuntimeException(error.toString()));
+                                }
+
+                                @Override
+                                public void cancelSecurityQuestion() {
+                                    emmiter.onSuccess(linkedBrokerParcelable);
+                                }
+                            });
+                        }
+                    });
+                }
+            }).flatMap(new Function<Single<TradeItLinkedBrokerParcelable>, ObservableSource<TradeItLinkedBrokerParcelable>>() {
+                @Override
+                public ObservableSource<TradeItLinkedBrokerParcelable> apply(@NonNull Single<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelableSingle) throws Exception {
+                    return tradeItLinkedBrokerParcelableSingle.toObservable();
+                }
+            }, true).subscribe(new DisposableObserver() {
+                @Override
+                public void onNext(@NonNull Object linkedBrokerParcelable) {
+                    Log.d(TAG, "onNext: " + linkedBrokerParcelable);
+                }
+
+                @Override
+                public void onError(@NonNull Throwable e) {
+                    callback.onFinished();
+                }
+
+                @Override
+                public void onComplete() {
+                    callback.onFinished();
+                }
+            });
+    }
+
+    public void refreshAccountBalances(final TradeItCallBackCompletion callback) {
+        Observable.fromArray(this.getLinkedBrokers())
+                .observeOn(AndroidSchedulers.mainThread(), true)
+                .subscribeOn(Schedulers.io())
+                .flatMapIterable(new Function<List<TradeItLinkedBrokerParcelable>, Iterable<TradeItLinkedBrokerParcelable>>() {
+                    @Override
+                    public Iterable<TradeItLinkedBrokerParcelable> apply(@NonNull List<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelables) throws Exception {
+                        return tradeItLinkedBrokerParcelables;
+                    }
+                }).map(new Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>>() {
+                    @Override
+                    public Single<TradeItLinkedBrokerParcelable> apply(@NonNull final TradeItLinkedBrokerParcelable linkedBrokerParcelable) throws Exception {
+                        return Single.create(new SingleOnSubscribe<TradeItLinkedBrokerParcelable>() {
+                            @Override
+                            public void subscribe(@NonNull final SingleEmitter<TradeItLinkedBrokerParcelable> emmiter) throws Exception {
+                                linkedBrokerParcelable.refreshAccountBalances(new TradeItCallBackCompletion() {
+                                    @Override
+                                    public void onFinished() {
+                                        emmiter.onSuccess(linkedBrokerParcelable);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }).flatMap(new Function<Single<TradeItLinkedBrokerParcelable>, ObservableSource<TradeItLinkedBrokerParcelable>>() {
+                    @Override
+                    public ObservableSource<TradeItLinkedBrokerParcelable> apply(@NonNull Single<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelableSingle) throws Exception {
+                        return tradeItLinkedBrokerParcelableSingle.toObservable();
+                    }
+                }, true).subscribe(new DisposableObserver() {
+                @Override
+                public void onNext(@NonNull Object linkedBrokerParcelable) {
+                    Log.d(TAG, "onNext: " + linkedBrokerParcelable);
+                }
+
+                @Override
+                public void onError(@NonNull Throwable e) {
+                    callback.onFinished();
+                }
+
+                @Override
+                public void onComplete() {
+                    callback.onFinished();
+                }
+            });
+
     }
 
     public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
