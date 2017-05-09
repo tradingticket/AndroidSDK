@@ -24,7 +24,7 @@ import it.trade.android.sdk.model.TradeItOrderParcelable;
 import it.trade.android.sdk.model.TradeItPositionParcelable;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
-import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse;
 import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
@@ -69,7 +69,7 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void getAvailableBrokers() throws InterruptedException {
-        linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
+        linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
             @Override
             public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
                 assertThat("The broker list is not empty", brokerList.isEmpty(), is(false));
@@ -88,7 +88,7 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
             @Override
             public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
                 assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
@@ -98,11 +98,11 @@ public class TradeItLinkedBrokerManagerTest {
                     @Override
                     public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
                         assertThat("The authentication is successful", !accounts.isEmpty(), is(true));
-                        accounts.get(0).refreshBalance(new TradeItCallBackImpl<TradeItBalanceParcelable>() {
+                        accounts.get(0).refreshBalance(new TradeItCallback<TradeItBalanceParcelable>() {
                             @Override
                             public void onSuccess(TradeItBalanceParcelable balance) {
                                 assertThat("refreshBalance returns available cash", balance.availableCash, notNullValue());
-                                accounts.get(0).refreshPositions(new TradeItCallBackImpl<List<TradeItPositionParcelable>>() {
+                                accounts.get(0).refreshPositions(new TradeItCallback<List<TradeItPositionParcelable>>() {
                                     @Override
                                     public void onSuccess(List<TradeItPositionParcelable> positions) {
                                         assertThat("refresh positions is successful", !positions.isEmpty(), is(true));
@@ -156,7 +156,7 @@ public class TradeItLinkedBrokerManagerTest {
     }
     @Test
     public void linkBrokerOldMethodAndAuthenticationAndTrade() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
             @Override
             public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
                 assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
@@ -167,11 +167,11 @@ public class TradeItLinkedBrokerManagerTest {
                         assertThat("The authentication is successful",  !accounts.isEmpty(), is(true));
 
                         final TradeItOrderParcelable order = new TradeItOrderParcelable(accounts.get(0), "GE");
-                        order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+                        order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
                             @Override
                             public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                                 assertThat("Preview order is successful",  response.orderId, notNullValue());
-                                order.placeOrder(response.orderId, new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+                                order.placeOrder(response.orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
                                     @Override
                                     public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
                                         assertEquals("Place order is successful",  placeOrderResponse.status, TradeItResponseStatus.SUCCESS);
@@ -224,7 +224,7 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void linkBrokerOldMethodAndSecurityQuestion() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummySecurity", "dummy",  new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummySecurity", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
             @Override
             public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
                 assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
@@ -264,7 +264,7 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void getOAuthLoginPopupUrlForMobile() throws InterruptedException {
-        linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "myinternalappcallback", new TradeItCallBackImpl<String>() {
+        linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "myinternalappcallback", new TradeItCallback<String>() {
 
             @Override
             public void onSuccess(String oAuthUrl) {
@@ -286,13 +286,13 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void linkAndUnlinkBrokers() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
             @Override
             public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
                 List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
                 assertThat("we linked one broker", linkedBrokers.size(), is(1));
 
-                linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl<TradeItResponse>() {
+                linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback<TradeItResponse>() {
                     @Override
                     public void onSuccess(TradeItResponse response) {
                         assertThat("unlink broker successfully", response, notNullValue());
@@ -323,13 +323,13 @@ public class TradeItLinkedBrokerManagerTest {
 
     @Test
     public void linkBrokerAndGetOAuthLoginPopupForTokenUpdateUrl() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
             @Override
             public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
                 String userId = linkedBroker.getLinkedLogin().userId;
                 assertThat("we linked one broker", userId, notNullValue());
 
-                linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "myinternalappcallback", new TradeItCallBackImpl<String>() {
+                linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "myinternalappcallback", new TradeItCallback<String>() {
 
                     @Override
                     public void onSuccess(String oAuthUrl) {

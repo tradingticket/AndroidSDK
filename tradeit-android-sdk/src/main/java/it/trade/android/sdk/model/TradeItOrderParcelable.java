@@ -7,7 +7,7 @@ import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.model.TradeItErrorResult;
-import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.model.reponse.TradeItPreviewStockOrEtfOrderResponse;
@@ -41,7 +41,7 @@ public class TradeItOrderParcelable implements Parcelable {
                 (this.stopPrice != null ? this.stopPrice.toString() : null),
                 this.expiration.getExpirationValue());
         final TradeItOrderParcelable order = this;
-        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
             @Override
             public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                 callback.onSuccess(response);
@@ -57,7 +57,7 @@ public class TradeItOrderParcelable implements Parcelable {
     }
 
     public void placeOrder(String orderId, final TradeItCallback<TradeItPlaceStockOrEtfOrderResponse> callback) {
-        this.linkedBrokerAccount.getTradeItApiClient().placeStockOrEtfOrder(orderId, new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+        this.linkedBrokerAccount.getTradeItApiClient().placeStockOrEtfOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
             @Override
             public void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
                 callback.onSuccess(response);

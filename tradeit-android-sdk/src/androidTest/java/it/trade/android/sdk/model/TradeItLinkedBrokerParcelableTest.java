@@ -82,7 +82,6 @@ public class TradeItLinkedBrokerParcelableTest {
         assertThat(apiClient.getSessionToken(), is("MySessionToken"));
 
         assertThat(linkedLogin, notNullValue());
-        assertThat(linkedLogin.apiKey, is("MyApiKey"));
         assertThat(linkedLogin.userId, is("MyUserId"));
         assertThat(linkedLogin.userToken, is("MyUserToken"));
 

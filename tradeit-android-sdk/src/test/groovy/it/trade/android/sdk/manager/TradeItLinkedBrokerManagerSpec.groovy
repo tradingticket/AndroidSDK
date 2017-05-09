@@ -7,7 +7,7 @@ import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
 import it.trade.api.TradeItApiClient
 import it.trade.model.TradeItErrorResult
-import it.trade.model.callback.TradeItCallBackImpl
+import it.trade.model.callback.TradeItCallback
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
 import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker
@@ -60,7 +60,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int successCallBackCount = 0
             int errorCallBackCount = 0
             List<TradeItAvailableBrokersResponse.Broker> brokerList = null
-            linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<Broker>>() {
+            linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
                 @Override
                 public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
                     successCallBackCount++
@@ -97,7 +97,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         when: "calling getAvailableBrokers"
             int successCallBackCount = 0
             int errorCallBackCount = 0
-            linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
+            linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
                 @Override
                 public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
                     successCallBackCount++
@@ -125,7 +125,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBroker"
             TradeItLinkedBrokerParcelable linkedBrokerResult = null
-            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
@@ -165,7 +165,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBroker"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
@@ -201,7 +201,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         when: "calling getOAuthLoginPopupUrl"
             TradeItErrorResult errorResult = null
             String oAuthUrlResult = null
-            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallback<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {
@@ -236,7 +236,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling getOAuthLoginPopupUrl"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallback<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {
@@ -273,7 +273,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBrokerWithOauthVerifier"
             TradeItLinkedBrokerParcelable linkedBrokerResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
@@ -324,7 +324,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBrokerWithOauthVerifier"
             TradeItLinkedBrokerParcelable linkedBrokerResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
@@ -369,7 +369,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling linkBrokerWithOauthVerifier"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
                 void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
@@ -412,7 +412,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             linkedBrokerManager.linkedBrokers = [linkedBroker]
 
         when: "calling unlinkBroker"
-            linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl<TradeItResponse>() {
+            linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback<TradeItResponse>() {
                 @Override
                 void onSuccess(TradeItResponse response) {
                     successCallBackCount++
@@ -457,7 +457,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         when: "calling getOAuthLoginPopupForTokenUpdateUrl"
             String oAuthUrlResult = null
-            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "my internal app callback", new TradeItCallback<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {

@@ -17,7 +17,7 @@ import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
-import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse;
 import it.trade.model.reponse.TradeItResponse;
@@ -52,7 +52,7 @@ public class TradeItLinkedBrokerManager {
     }
 
     public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
-        apiClient.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
+        apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
             @Override
             public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
                 callback.onSuccess(brokerList);
@@ -67,7 +67,7 @@ public class TradeItLinkedBrokerManager {
     }
 
     public void getOAuthLoginPopupUrl(String broker, String deepLinkCallback, final TradeItCallback<String> callback) {
-        apiClient.getOAuthLoginPopupUrlForMobile(broker, deepLinkCallback, new TradeItCallBackImpl<String>() {
+        apiClient.getOAuthLoginPopupUrlForMobile(broker, deepLinkCallback, new TradeItCallback<String>() {
             @Override
             public void onSuccess(String oAuthURL) {
                 callback.onSuccess(oAuthURL);
@@ -82,7 +82,7 @@ public class TradeItLinkedBrokerManager {
     }
 
     public void getOAuthLoginPopupForTokenUpdateUrl(TradeItLinkedBrokerParcelable linkedBroker, String deepLinkCallback, final TradeItCallback<String> callback) {
-        apiClient.getOAuthLoginPopupUrlForTokenUpdate(linkedBroker.getBrokerName(), linkedBroker.getLinkedLogin().userId, deepLinkCallback, new TradeItCallBackImpl<String>() {
+        apiClient.getOAuthLoginPopupUrlForTokenUpdate(linkedBroker.getBrokerName(), linkedBroker.getLinkedLogin().userId, deepLinkCallback, new TradeItCallback<String>() {
             @Override
             public void onSuccess(String oAuthUrl) {
                 callback.onSuccess(oAuthUrl);
@@ -97,7 +97,7 @@ public class TradeItLinkedBrokerManager {
     }
 
     public void linkBrokerWithOauthVerifier(final String accountLabel, String oAuthVerifier, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
-        apiClient.linkBrokerWithOauthVerifier(oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedLogin>() {
+        apiClient.linkBrokerWithOauthVerifier(oAuthVerifier, new TradeItCallback<TradeItLinkedLogin>() {
             @Override
             public void onSuccess(TradeItLinkedLogin linkedLogin) {
                 try {
@@ -136,7 +136,7 @@ public class TradeItLinkedBrokerManager {
             keystoreService.deleteLinkedLogin(linkedBroker.getLinkedLogin());
             linkedBrokers.remove(linkedBroker);
             linkedBrokerCache.removeFromCache(linkedBroker);
-            apiClient.unlinkBrokerAccount(linkedBroker.getLinkedLogin(), new TradeItCallBackImpl<TradeItResponse>() {
+            apiClient.unlinkBrokerAccount(linkedBroker.getLinkedLogin(), new TradeItCallback<TradeItResponse>() {
                 @Override
                 public void onSuccess(TradeItResponse response) {
                     callback.onSuccess(response);
@@ -159,7 +159,7 @@ public class TradeItLinkedBrokerManager {
      */
     @Deprecated
     public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
-        apiClient.linkBrokerAccount(username, password, broker, new TradeItCallBackImpl<TradeItLinkedLogin>() {
+        apiClient.linkBrokerAccount(username, password, broker, new TradeItCallback<TradeItLinkedLogin>() {
             @Override
             public void onSuccess(TradeItLinkedLogin linkedLogin) {
                 TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedLogin);

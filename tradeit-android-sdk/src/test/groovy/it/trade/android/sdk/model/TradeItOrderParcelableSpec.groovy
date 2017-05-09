@@ -3,7 +3,7 @@ package it.trade.android.sdk.model
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpiration
 import it.trade.model.TradeItErrorResult
-import it.trade.model.callback.TradeItCallBackImpl
+import it.trade.model.callback.TradeItCallback
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
 import spock.lang.Specification
@@ -45,7 +45,7 @@ class TradeItOrderParcelableSpec extends Specification {
 
         when: "calling preview order"
             TradeItPreviewStockOrEtfOrderResponse previewResponse = null
-            order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+            order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                     previewResponse = response
@@ -87,7 +87,7 @@ class TradeItOrderParcelableSpec extends Specification {
 
         when: "calling preview order"
             TradeItErrorResult errorResult = null
-            order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+            order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                     successfulCallbackCount++
@@ -136,7 +136,7 @@ class TradeItOrderParcelableSpec extends Specification {
 
         when: "calling place order"
             TradeItPlaceStockOrEtfOrderResponse placeOrderResponse = null
-            order.placeOrder("My Order Id", new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+            order.placeOrder("My Order Id", new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
                     placeOrderResponse= response
@@ -173,7 +173,7 @@ class TradeItOrderParcelableSpec extends Specification {
 
         when: "calling preview order"
             TradeItErrorResult errorResult = null
-            order.placeOrder("My Order Id", new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+            order.placeOrder("My Order Id", new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
                     successfulCallbackCount++

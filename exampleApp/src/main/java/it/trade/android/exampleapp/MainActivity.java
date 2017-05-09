@@ -30,7 +30,7 @@ import it.trade.android.sdk.model.TradeItOrderParcelable;
 import it.trade.android.sdk.model.TradeItPositionParcelable;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
-import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.request.TradeItEnvironment;
 
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "# of linkedBrokers before deletion: " + linkedBrokersToDelete.size());
 
             for (final TradeItLinkedBrokerParcelable linkedBroker : linkedBrokersToDelete) {
-                linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl() {
+                linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback() {
                     @Override
                     public void onSuccess(Object type) {
                         Log.d(TAG, "# of linkedBrokers after deletion: " + linkedBrokerManager.getLinkedBrokers().size());
@@ -283,14 +283,14 @@ public class MainActivity extends AppCompatActivity {
     private void authenticateWithSecurityQuestion(String dummySecurityQuestionLogin) {
         final MainActivity mainActivity = this;
         final String dummyLogin = dummySecurityQuestionLogin;
-        linkedBrokerManager.linkBroker(dummyLogin, "Dummy", dummyLogin, "dummy", new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+        linkedBrokerManager.linkBroker(dummyLogin, "Dummy", dummyLogin, "dummy", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
             @Override
             public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
                 linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
                     @Override
                     public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
                         showAlert("Dummy security", "Successfully Authenticate " + dummyLogin);
-                        linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl() {
+                        linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback() {
                             @Override
                             public void onSuccess(Object type) {
                                 Log.d(TAG, "unlinking successfully " + dummyLogin);
@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
             for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
-                linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItBalanceParcelable>() {
+                linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalanceParcelable>() {
                     @Override
                     public void onSuccess(TradeItBalanceParcelable balance) {
                         Intent intent = new Intent(mainActivity, BalancesActivity.class);
@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
             for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
-                linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPositionParcelable>>() {
+                linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItPositionParcelable>>() {
                     @Override
                     public void onSuccess(List<TradeItPositionParcelable> positions) {
                         Intent intent = new Intent(mainActivity, PositionsActivity.class);

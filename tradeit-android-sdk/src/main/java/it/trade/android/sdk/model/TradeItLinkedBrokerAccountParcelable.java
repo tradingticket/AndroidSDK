@@ -12,7 +12,7 @@ import java.util.Map;
 
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
-import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItGetAccountOverviewResponse;
@@ -90,7 +90,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     public void refreshBalance(final TradeItCallback<TradeItBalanceParcelable> callback) {
         final TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = this;
-        this.getTradeItApiClient().getAccountOverview(accountNumber, new TradeItCallBackImpl<TradeItGetAccountOverviewResponse>() {
+        this.getTradeItApiClient().getAccountOverview(accountNumber, new TradeItCallback<TradeItGetAccountOverviewResponse>() {
             @Override
             public void onSuccess(TradeItGetAccountOverviewResponse response) {
                 TradeItBalanceParcelable balance = new TradeItBalanceParcelable(response);
@@ -111,7 +111,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     public void refreshPositions(final TradeItCallback<List<TradeItPositionParcelable>> callback) {
         final TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = this;
-        this.getTradeItApiClient().getPositions(accountNumber, new TradeItCallBackImpl<List<TradeItPosition>>() {
+        this.getTradeItApiClient().getPositions(accountNumber, new TradeItCallback<List<TradeItPosition>>() {
             @Override
             public void onSuccess(List<TradeItPosition> positions) {
                 List<TradeItPositionParcelable> positionsParcelable = mapPositionsToPositionsParcelable(positions);

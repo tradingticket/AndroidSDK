@@ -1,7 +1,7 @@
 package it.trade.android.sdk.model
 
 import it.trade.model.TradeItErrorResult
-import it.trade.model.callback.TradeItCallBackImpl
+import it.trade.model.callback.TradeItCallback
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItErrorCode
@@ -51,7 +51,7 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             TradeItBalanceParcelable balance = null
-            linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItBalanceParcelable>() {
+            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalanceParcelable>() {
                 @Override
                 void onSuccess(TradeItBalanceParcelable response) {
                     balance = response
@@ -94,7 +94,7 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             TradeItErrorResult errorResult = null
-            linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItGetAccountOverviewResponse>() {
+            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverviewResponse>() {
                 @Override
                 void onSuccess(TradeItGetAccountOverviewResponse response) {
                     successCallbackCount++
@@ -138,7 +138,7 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             List<TradeItPosition> positionsResult = null
-            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPositionParcelable>>() {
+            linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItPositionParcelable>>() {
                 @Override
                 void onSuccess(List<TradeItPositionParcelable> positions) {
                     positionsResult = positions
@@ -176,7 +176,7 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             TradeItErrorResult errorResult = null
-            linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItPosition>>() {
+            linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItPosition>>() {
                 @Override
                 void onSuccess(List<TradeItPosition> positions) {
                     successCallbackCount++

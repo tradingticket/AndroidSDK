@@ -24,7 +24,6 @@ public class TradeItLinkedLoginParcelable extends TradeItLinkedLogin implements 
     }
 
     public TradeItLinkedLoginParcelable(TradeItLinkedLogin linkedLogin) {
-        this.apiKey = linkedLogin.apiKey;
         this.broker = linkedLogin.broker;
         this.userId = linkedLogin.userId;
         this.userToken = linkedLogin.userToken;
@@ -42,7 +41,6 @@ public class TradeItLinkedLoginParcelable extends TradeItLinkedLogin implements 
         dest.writeString(this.broker);
         dest.writeString(this.userToken);
         dest.writeString(this.userId);
-        dest.writeString(this.apiKey);
     }
 
     protected TradeItLinkedLoginParcelable(Parcel in) {
@@ -50,7 +48,6 @@ public class TradeItLinkedLoginParcelable extends TradeItLinkedLogin implements 
         this.broker = in.readString();
         this.userToken = in.readString();
         this.userId = in.readString();
-        this.apiKey = in.readString();
     }
 
     public static final Parcelable.Creator<TradeItLinkedLoginParcelable> CREATOR = new Parcelable.Creator<TradeItLinkedLoginParcelable>() {

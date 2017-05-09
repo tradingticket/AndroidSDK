@@ -17,7 +17,7 @@ import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.model.TradeItErrorResult;
-import it.trade.model.callback.TradeItCallBackImpl;
+import it.trade.model.callback.TradeItCallback;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker;
 
 public class OauthLinkBrokerActivity extends AppCompatActivity {
@@ -37,7 +37,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
         brokersSpinner = (Spinner) this.findViewById(R.id.brokers_spinner);
         final OauthLinkBrokerActivity oauthLinkBrokerActivity = this;
 
-        linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<Broker>>() {
+        linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
             @Override
             public void onSuccess(List<Broker> brokersList) {
                 linkBrokerButton.setEnabled(true);
@@ -61,7 +61,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
         if (intent != null && intent.getData() != null) {
             String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
             if (oAuthVerifier != null) {
-                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBrokerParcelable>() {
+                linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallback<TradeItLinkedBrokerParcelable>() {
                     @Override
                     public void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
                         oAuthResultTextView.setText("oAuthFlow Success: " + linkedBroker.toString() + "\n");
@@ -79,7 +79,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
     public void processOauthFlow(View view) {
         final Context context = this;
         Broker brokerSelected = (Broker) brokersSpinner.getSelectedItem();
-        linkedBrokerManager.getOAuthLoginPopupUrl(brokerSelected.shortName, "exampleapp://tradeit", new TradeItCallBackImpl<String>() {
+        linkedBrokerManager.getOAuthLoginPopupUrl(brokerSelected.shortName, "exampleapp://tradeit", new TradeItCallback<String>() {
             @Override
             public void onSuccess(String oAuthUrl) {
                 Intent intent = new Intent(context, WebViewActivity.class);

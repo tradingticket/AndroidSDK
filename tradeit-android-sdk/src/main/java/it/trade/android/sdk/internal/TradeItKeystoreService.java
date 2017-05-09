@@ -36,7 +36,6 @@ import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItUpdateLinkedLoginException;
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
-import it.trade.model.request.TradeItRequestWithKey;
 
 
 public class TradeItKeystoreService {
@@ -101,7 +100,6 @@ public class TradeItKeystoreService {
             for (String linkedLoginEncryptedJson : linkedLoginEncryptedJsonSet) {
                 String linkedLoginJson = decryptString(linkedLoginEncryptedJson);
                 TradeItLinkedLoginParcelable linkedLogin = gson.fromJson(linkedLoginJson, TradeItLinkedLoginParcelable.class);
-                linkedLogin.apiKey = TradeItRequestWithKey.API_KEY;
                 linkedLoginList.add(linkedLogin);
             }
 
