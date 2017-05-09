@@ -8,9 +8,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import it.trade.tradeitapi.model.TradeItPosition;
+import it.trade.android.sdk.model.TradeItPositionParcelable;
 
 import static it.trade.android.exampleapp.MainActivity.POSITIONS_PARAMETER;
+
 
 public class PositionsActivity extends AppCompatActivity {
 
@@ -21,7 +22,7 @@ public class PositionsActivity extends AppCompatActivity {
         TextView textView = (TextView) this.findViewById(R.id.positions_textview);
         textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        List<TradeItPosition> positions = intent.getParcelableArrayListExtra(POSITIONS_PARAMETER);
+        List<TradeItPositionParcelable> positions = intent.getParcelableArrayListExtra(POSITIONS_PARAMETER);
         textView.setText(positions.toString());
     }
 }

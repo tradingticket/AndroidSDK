@@ -5,147 +5,152 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.trade.android.sdk.internal.DefaultCallbackWithErrorHandling;
-import it.trade.android.sdk.model.TradeItCallback;
-import it.trade.android.sdk.model.TradeItErrorResult;
-import it.trade.android.sdk.model.TradeItLinkedBroker;
+import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
+import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException;
+import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
+import it.trade.android.sdk.exceptions.TradeItUpdateLinkedLoginException;
+import it.trade.android.sdk.internal.TradeItKeystoreService;
+import it.trade.android.sdk.model.TradeItApiClientParcelable;
+import it.trade.android.sdk.model.TradeItErrorResultParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
-import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.API.TradeItBrokerLinker;
-import it.trade.tradeitapi.exception.TradeItDeleteLinkedLoginException;
-import it.trade.tradeitapi.exception.TradeItRetrieveLinkedLoginException;
-import it.trade.tradeitapi.exception.TradeItSaveLinkedLoginException;
-import it.trade.tradeitapi.exception.TradeItUpdateLinkedLoginException;
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse;
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker;
-import it.trade.tradeitapi.model.TradeItEnvironment;
-import it.trade.tradeitapi.model.TradeItLinkLoginRequest;
-import it.trade.tradeitapi.model.TradeItLinkLoginResponse;
-import it.trade.tradeitapi.model.TradeItLinkedLogin;
-import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
-import it.trade.tradeitapi.model.TradeItOAuthAccessTokenResponse;
-import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileRequest;
-import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForMobileResponse;
-import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForTokenUpdateRequest;
-import it.trade.tradeitapi.model.TradeItOAuthLoginPopupUrlForTokenUpdateResponse;
-import it.trade.tradeitapi.model.TradeItResponse;
-import it.trade.tradeitapi.model.TradeItResponseStatus;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
+import it.trade.api.TradeItApiClient;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.callback.TradeItCallback;
+import it.trade.model.callback.TradeItCallback;
+import it.trade.model.reponse.TradeItAvailableBrokersResponse;
+import it.trade.model.reponse.TradeItResponse;
+import it.trade.model.request.TradeItLinkedLogin;
 
 public class TradeItLinkedBrokerManager {
 
-    protected TradeItBrokerLinker brokerLinker;
-
-    private List<TradeItLinkedBroker> linkedBrokers = new ArrayList<>();
-    private TradeItEnvironment environment;
+    private List<TradeItLinkedBrokerParcelable> linkedBrokers = new ArrayList<>();
+    private TradeItKeystoreService keystoreService;
     private TradeItLinkedBrokerCache linkedBrokerCache;
-    private String apiKey;
+    private TradeItApiClient apiClient;
 
-    public TradeItLinkedBrokerManager(String apiKey, TradeItEnvironment environment, TradeItLinkedBrokerCache linkedBrokerCache, TradeItBrokerLinker brokerLinker) throws TradeItRetrieveLinkedLoginException {
-        this.apiKey = apiKey;
-        this.environment = environment;
+    public TradeItLinkedBrokerManager(TradeItApiClient apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
+        this.keystoreService = keystoreService;
         this.linkedBrokerCache = linkedBrokerCache;
-        this.brokerLinker = brokerLinker;
+        this.apiClient = apiClient;
         this.loadLinkedBrokersFromSharedPreferences();
     }
 
     private void loadLinkedBrokersFromSharedPreferences() throws TradeItRetrieveLinkedLoginException {
-        List<TradeItLinkedLogin> linkedLoginList = brokerLinker.getLinkedLogins();
-        for (TradeItLinkedLogin linkedLogin : linkedLoginList) {
-            TradeItApiClient apiClient = new TradeItApiClient(apiKey, environment);
+        List<TradeItLinkedLoginParcelable> linkedLoginList = keystoreService.getLinkedLogins();
+        for (TradeItLinkedLoginParcelable linkedLogin : linkedLoginList) {
+            TradeItApiClientParcelable
+                    apiClient = new TradeItApiClientParcelable(this.apiClient);
             //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
             apiClient.setSessionToken("invalid-default-token");
 
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
             linkedBrokerCache.syncFromCache(linkedBroker);
             linkedBrokers.add(linkedBroker);
         }
     }
 
-    public void getAvailableBrokers(final TradeItCallback<List<Broker>> callback) {
-        brokerLinker.getAvailableBrokers(new Callback<TradeItAvailableBrokersResponse>() {
-            List<Broker> brokerList = new ArrayList<>();
-
-            public void onResponse(Call<TradeItAvailableBrokersResponse> call, Response<TradeItAvailableBrokersResponse> response) {
-                if (response.isSuccessful() && response.body().status == TradeItResponseStatus.SUCCESS) {
-                    TradeItAvailableBrokersResponse availableBrokersResponse = response.body();
-                    brokerList = availableBrokersResponse.brokerList;
-                }
+    public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
+        apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
+            @Override
+            public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
                 callback.onSuccess(brokerList);
             }
 
-            public void onFailure(Call call, Throwable t) {
-                callback.onSuccess(brokerList);
+            @Override
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                callback.onError(errorResultParcelable);
             }
         });
     }
 
     public void getOAuthLoginPopupUrl(String broker, String deepLinkCallback, final TradeItCallback<String> callback) {
-        TradeItOAuthLoginPopupUrlForMobileRequest request = new TradeItOAuthLoginPopupUrlForMobileRequest(broker, deepLinkCallback);
-        brokerLinker.getOAuthLoginPopupUrlForMobile(request, new DefaultCallbackWithErrorHandling<TradeItOAuthLoginPopupUrlForMobileResponse, String>(callback) {
+        apiClient.getOAuthLoginPopupUrlForMobile(broker, deepLinkCallback, new TradeItCallback<String>() {
             @Override
-            public void onSuccessResponse(Response<TradeItOAuthLoginPopupUrlForMobileResponse> response) {
-                callback.onSuccess(response.body().oAuthURL);
+            public void onSuccess(String oAuthURL) {
+                callback.onSuccess(oAuthURL);
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                callback.onError(errorResultParcelable);
             }
         });
     }
 
-    public void getOAuthLoginPopupForTokenUpdateUrl(TradeItLinkedBroker linkedBroker, String deepLinkCallback, final TradeItCallback<String> callback) {
-        TradeItOAuthLoginPopupUrlForTokenUpdateRequest request = new TradeItOAuthLoginPopupUrlForTokenUpdateRequest(linkedBroker.getBrokerName(), deepLinkCallback, linkedBroker.getLinkedLogin().userId);
-        brokerLinker.getOAuthLoginPopupUrlForTokenUpdate(request, new DefaultCallbackWithErrorHandling<TradeItOAuthLoginPopupUrlForTokenUpdateResponse, String>(callback) {
+    public void getOAuthLoginPopupForTokenUpdateUrl(TradeItLinkedBrokerParcelable linkedBroker, String deepLinkCallback, final TradeItCallback<String> callback) {
+        apiClient.getOAuthLoginPopupUrlForTokenUpdate(linkedBroker.getBrokerName(), linkedBroker.getLinkedLogin().userId, deepLinkCallback, new TradeItCallback<String>() {
             @Override
-            public void onSuccessResponse(Response<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> response) {
-                callback.onSuccess(response.body().oAuthURL);
+            public void onSuccess(String oAuthUrl) {
+                callback.onSuccess(oAuthUrl);
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                callback.onError(errorResultParcelable);
             }
         });
     }
 
-    public void linkBrokerWithOauthVerifier(final String accountLabel, String oAuthVerifier, final TradeItCallback<TradeItLinkedBroker> callback) {
-        final TradeItOAuthAccessTokenRequest request = new TradeItOAuthAccessTokenRequest(oAuthVerifier);
-        brokerLinker.getOAuthAccessToken(request, new DefaultCallbackWithErrorHandling<TradeItOAuthAccessTokenResponse, TradeItLinkedBroker>(callback) {
+    public void linkBrokerWithOauthVerifier(final String accountLabel, String oAuthVerifier, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
+        apiClient.linkBrokerWithOauthVerifier(oAuthVerifier, new TradeItCallback<TradeItLinkedLogin>() {
             @Override
-            public void onSuccessResponse(Response<TradeItOAuthAccessTokenResponse> response) {
-                TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(request, response.body());
+            public void onSuccess(TradeItLinkedLogin linkedLogin) {
                 try {
-                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(apiKey, environment), linkedLogin, linkedBrokerCache);
+                    TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedLogin);
+                    TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(new TradeItApiClientParcelable(apiClient), linkedLoginParcelable, linkedBrokerCache);
                     int indexOfLinkedBroker = linkedBrokers.indexOf(linkedBroker);
                     if (indexOfLinkedBroker != -1) { //linked broker for this user id already exists, this is a token update
-                        TradeItLinkedBroker linkedBrokerToUpdate = linkedBrokers.get(indexOfLinkedBroker);
-                        linkedBrokerToUpdate.setLinkedLogin(linkedLogin);
+                        TradeItLinkedBrokerParcelable linkedBrokerToUpdate = linkedBrokers.get(indexOfLinkedBroker);
+                        linkedBrokerToUpdate.setLinkedLogin(linkedLoginParcelable);
                         linkedBroker = linkedBrokerToUpdate;
-                        brokerLinker.updateLinkedLogin(linkedLogin);
+                        keystoreService.updateLinkedLogin(linkedLoginParcelable);
                     } else {
-                        brokerLinker.saveLinkedLogin(linkedLogin, accountLabel);
+                        keystoreService.saveLinkedLogin(linkedLoginParcelable, accountLabel);
                         linkedBrokers.add(linkedBroker);
                     }
                     callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedLoginException e) {
                     Log.e(this.getClass().getName(), e.getMessage(), e);
-                    callback.onError(new TradeItErrorResult("Failed to link broker", e.getMessage()));
+                    callback.onError(new TradeItErrorResultParcelable("Failed to link broker", e.getMessage()));
                 } catch (TradeItUpdateLinkedLoginException e) {
                     Log.e(this.getClass().getName(), e.getMessage(), e);
-                    callback.onError(new TradeItErrorResult("Failed to update link broker", e.getMessage()));
+                    callback.onError(new TradeItErrorResultParcelable("Failed to update link broker", e.getMessage()));
                 }
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                callback.onError(errorResultParcelable);
             }
         });
     }
 
-    public void unlinkBroker(final TradeItLinkedBroker linkedBroker, TradeItCallback callback) {
+    public void unlinkBroker(final TradeItLinkedBrokerParcelable linkedBroker, final TradeItCallback callback) {
         try {
-            brokerLinker.deleteLinkedLogin(linkedBroker.getLinkedLogin());
+            keystoreService.deleteLinkedLogin(linkedBroker.getLinkedLogin());
             linkedBrokers.remove(linkedBroker);
             linkedBrokerCache.removeFromCache(linkedBroker);
-            this.brokerLinker.unlinkBrokerAccount(linkedBroker.getLinkedLogin(), new DefaultCallbackWithErrorHandling<TradeItResponse, TradeItResponse>(callback) {
+            apiClient.unlinkBrokerAccount(linkedBroker.getLinkedLogin(), new TradeItCallback<TradeItResponse>() {
                 @Override
-                public void onSuccessResponse(Response<TradeItResponse> response) {
-                    callback.onSuccess(response.body());
+                public void onSuccess(TradeItResponse response) {
+                    callback.onSuccess(response);
+                }
+
+                @Override
+                public void onError(TradeItErrorResult error) {
+                    TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                    callback.onError(errorResultParcelable);
                 }
             });
         } catch (TradeItDeleteLinkedLoginException e) {
             Log.e(this.getClass().getName(), e.getMessage(), e);
-            callback.onError(new TradeItErrorResult("Unlink broker error", "An error occured while unlinking the broker, please try again later"));
+            callback.onError(new TradeItErrorResultParcelable("Unlink broker error", "An error occured while unlinking the broker, please try again later"));
         }
     }
 
@@ -153,15 +158,14 @@ public class TradeItLinkedBrokerManager {
      * @deprecated Use the new OAuth flow and the #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback) method instead
      */
     @Deprecated
-    public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBroker> callback) {
-        final TradeItLinkLoginRequest linkLoginRequest = new TradeItLinkLoginRequest(username, password, broker);
-        brokerLinker.linkBrokerAccount(linkLoginRequest, new DefaultCallbackWithErrorHandling<TradeItLinkLoginResponse, TradeItLinkedBroker>(callback) {
+    public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
+        apiClient.linkBrokerAccount(username, password, broker, new TradeItCallback<TradeItLinkedLogin>() {
             @Override
-            public void onSuccessResponse(Response<TradeItLinkLoginResponse> response) {
-                TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(linkLoginRequest, response.body());
+            public void onSuccess(TradeItLinkedLogin linkedLogin) {
+                TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedLogin);
                 try {
-                    brokerLinker.saveLinkedLogin(linkedLogin, accountLabel);
-                    TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(new TradeItApiClient(apiKey, environment), linkedLogin, linkedBrokerCache);
+                    keystoreService.saveLinkedLogin(linkedLoginParcelable, accountLabel);
+                    TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(new TradeItApiClientParcelable(apiClient), linkedLoginParcelable, linkedBrokerCache);
                     linkedBrokers.add(linkedBroker);
                     callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedLoginException e) {
@@ -169,10 +173,16 @@ public class TradeItLinkedBrokerManager {
                     callback.onError(new TradeItErrorResult("Failed to link broker", e.getMessage()));
                 }
             }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                callback.onError(errorResultParcelable);
+            }
         });
     }
 
-    public List<TradeItLinkedBroker> getLinkedBrokers() {
+    public List<TradeItLinkedBrokerParcelable> getLinkedBrokers() {
         return new ArrayList<>(linkedBrokers);
     }
 }

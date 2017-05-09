@@ -7,7 +7,8 @@ import android.util.Log;
 import it.trade.android.sdk.exceptions.TradeItSDKConfigurationException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
-import it.trade.tradeitapi.model.TradeItEnvironment;
+import it.trade.model.request.TradeItEnvironment;
+
 
 public class TradeItSDK {
     private static TradeItSdkInstance instance;

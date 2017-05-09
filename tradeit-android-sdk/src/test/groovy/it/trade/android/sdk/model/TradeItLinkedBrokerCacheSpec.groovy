@@ -3,25 +3,27 @@ package it.trade.android.sdk.model
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import it.trade.tradeitapi.API.TradeItApiClient
-import it.trade.tradeitapi.model.*
+import it.trade.model.reponse.TradeItBrokerAccount
+import it.trade.model.reponse.TradeItGetAccountOverviewResponse
+import it.trade.model.reponse.TradeItLinkLoginResponse
+import it.trade.model.request.TradeItLinkLoginRequest
 import spock.lang.Specification
 
 class TradeItLinkedBrokerCacheSpec extends Specification {
     Context context = Mock(Context)
     TradeItLinkedBrokerCache linkedBrokerCache = new TradeItLinkedBrokerCache(context);
-    TradeItApiClient apiClient = Mock(TradeItApiClient)
+    TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable)
     SharedPreferences sharedPreferences = Mock(SharedPreferences)
     SharedPreferences.Editor editor = Mock(SharedPreferences.Editor)
     String userId = "My userId"
-    TradeItLinkedLogin linkedLogin
+    TradeItLinkedLoginParcelable linkedLogin
 
     def setup() {
         TradeItLinkLoginRequest linkLoginRequest = new TradeItLinkLoginRequest("my id", "my password", "broker")
         TradeItLinkLoginResponse linkLoginResponse = new TradeItLinkLoginResponse()
         linkLoginResponse.userId = userId
         linkLoginResponse.userToken = "My userToken"
-        linkedLogin = new TradeItLinkedLogin(linkLoginRequest, linkLoginResponse)
+        linkedLogin = new TradeItLinkedLoginParcelable(linkLoginRequest, linkLoginResponse)
 
 
         context.getSharedPreferences(_, Context.MODE_PRIVATE) >> {
@@ -35,12 +37,12 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "Cache handles a linked broker not yet cached with an empty cache"() {
         given: "a linked broker with one account"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
-            TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItBrokerAccount));
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
+            TradeItLinkedBrokerAccountParcelable account1 = new TradeItLinkedBrokerAccountParcelable(linkedBroker, Mock(TradeItBrokerAccount));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
             account1.accountBaseCurrency = "My Account base currency"
-            account1.balance = new TradeItGetAccountOverviewResponse()
+            account1.balance = new TradeItBalanceParcelable()
             account1.balance.availableCash = 20000
             linkedBroker.accountsLastUpdated = new Date()
             linkedBroker.accounts = [account1]
@@ -84,12 +86,12 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "Cache update a linked broker already cached"() {
         given: "a linked broker with one account"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
-            TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBroker, Mock(TradeItBrokerAccount));
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
+            TradeItLinkedBrokerAccountParcelable account1 = new TradeItLinkedBrokerAccountParcelable(linkedBroker, Mock(TradeItBrokerAccount));
             account1.accountName = "My Account Name"
             account1.accountNumber = "My Account Number"
             account1.accountBaseCurrency = "My Account base currency"
-            account1.balance = new TradeItGetAccountOverviewResponse()
+            account1.balance = new TradeItBalanceParcelable()
             account1.balance.availableCash = 20000
             linkedBroker.accountsLastUpdated = new Date()
             linkedBroker.accounts = [account1]
@@ -135,7 +137,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "SyncFromCache handles a linkedBroker cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
 
         and: "a linkedBroker cached"
             sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
@@ -144,12 +146,12 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
                 return set
             }
             sharedPreferences.getString({it.contains(userId)}, "") >> {
-                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
-                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItBrokerAccount));
+                TradeItLinkedBrokerParcelable linkedBrokerCached = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
+                TradeItLinkedBrokerAccountParcelable account1 = new TradeItLinkedBrokerAccountParcelable(linkedBrokerCached, Mock(TradeItBrokerAccount));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
                 account1.accountBaseCurrency = "My Account base currency"
-                account1.balance = new TradeItGetAccountOverviewResponse()
+                account1.balance = new TradeItBalanceParcelable()
                 account1.balance.availableCash = 20000
                 linkedBrokerCached.accountsLastUpdated = new Date()
                 linkedBrokerCached.accounts = [account1]
@@ -171,7 +173,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "SyncFromCache handles a linkedBroker non cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
 
         and: "This linkedBroker is not cached"
             sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
@@ -180,9 +182,9 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
                 return set
             }
             sharedPreferences.getString({it.contains("an other userId")}, "") >> {
-                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
+                TradeItLinkedBrokerParcelable linkedBrokerCached = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
                 linkedBrokerCached.linkedLogin.userId == "an other userId"
-                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItBrokerAccount));
+                TradeItLinkedBrokerAccountParcelable account1 = new TradeItLinkedBrokerAccountParcelable(linkedBrokerCached, Mock(TradeItBrokerAccount));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
                 account1.accountBaseCurrency = "My Account base currency"
@@ -204,7 +206,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
 
     def "removeFromCache handles a linkedBroker cached"() {
         given: "a linked broker loaded from the keystore"
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
 
         and: "a linkedBroker cached"
             Set<String> set = new HashSet<>()
@@ -214,8 +216,8 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             }
 
             sharedPreferences.getString({it.contains(userId)}, "") >> {
-                TradeItLinkedBroker linkedBrokerCached = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache);
-                TradeItLinkedBrokerAccount account1 = new TradeItLinkedBrokerAccount(linkedBrokerCached, Mock(TradeItBrokerAccount));
+                TradeItLinkedBrokerParcelable linkedBrokerCached = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
+                TradeItLinkedBrokerAccountParcelable account1 = new TradeItLinkedBrokerAccountParcelable(linkedBrokerCached, Mock(TradeItBrokerAccount));
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
                 account1.accountBaseCurrency = "My Account base currency"

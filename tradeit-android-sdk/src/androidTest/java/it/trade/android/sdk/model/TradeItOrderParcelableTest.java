@@ -14,12 +14,11 @@ import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
-import it.trade.tradeitapi.API.TradeItApiClient;
-import it.trade.tradeitapi.model.TradeItBrokerAccount;
-import it.trade.tradeitapi.model.TradeItEnvironment;
-import it.trade.tradeitapi.model.TradeItLinkedLogin;
-import it.trade.tradeitapi.model.TradeItOAuthAccessTokenRequest;
-import it.trade.tradeitapi.model.TradeItOAuthAccessTokenResponse;
+import it.trade.api.TradeItApiClient;
+import it.trade.model.reponse.TradeItBrokerAccount;
+import it.trade.model.reponse.TradeItOAuthAccessTokenResponse;
+import it.trade.model.request.TradeItEnvironment;
+import it.trade.model.request.TradeItOAuthAccessTokenRequest;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -27,9 +26,9 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class TradeItOrderTest {
-    private TradeItOrder order;
-    private TradeItLinkedBrokerAccount linkedBrokerAccount;
+public class TradeItOrderParcelableTest {
+    private TradeItOrderParcelable order;
+    private TradeItLinkedBrokerAccountParcelable linkedBrokerAccount;
 
     @Before
     public void createTradeItOrder() {
@@ -43,20 +42,20 @@ public class TradeItOrderTest {
         oAuthAccessTokenResponse.userId = "MyUserId";
         oAuthAccessTokenResponse.userToken = "MyUserToken";
         oAuthAccessTokenResponse.broker = "MyBroker";
-        TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
-        TradeItApiClient apiClient = new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment());
+        TradeItLinkedLoginParcelable linkedLogin = new TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
+        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable(new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment()));
 
         apiClient.setSessionToken("MySessionToken");
-        TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());
+        TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());
 
         TradeItBrokerAccount account = new TradeItBrokerAccount();
         account.accountNumber = "MyAccountNumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
         account.name = "MyAccountName";
 
-        linkedBrokerAccount = new TradeItLinkedBrokerAccount(linkedBroker, account);
+        linkedBrokerAccount = new TradeItLinkedBrokerAccountParcelable(linkedBroker, account);
 
-        order = new TradeItOrder(linkedBrokerAccount, "MySymbol");
+        order = new TradeItOrderParcelable(linkedBrokerAccount, "MySymbol");
     }
 
     @Test
@@ -77,8 +76,8 @@ public class TradeItOrderTest {
         parcel.setDataPosition(0);
 
         // Read the data.
-        TradeItOrder createdFromParcel = TradeItOrder.CREATOR.createFromParcel(parcel);
-        TradeItLinkedBrokerAccount createdLinkedBrokerAccount = createdFromParcel.getLinkedBrokerAccount();
+        TradeItOrderParcelable createdFromParcel = TradeItOrderParcelable.CREATOR.createFromParcel(parcel);
+        TradeItLinkedBrokerAccountParcelable createdLinkedBrokerAccount = createdFromParcel.getLinkedBrokerAccount();
         TradeItOrderAction action = createdFromParcel.getAction();
         TradeItOrderExpiration expiration = createdFromParcel.getExpiration();
         Double limitPrice = createdFromParcel.getLimitPrice();

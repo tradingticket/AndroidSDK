@@ -11,20 +11,21 @@ import org.junit.runner.RunWith;
 import java.util.Arrays;
 import java.util.List;
 
-import it.trade.tradeitapi.model.TradeItErrorCode;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.reponse.TradeItErrorCode;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class TradeItErrorResultTest {
+public class TradeItErrorResultParcelableTest {
 
-    private TradeItErrorResult errorResult;
+    private TradeItErrorResultParcelable errorResult;
 
     @Before
     public void createTradeItErrorResult() {
-        errorResult = new TradeItErrorResult();
+        errorResult = new TradeItErrorResultParcelable();
     }
 
     @Test
@@ -44,7 +45,7 @@ public class TradeItErrorResultTest {
         parcel.setDataPosition(0);
 
         // Read the data.
-        TradeItErrorResult createdFromParcel = TradeItErrorResult.CREATOR.createFromParcel(parcel);
+        TradeItErrorResult createdFromParcel = TradeItErrorResultParcelable.CREATOR.createFromParcel(parcel);
         TradeItErrorCode errorCode = createdFromParcel.getErrorCode();
         int httpCode = createdFromParcel.getHttpCode();
         List<String> longMessages = createdFromParcel.getLongMessages();

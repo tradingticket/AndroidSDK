@@ -11,18 +11,20 @@ import org.junit.runner.RunWith;
 import java.util.Arrays;
 import java.util.List;
 
+import it.trade.model.TradeItSecurityQuestion;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(AndroidJUnit4.class)
 @SmallTest
-public class TradeItSecurityQuestionTest {
+public class TradeItSecurityQuestionParcelableTest {
 
-    private TradeItSecurityQuestion tradeItSecurityQuestion;
+    private TradeItSecurityQuestionParcelable tradeItSecurityQuestion;
 
     @Before
     public void createTradeItSecurityQuestion() {
-        tradeItSecurityQuestion = new TradeItSecurityQuestion("My security question", Arrays.asList("option1", "option2", "option3"));
+        tradeItSecurityQuestion = new TradeItSecurityQuestionParcelable("My security question", Arrays.asList("option1", "option2", "option3"));
     }
 
     @Test
@@ -34,7 +36,7 @@ public class TradeItSecurityQuestionTest {
         parcel.setDataPosition(0);
 
         // Read the data.
-        TradeItSecurityQuestion createdFromParcel = TradeItSecurityQuestion.CREATOR.createFromParcel(parcel);
+        TradeItSecurityQuestion createdFromParcel = TradeItSecurityQuestionParcelable.CREATOR.createFromParcel(parcel);
         String securityQuestion = createdFromParcel.getSecurityQuestion();
         List<String> securityQuestionOptions = createdFromParcel.getSecurityQuestionOptions();
 
