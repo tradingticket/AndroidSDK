@@ -10,10 +10,8 @@ import java.util.List;
 
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
-import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.AuthenticationCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestion;
-import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.TradeItAuthenticateResponse;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItErrorCode;
@@ -45,7 +43,7 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccountParcelable>> callback) {
         final TradeItLinkedBrokerParcelable linkedBroker = this;
-        this.apiClient.authenticate(this.linkedLogin, new AuthenticationCallback<TradeItAuthenticateResponse, TradeItSecurityQuestion>(callback, apiClient) {
+        this.apiClient.authenticate(this.linkedLogin, new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccountParcelable>>(callback, apiClient) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
                 linkedBroker.error = null;
@@ -55,7 +53,7 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
                 accounts = linkedBrokerAccounts;
                 accountsLastUpdated = new Date();
                 linkedBrokerCache.cache(linkedBroker);
-                ((TradeItCallbackWithSecurityQuestionImpl) callback).onSuccess(linkedBrokerAccounts);
+                callback.onSuccess(linkedBrokerAccounts);
             }
 
             @Override
