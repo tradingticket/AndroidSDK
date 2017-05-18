@@ -21,6 +21,14 @@ public class TradeItSDK {
         }
     }
 
+    public static void configureWithBaseUrl(Context context, String apiKey, TradeItEnvironment environment, String baseUrl) {
+        if (instance == null) {
+            instance = new TradeItSdkInstance(context, apiKey, environment, baseUrl);
+        } else {
+            Log.w("TradeItSDK", "Warning: TradeItSDK.configure() called multiple times. Ignoring.");
+        }
+    }
+
     public static void clearConfig() {
         instance = null;
     }

@@ -22,6 +22,15 @@ public class TradeItSdkInstance {
     private static final String TRADE_IT_LINKED_BROKERS_ALIAS = "TRADE_IT_LINKED_BROKERS_ALIAS";
 
     public TradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment) {
+        initializeTradeItSdkInstance(context, apiKey, environment);
+    }
+
+    public TradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, String baseUrl) {
+        environment.setBaseUrl(baseUrl);
+        initializeTradeItSdkInstance(context, apiKey, environment);
+    }
+
+    private void initializeTradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment) {
         this.context = context;
         this.apiKey = apiKey;
         this.environment = environment;
