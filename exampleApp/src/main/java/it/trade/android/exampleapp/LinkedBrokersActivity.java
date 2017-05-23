@@ -11,7 +11,11 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.TradeItSecurityQuestion;
+import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 
 import static it.trade.android.exampleapp.MainActivity.LINKED_BROKERS_PARAMETER;
 
@@ -40,6 +44,22 @@ public class LinkedBrokersActivity extends AppCompatActivity {
                 output += json + "\n\n===\n\n";
                 Log.d("TEST", json);
             }
+            linkedBrokers.get(0).authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+                @Override
+                public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+
+                }
+
+                @Override
+                public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> type) {
+
+                }
+
+                @Override
+                public void onError(TradeItErrorResult error) {
+
+                }
+            });
             textView.setText(output);
             Log.d("TEST", "==========");
         }

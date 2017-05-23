@@ -29,10 +29,10 @@ import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
 import it.trade.android.sdk.model.TradeItErrorResultParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
-import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
@@ -48,10 +48,10 @@ public class TradeItLinkedBrokerManager {
     private List<TradeItLinkedBrokerParcelable> linkedBrokers = new ArrayList<>();
     private TradeItKeystoreService keystoreService;
     private TradeItLinkedBrokerCache linkedBrokerCache;
-    private TradeItApiClient apiClient;
+    private TradeItApiClientParcelable apiClient;
     private static final String TAG = TradeItLinkedBrokerManager.class.getName();
 
-    public TradeItLinkedBrokerManager(TradeItApiClient apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
+    public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
         this.keystoreService = keystoreService;
         this.linkedBrokerCache = linkedBrokerCache;
         this.apiClient = apiClient;
@@ -62,7 +62,7 @@ public class TradeItLinkedBrokerManager {
         List<TradeItLinkedLoginParcelable> linkedLoginList = keystoreService.getLinkedLogins();
         for (TradeItLinkedLoginParcelable linkedLogin : linkedLoginList) {
             TradeItApiClientParcelable
-                    apiClient = new TradeItApiClientParcelable(this.apiClient);
+                    apiClient = new TradeItApiClientParcelable(this.apiClient.getApiKey(), this.apiClient.getEnvironment(), this.apiClient.getRequestCookieProviderParcelable());
             //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
             apiClient.setSessionToken("invalid-default-token");
 
@@ -251,7 +251,9 @@ public class TradeItLinkedBrokerManager {
             public void onSuccess(TradeItLinkedLogin linkedLogin) {
                 try {
                     TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedLogin);
-                    TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(new TradeItApiClientParcelable(apiClient), linkedLoginParcelable, linkedBrokerCache);
+                    TradeItApiClientParcelable
+                            apiClientParcelable = new TradeItApiClientParcelable(apiClient.getApiKey(), apiClient.getEnvironment(), apiClient.getRequestCookieProviderParcelable());
+                    TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClientParcelable, linkedLoginParcelable, linkedBrokerCache);
                     int indexOfLinkedBroker = linkedBrokers.indexOf(linkedBroker);
                     if (indexOfLinkedBroker != -1) { //linked broker for this user id already exists, this is a token update
                         TradeItLinkedBrokerParcelable linkedBrokerToUpdate = linkedBrokers.get(indexOfLinkedBroker);
@@ -314,7 +316,9 @@ public class TradeItLinkedBrokerManager {
                 TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedLogin);
                 try {
                     keystoreService.saveLinkedLogin(linkedLoginParcelable, accountLabel);
-                    TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(new TradeItApiClientParcelable(apiClient), linkedLoginParcelable, linkedBrokerCache);
+                    TradeItApiClientParcelable
+                            apiClientParcelable = new TradeItApiClientParcelable(apiClient.getApiKey(), apiClient.getEnvironment(), apiClient.getRequestCookieProviderParcelable());
+                    TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClientParcelable, linkedLoginParcelable, linkedBrokerCache);
                     linkedBrokers.add(linkedBroker);
                     callback.onSuccess(linkedBroker);
                 } catch (TradeItSaveLinkedLoginException e) {

@@ -3,6 +3,8 @@ package it.trade.android.sdk.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.Gson;
 

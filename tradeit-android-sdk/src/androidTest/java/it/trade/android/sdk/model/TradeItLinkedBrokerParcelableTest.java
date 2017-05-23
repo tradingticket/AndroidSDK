@@ -45,7 +45,7 @@ public class TradeItLinkedBrokerParcelableTest {
         oAuthAccessTokenResponse.userToken = "MyUserToken";
         oAuthAccessTokenResponse.broker = "MyBroker";
         TradeItLinkedLoginParcelable linkedLogin = new TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
-        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable(new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment()));
+        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable("MyApiKey", TradeItSDK.getEnvironment());
 
         apiClient.setSessionToken("MySessionToken");
         linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());
@@ -79,6 +79,7 @@ public class TradeItLinkedBrokerParcelableTest {
         Date accountLastUpdated = createdFromParcel.getAccountsLastUpdated();
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue());
+
         assertThat(apiClient.getSessionToken(), is("MySessionToken"));
 
         assertThat(linkedLogin, notNullValue());

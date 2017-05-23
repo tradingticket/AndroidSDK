@@ -43,7 +43,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         oAuthAccessTokenResponse.userToken = "MyUserToken";
         oAuthAccessTokenResponse.broker = "MyBroker";
         TradeItLinkedLoginParcelable linkedLogin = new TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
-        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable(new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment()));
+        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable("MyApiKey", TradeItSDK.getEnvironment());
 
         apiClient.setSessionToken("MyToken");
         TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());

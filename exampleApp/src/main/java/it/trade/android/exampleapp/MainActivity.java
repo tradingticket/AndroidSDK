@@ -91,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
         initTable();
 
-        TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+        //TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+        TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA, new RequestCookieProviderParcelableImpl());
         linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     }
 
