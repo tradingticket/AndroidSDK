@@ -13,10 +13,12 @@ import java.util.Map;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
-import it.trade.model.callback.TradeItCallback;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItGetAccountOverviewResponse;
 import it.trade.model.reponse.TradeItPosition;
+
+import static it.trade.model.reponse.TradeItErrorCode.BROKER_EXECUTION_ERROR;
+import static it.trade.model.reponse.TradeItErrorCode.PARAMETER_ERROR;
 
 public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
     private static Map<String, TradeItLinkedBrokerParcelable> linkedBrokersMap = new HashMap<>(); //used for parcelable
@@ -43,7 +45,9 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
     }
 
     protected void setErrorOnLinkedBroker(TradeItErrorResultParcelable errorResult) {
-        this.linkedBroker.setError(errorResult);
+        if (errorResult.getErrorCode() != BROKER_EXECUTION_ERROR && errorResult.getErrorCode() != PARAMETER_ERROR) {
+            this.linkedBroker.setError(errorResult);
+        }
     }
 
     public String getBrokerName() {
