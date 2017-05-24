@@ -92,11 +92,10 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE);
             }
 
-                @Override
-                public void onError(TradeItErrorResult error) {
-                    oAuthResultTextView.setText("getOAuthLoginPopupUrl Error: " + error + "\n");
-                }
-            });
-        }
+            @Override
+            public void onError(TradeItErrorResult error) {
+                oAuthResultTextView.setText("getOAuthLoginPopupUrl Error: " + error + "\n");
+            }
+        });
     }
 }

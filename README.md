@@ -18,6 +18,10 @@ Example in the onCreate method of your main application:
 ```Java
 TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
 ```
+If you want to inject cookies on each request you have to implement the `RequestCookieProviderParcelable` and implements the `provideCookies` method (see `RequestCookieProviderParcelableImpl` for example), and initialize the SDK like this:
+```Java
+TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA, new RequestCookieProviderParcelableImpl());
+```
 Get an instance of the TradeItLinkedBrokerManager in your application: 
 ```Java
 TradeItLinkedBrokerManager linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();

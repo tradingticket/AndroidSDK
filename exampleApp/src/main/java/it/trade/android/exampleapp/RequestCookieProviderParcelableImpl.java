@@ -2,18 +2,20 @@ package it.trade.android.exampleapp;
 
 import android.os.Parcel;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import it.trade.android.sdk.model.RequestCookieProviderParcelable;
-import it.trade.model.Cookie;
+import okhttp3.Cookie;
 
 public class RequestCookieProviderParcelableImpl extends RequestCookieProviderParcelable {
         @Override
-        public Set<Cookie> provideCookies() {
-            Set<Cookie> cookies = new HashSet<>();
-            cookies.add(new Cookie("atest1", "cookie1"));
-            cookies.add(new Cookie("atest2", "cookie2"));
+        public List<Cookie> provideCookies() {
+            List<Cookie> cookies = new ArrayList<>();
+            Cookie cookie1 = new Cookie.Builder().name("test1").value("value1").domain("mydomain").build();
+            Cookie cookie2 = new Cookie.Builder().name("test2").value("value2").domain("mydomain").build();
+            cookies.add(cookie1);
+            cookies.add(cookie2);
             return cookies;
         }
 

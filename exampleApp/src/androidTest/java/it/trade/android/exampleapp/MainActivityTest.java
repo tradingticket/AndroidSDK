@@ -97,7 +97,7 @@ public class MainActivityTest {
     public void testDummySecurity() throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.getLabel());
 
-        Thread.sleep(1200l); //TODO there should be a better way for waiting
+        Thread.sleep(1600l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "What is your mother's maiden name");
 
@@ -123,7 +123,7 @@ public class MainActivityTest {
                 allOf(withText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.getLabel()), isDisplayed()));
         textView.perform(click());
 
-        Thread.sleep(1200l); //TODO there should be a better way for waiting
+        Thread.sleep(1600l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "Select an option from the following");
 
@@ -243,6 +243,8 @@ public class MainActivityTest {
 
         //place trade
         tapOnText("Place trade");
+
+        Thread.sleep(1500l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview,"TradeItResponse{code=null, longMessages=[Transmitted successfully to Dummy], shortMessage='Order Successfully Submitted', status='SUCCESS'");
 

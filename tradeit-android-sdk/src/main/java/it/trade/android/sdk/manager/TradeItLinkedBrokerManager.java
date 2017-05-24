@@ -29,7 +29,6 @@ import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
 import it.trade.android.sdk.model.TradeItErrorResultParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
-import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
@@ -40,8 +39,6 @@ import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse;
 import it.trade.model.reponse.TradeItResponse;
 import it.trade.model.request.TradeItLinkedLogin;
-
-;
 
 public class TradeItLinkedBrokerManager {
 
