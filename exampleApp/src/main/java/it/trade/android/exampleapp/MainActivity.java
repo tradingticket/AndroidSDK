@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
         linkedBrokerManager.authenticateAll(new TradeItCallbackWithSecurityQuestionAndCompletion() {
             @Override
             public void onFinished() {
+                Log.d(TAG, "authenticateAllLinkedBrokers - onFinished");
                 goToLinkedBrokersActivity();
             }
 

@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
@@ -87,15 +86,10 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
                 Log.w(TAG, "Undeliverable exception received, not sure what to do", e);
             }
         });
-        Observable.fromArray(this.accounts)
+        Observable.fromIterable(this.accounts)
                 .observeOn(AndroidSchedulers.mainThread(), true)
                 .subscribeOn(Schedulers.io())
-                .flatMapIterable(new Function<List<TradeItLinkedBrokerAccountParcelable>, Iterable<TradeItLinkedBrokerAccountParcelable>>() {
-                    @Override
-                    public Iterable<TradeItLinkedBrokerAccountParcelable> apply(@NonNull List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccountParcelables) throws Exception {
-                        return linkedBrokerAccountParcelables;
-                    }
-                }).map(new Function<TradeItLinkedBrokerAccountParcelable, Single<TradeItLinkedBrokerAccountParcelable>>() {
+                .flatMapSingle(new Function<TradeItLinkedBrokerAccountParcelable, Single<TradeItLinkedBrokerAccountParcelable>>() {
                     @Override
                     public Single<TradeItLinkedBrokerAccountParcelable> apply(@NonNull final TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) throws Exception {
                         return Single.create(new SingleOnSubscribe<TradeItLinkedBrokerAccountParcelable>() {
@@ -116,12 +110,8 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
                             }
                         });
                     }
-                }).flatMap(new Function<Single<TradeItLinkedBrokerAccountParcelable>, ObservableSource<?>>() {
-                        @Override
-                        public ObservableSource<?> apply(@NonNull Single<TradeItLinkedBrokerAccountParcelable> tradeItLinkedBrokerAccountParcelableSingle) throws Exception {
-                            return tradeItLinkedBrokerAccountParcelableSingle.toObservable();
-                        }
-                }).subscribe(new DisposableObserver() {
+                }, true)
+                .subscribe(new DisposableObserver() {
                     @Override
                     public void onNext(@NonNull Object linkedBrokerAccountParcelable) {
                         Log.d(TAG, "onNext: " + linkedBrokerAccountParcelable);
@@ -144,14 +134,14 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         this.getApiClient().authenticate(this.getLinkedLogin(), new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccountParcelable>>(callback, apiClient) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
-                linkedBroker.error = null;
-                TradeItAuthenticateResponse authResponse = response.body();
-                List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
-                List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
-                accounts = linkedBrokerAccounts;
-                accountsLastUpdated = new Date();
-                linkedBrokerCache.cache(linkedBroker);
-                callback.onSuccess(linkedBrokerAccounts);
+                    linkedBroker.error = null;
+                    TradeItAuthenticateResponse authResponse = response.body();
+                    List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
+                    List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
+                    accounts = linkedBrokerAccounts;
+                    accountsLastUpdated = new Date();
+                    linkedBrokerCache.cache(linkedBroker);
+                    callback.onSuccess(linkedBrokerAccounts);
             }
 
             @Override

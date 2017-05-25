@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
@@ -35,12 +34,14 @@ import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
+import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
-import it.trade.model.TradeItSecurityQuestion;;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse;
 import it.trade.model.reponse.TradeItResponse;
 import it.trade.model.request.TradeItLinkedLogin;
+
+;
 
 public class TradeItLinkedBrokerManager {
 
@@ -101,15 +102,10 @@ public class TradeItLinkedBrokerManager {
                 Log.w(TAG, "Undeliverable exception received, not sure what to do", e);
             }
         });
-        Observable.fromArray(this.getLinkedBrokers())
+        Observable.fromIterable(this.getLinkedBrokers())
             .observeOn(AndroidSchedulers.mainThread(), true)
             .subscribeOn(Schedulers.io())
-            .flatMapIterable(new Function<List<TradeItLinkedBrokerParcelable>, Iterable<TradeItLinkedBrokerParcelable>>() {
-                @Override
-                public Iterable<TradeItLinkedBrokerParcelable> apply(@NonNull List<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelables) throws Exception {
-                    return tradeItLinkedBrokerParcelables;
-                }
-            }).map(new Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>>() {
+            .flatMapSingle(new Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>>() {
                 @Override
                 public Single<TradeItLinkedBrokerParcelable> apply(@NonNull final TradeItLinkedBrokerParcelable linkedBrokerParcelable) throws Exception {
                     return Single.create(new SingleOnSubscribe<TradeItLinkedBrokerParcelable>() {
@@ -118,61 +114,57 @@ public class TradeItLinkedBrokerManager {
                             linkedBrokerParcelable.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
                                 @Override
                                 public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                                    Log.d(TAG, "Single onSecurityQuestion");
                                     callback.onSecurityQuestion(securityQuestion, this);
                                 }
 
                                 @Override
                                 public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> type) {
+                                    Log.d(TAG, "Single onSuccess");
                                     emmiter.onSuccess(linkedBrokerParcelable);
                                 }
 
                                 @Override
                                 public void onError(TradeItErrorResult error) {
-                                    Log.e(TAG, error.toString());
+                                    Log.d(TAG, "Single onError" + error.toString());
                                     emmiter.onError(new RuntimeException(error.toString()));
                                 }
 
                                 @Override
                                 public void cancelSecurityQuestion() {
+                                    Log.d(TAG, "Single cancelSecurityQuestion");
                                     emmiter.onSuccess(linkedBrokerParcelable);
                                 }
                             });
                         }
                     });
                 }
-            }).flatMap(new Function<Single<TradeItLinkedBrokerParcelable>, ObservableSource<TradeItLinkedBrokerParcelable>>() {
-                @Override
-                public ObservableSource<TradeItLinkedBrokerParcelable> apply(@NonNull Single<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelableSingle) throws Exception {
-                    return tradeItLinkedBrokerParcelableSingle.toObservable();
-                }
-            }, true).subscribe(new DisposableObserver() {
+            }, true)
+            .subscribe(new DisposableObserver() {
                 @Override
                 public void onNext(@NonNull Object linkedBrokerParcelable) {
-                    Log.d(TAG, "onNext: " + linkedBrokerParcelable);
+                    Log.d(TAG, "authenticateAll - onNext: " + linkedBrokerParcelable);
                 }
 
                 @Override
                 public void onError(@NonNull Throwable e) {
+                    Log.d(TAG, "authenticateAll - onError " + e.getMessage());
                     callback.onFinished();
                 }
 
                 @Override
                 public void onComplete() {
+                    Log.d(TAG, "authenticateAll - Oncomplete");
                     callback.onFinished();
                 }
             });
     }
 
     public void refreshAccountBalances(final TradeItCallBackCompletion callback) {
-        Observable.fromArray(this.getLinkedBrokers())
+        Observable.fromIterable(this.getLinkedBrokers())
                 .observeOn(AndroidSchedulers.mainThread(), true)
                 .subscribeOn(Schedulers.io())
-                .flatMapIterable(new Function<List<TradeItLinkedBrokerParcelable>, Iterable<TradeItLinkedBrokerParcelable>>() {
-                    @Override
-                    public Iterable<TradeItLinkedBrokerParcelable> apply(@NonNull List<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelables) throws Exception {
-                        return tradeItLinkedBrokerParcelables;
-                    }
-                }).map(new Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>>() {
+                .flatMapSingle(new Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>>() {
                     @Override
                     public Single<TradeItLinkedBrokerParcelable> apply(@NonNull final TradeItLinkedBrokerParcelable linkedBrokerParcelable) throws Exception {
                         return Single.create(new SingleOnSubscribe<TradeItLinkedBrokerParcelable>() {
@@ -187,28 +179,25 @@ public class TradeItLinkedBrokerManager {
                             }
                         });
                     }
-                }).flatMap(new Function<Single<TradeItLinkedBrokerParcelable>, ObservableSource<TradeItLinkedBrokerParcelable>>() {
-                    @Override
-                    public ObservableSource<TradeItLinkedBrokerParcelable> apply(@NonNull Single<TradeItLinkedBrokerParcelable> tradeItLinkedBrokerParcelableSingle) throws Exception {
-                        return tradeItLinkedBrokerParcelableSingle.toObservable();
-                    }
-                }, true).subscribe(new DisposableObserver() {
+                }, true)
+                .subscribe(new DisposableObserver() {
                 @Override
                 public void onNext(@NonNull Object linkedBrokerParcelable) {
-                    Log.d(TAG, "onNext: " + linkedBrokerParcelable);
+                    Log.d(TAG, "refreshAccountBalances onNext: " + linkedBrokerParcelable);
                 }
 
                 @Override
                 public void onError(@NonNull Throwable e) {
+                    Log.d(TAG, "refreshAccountBalances onError: " + e);
                     callback.onFinished();
                 }
 
                 @Override
                 public void onComplete() {
+                    Log.d(TAG, "refreshAccountBalances oncomplete");
                     callback.onFinished();
                 }
             });
-
     }
 
     public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
