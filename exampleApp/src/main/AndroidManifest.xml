@@ -18,6 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".WebViewActivity"
+            android:parentActivityName=".OauthLinkBrokerActivity"
             android:launchMode="singleTask"/>
         <activity
             android:name=".LinkedBrokersActivity"

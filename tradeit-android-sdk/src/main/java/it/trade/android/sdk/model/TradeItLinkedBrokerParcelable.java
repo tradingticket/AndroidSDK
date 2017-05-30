@@ -2,21 +2,38 @@ package it.trade.android.sdk.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.exceptions.UndeliverableException;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.schedulers.Schedulers;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.AuthenticationCallback;
+import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestion;
 import it.trade.model.reponse.TradeItAuthenticateResponse;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItErrorCode;
 import it.trade.model.request.TradeItLinkedLogin;
 import retrofit2.Response;
+
 
 public class TradeItLinkedBrokerParcelable implements Parcelable {
     private transient TradeItApiClientParcelable apiClient;
@@ -25,6 +42,8 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
     private Date accountsLastUpdated;
     private TradeItErrorResultParcelable error;
     private transient TradeItLinkedBrokerCache linkedBrokerCache;
+
+    private static final String TAG = TradeItLinkedBrokerParcelable.class.getName();
 
     public TradeItLinkedBrokerParcelable(TradeItApiClientParcelable apiClient, TradeItLinkedLoginParcelable linkedLogin, TradeItLinkedBrokerCache linkedBrokerCache) {
         this.apiClient = apiClient;
@@ -37,23 +56,92 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         linkedBrokerCache.cache(this);
     }
 
-//    public void refreshBalancesForAllAccounts() {
-//
-//    }
+    public void refreshAccountBalances(final TradeItCallBackCompletion callback) {
+        RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
+            @Override
+            public void accept(@NonNull Throwable e) throws Exception {
+                if (e instanceof UndeliverableException) {
+                    e = e.getCause();
+                }
+                if ((e instanceof IOException) || (e instanceof SocketException)) {
+                    // fine, irrelevant network problem or API that throws on cancellation
+                    return;
+                }
+                if (e instanceof InterruptedException) {
+                    // fine, some blocking code was interrupted by a dispose call
+                    return;
+                }
+                if ((e instanceof NullPointerException) || (e instanceof IllegalArgumentException)) {
+                    // that's likely a bug in the application
+                    Thread.currentThread().getUncaughtExceptionHandler()
+                            .uncaughtException(Thread.currentThread(), e);
+                    return;
+                }
+                if (e instanceof IllegalStateException) {
+                    // that's a bug in RxJava or in a custom operator
+                    Thread.currentThread().getUncaughtExceptionHandler()
+                            .uncaughtException(Thread.currentThread(), e);
+                    return;
+                }
+                Log.w(TAG, "Undeliverable exception received, not sure what to do", e);
+            }
+        });
+        Observable.fromIterable(this.accounts)
+                .observeOn(AndroidSchedulers.mainThread(), true)
+                .subscribeOn(Schedulers.io())
+                .flatMapSingle(new Function<TradeItLinkedBrokerAccountParcelable, Single<TradeItLinkedBrokerAccountParcelable>>() {
+                    @Override
+                    public Single<TradeItLinkedBrokerAccountParcelable> apply(@NonNull final TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) throws Exception {
+                        return Single.create(new SingleOnSubscribe<TradeItLinkedBrokerAccountParcelable>() {
+                            @Override
+                            public void subscribe(@NonNull final SingleEmitter<TradeItLinkedBrokerAccountParcelable> emmiter) throws Exception {
+                                linkedBrokerAccountParcelable.refreshBalance(new TradeItCallback<TradeItBalanceParcelable>() {
+                                    @Override
+                                    public void onSuccess(TradeItBalanceParcelable balance) {
+                                        emmiter.onSuccess(linkedBrokerAccountParcelable);
+                                    }
+
+                                    @Override
+                                    public void onError(TradeItErrorResult error) {
+                                        Log.e(TAG, error.toString());
+                                        emmiter.onError(new RuntimeException(error.toString()));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }, true)
+                .subscribe(new DisposableObserver() {
+                    @Override
+                    public void onNext(@NonNull Object linkedBrokerAccountParcelable) {
+                        Log.d(TAG, "onNext: " + linkedBrokerAccountParcelable);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        callback.onFinished();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        callback.onFinished();
+                    }
+                });
+    }
 
     public void authenticate(final TradeItCallbackWithSecurityQuestion<List<TradeItLinkedBrokerAccountParcelable>> callback) {
         final TradeItLinkedBrokerParcelable linkedBroker = this;
-        this.apiClient.authenticate(this.linkedLogin, new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccountParcelable>>(callback, apiClient) {
+        this.getApiClient().authenticate(this.getLinkedLogin(), new AuthenticationCallback<TradeItAuthenticateResponse, List<TradeItLinkedBrokerAccountParcelable>>(callback, apiClient) {
             @Override
             public void onSuccessResponse(Response<TradeItAuthenticateResponse> response) {
-                linkedBroker.error = null;
-                TradeItAuthenticateResponse authResponse = response.body();
-                List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
-                List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
-                accounts = linkedBrokerAccounts;
-                accountsLastUpdated = new Date();
-                linkedBrokerCache.cache(linkedBroker);
-                callback.onSuccess(linkedBrokerAccounts);
+                    linkedBroker.error = null;
+                    TradeItAuthenticateResponse authResponse = response.body();
+                    List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
+                    List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
+                    accounts = linkedBrokerAccounts;
+                    accountsLastUpdated = new Date();
+                    linkedBrokerCache.cache(linkedBroker);
+                    callback.onSuccess(linkedBrokerAccounts);
             }
 
             @Override
@@ -119,7 +207,7 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
 
     private List<TradeItLinkedBrokerAccountParcelable> mapBrokerAccountsToLinkedBrokerAccounts(List<TradeItBrokerAccount> accounts) {
         List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = new ArrayList<>();
-        for (TradeItBrokerAccount account: accounts) {
+        for (TradeItBrokerAccount account : accounts) {
             linkedBrokerAccounts.add(new TradeItLinkedBrokerAccountParcelable(this, account));
         }
         return linkedBrokerAccounts;
