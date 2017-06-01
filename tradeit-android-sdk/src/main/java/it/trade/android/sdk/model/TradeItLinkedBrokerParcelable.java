@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import it.trade.android.sdk.TradeItSDK;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
@@ -253,12 +254,13 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
     }
 
     protected TradeItLinkedBrokerParcelable(Parcel in) {
-        this.apiClient = in.readParcelable(TradeItApiClient.class.getClassLoader());
+        this.apiClient = in.readParcelable(TradeItApiClientParcelable.class.getClassLoader());
         this.linkedLogin = in.readParcelable(TradeItLinkedLogin.class.getClassLoader());
         this.accounts = in.createTypedArrayList(TradeItLinkedBrokerAccountParcelable.CREATOR);
         long tmpAccountsLastUpdated = in.readLong();
         this.accountsLastUpdated = tmpAccountsLastUpdated == -1 ? null : new Date(tmpAccountsLastUpdated);
         this.error = in.readParcelable(TradeItErrorResultParcelable.class.getClassLoader());
+        this.linkedBrokerCache = TradeItSDK.getLinkedBrokerCache();
     }
 
     public static final Parcelable.Creator<TradeItLinkedBrokerParcelable> CREATOR = new Parcelable.Creator<TradeItLinkedBrokerParcelable>() {

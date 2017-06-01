@@ -5,9 +5,7 @@ import it.trade.android.sdk.model.TradeItApiClientParcelable
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
-import it.trade.api.TradeItApiClient
 import it.trade.model.TradeItErrorResult
-import it.trade.model.callback.TradeItCallback
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
 import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker
@@ -26,7 +24,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     String apiKey = "test api key"
     TradeItEnvironment environment = TradeItEnvironment.QA
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
-    TradeItApiClient apiClient = Mock(TradeItApiClient)
+    TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable)
     
     void setup() {
         keystoreService.getLinkedLogins() >> []

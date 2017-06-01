@@ -14,7 +14,6 @@ import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
-import it.trade.api.TradeItApiClient;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse;
 import it.trade.model.request.TradeItEnvironment;
@@ -43,7 +42,7 @@ public class TradeItOrderParcelableTest {
         oAuthAccessTokenResponse.userToken = "MyUserToken";
         oAuthAccessTokenResponse.broker = "MyBroker";
         TradeItLinkedLoginParcelable linkedLogin = new TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, oAuthAccessTokenResponse);
-        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable(new TradeItApiClient("MyApiKey", TradeItSDK.getEnvironment()));
+        TradeItApiClientParcelable apiClient = new TradeItApiClientParcelable("MyApiKey", TradeItSDK.getEnvironment());
 
         apiClient.setSessionToken("MySessionToken");
         TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, TradeItSDK.getLinkedBrokerCache());
