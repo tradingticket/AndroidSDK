@@ -1,30 +1,19 @@
 package it.trade.android.sdk.model
 
-import it.trade.android.sdk.model.TradeItCallBackImpl
-import it.trade.android.sdk.model.TradeItErrorResult
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccount
-import it.trade.android.sdk.model.TradeItOrder
-import it.trade.tradeitapi.API.TradeItApiClient
-import it.trade.tradeitapi.model.TradeItErrorCode
-import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse
-import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse.OrderInfo
-import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse.Price
-import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse
-import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse.OrderDetails
-import it.trade.tradeitapi.model.TradeItResponseStatus
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import spock.lang.Specification
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpiration
+import it.trade.model.TradeItErrorResult
+import it.trade.model.callback.TradeItCallback
+import it.trade.model.callback.TradeItCallback
+import it.trade.model.reponse.*
+import spock.lang.Specification
 
-class TradeItOrderSpec extends Specification {
-    private TradeItLinkedBrokerAccount linkedBrokerAccount = Mock(TradeItLinkedBrokerAccount)
-    private TradeItOrder order = new TradeItOrder(linkedBrokerAccount, "My symbol")
+class TradeItOrderParcelableSpec extends Specification {
+    private TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = Mock(TradeItLinkedBrokerAccountParcelable)
+    private TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokerAccount, "My symbol")
 
     void setup() {
-        linkedBrokerAccount.getTradeItApiClient() >> Mock(TradeItApiClient)
+        linkedBrokerAccount.getTradeItApiClient() >> Mock(TradeItApiClientParcelable)
         linkedBrokerAccount.accountNumber >> "My account number"
         linkedBrokerAccount.accountName >> "My account name"
     }
@@ -38,8 +27,7 @@ class TradeItOrderSpec extends Specification {
             order.setQuantity(1)
 
             linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(_, _) >> { args ->
-                Callback<TradeItPreviewStockOrEtfOrderResponse> callback = args[1]
-                Call<TradeItPreviewStockOrEtfOrderResponse> call = Mock(Call)
+                TradeItCallback<TradeItPreviewStockOrEtfOrderResponse> callback = args[1]
                 TradeItPreviewStockOrEtfOrderResponse tradeItPreviewStockOrEtfOrderResponse = new TradeItPreviewStockOrEtfOrderResponse()
                 tradeItPreviewStockOrEtfOrderResponse.sessionToken = "My session token"
                 tradeItPreviewStockOrEtfOrderResponse.longMessages = null
@@ -52,14 +40,12 @@ class TradeItOrderSpec extends Specification {
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderQuantity = 1
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderPrice = "market"
 
-
-                Response<TradeItPreviewStockOrEtfOrderResponse> response = Response.success(tradeItPreviewStockOrEtfOrderResponse);
-                callback.onResponse(call, response);
+                callback.onSuccess(tradeItPreviewStockOrEtfOrderResponse);
             }
 
         when: "calling preview order"
             TradeItPreviewStockOrEtfOrderResponse previewResponse = null
-            order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+            order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                     previewResponse = response
@@ -95,22 +81,13 @@ class TradeItOrderSpec extends Specification {
             order.setQuantity(1)
 
             linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(_, _) >> { args ->
-                Callback<TradeItPreviewStockOrEtfOrderResponse> callback = args[1]
-                Call<TradeItPreviewStockOrEtfOrderResponse> call = Mock(Call)
-                TradeItPreviewStockOrEtfOrderResponse tradeItPreviewStockOrEtfOrderResponse = new TradeItPreviewStockOrEtfOrderResponse()
-                tradeItPreviewStockOrEtfOrderResponse.sessionToken = "My session token"
-                tradeItPreviewStockOrEtfOrderResponse.shortMessage = "My short error message"
-                tradeItPreviewStockOrEtfOrderResponse.longMessages = ["My long error message"]
-                tradeItPreviewStockOrEtfOrderResponse.status = TradeItResponseStatus.ERROR
-                tradeItPreviewStockOrEtfOrderResponse.code = TradeItErrorCode.BROKER_ACCOUNT_ERROR
-
-                Response<TradeItPreviewStockOrEtfOrderResponse> response = Response.success(tradeItPreviewStockOrEtfOrderResponse);
-                callback.onResponse(call, response);
+                TradeItCallback<TradeItPreviewStockOrEtfOrderResponse> callback = args[1]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.BROKER_ACCOUNT_ERROR, "My short error message", ["My long error message"]))
             }
 
         when: "calling preview order"
             TradeItErrorResult errorResult = null
-            order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+            order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                     successfulCallbackCount++
@@ -140,8 +117,7 @@ class TradeItOrderSpec extends Specification {
             int errorCallbackCount = 0
 
             linkedBrokerAccount.getTradeItApiClient().placeStockOrEtfOrder(_, _) >> { args ->
-                Callback<TradeItPlaceStockOrEtfOrderResponse> callback = args[1]
-                Call<TradeItPlaceStockOrEtfOrderResponse> call = Mock(Call)
+                TradeItCallback<TradeItPlaceStockOrEtfOrderResponse> callback = args[1]
                 TradeItPlaceStockOrEtfOrderResponse tradeItPlaceStockOrEtfOrderResponse = new TradeItPlaceStockOrEtfOrderResponse()
                 tradeItPlaceStockOrEtfOrderResponse.sessionToken = "My session token"
                 tradeItPlaceStockOrEtfOrderResponse.longMessages = null
@@ -155,15 +131,12 @@ class TradeItOrderSpec extends Specification {
                 Price price  = new Price()
                 price.type = "market"
                 tradeItPlaceStockOrEtfOrderResponse.orderInfo.price = price
-
-
-                Response<TradeItPlaceStockOrEtfOrderResponse> response = Response.success(tradeItPlaceStockOrEtfOrderResponse);
-                callback.onResponse(call, response);
+                callback.onSuccess(tradeItPlaceStockOrEtfOrderResponse);
             }
 
         when: "calling place order"
             TradeItPlaceStockOrEtfOrderResponse placeOrderResponse = null
-            order.placeOrder("My Order Id", new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+            order.placeOrder("My Order Id", new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
                     placeOrderResponse= response
@@ -194,22 +167,13 @@ class TradeItOrderSpec extends Specification {
             int successfulCallbackCount = 0
             int errorCallbackCount = 0
             linkedBrokerAccount.getTradeItApiClient().placeStockOrEtfOrder(_, _) >> { args ->
-                Callback<TradeItPlaceStockOrEtfOrderResponse> callback = args[1]
-                Call<TradeItPlaceStockOrEtfOrderResponse> call = Mock(Call)
-                TradeItPlaceStockOrEtfOrderResponse tradeItPlaceStockOrEtfOrderResponse = new TradeItPlaceStockOrEtfOrderResponse()
-                tradeItPlaceStockOrEtfOrderResponse.sessionToken = "My session token"
-                tradeItPlaceStockOrEtfOrderResponse.shortMessage = "My short error message"
-                tradeItPlaceStockOrEtfOrderResponse.longMessages = ["My long error message"]
-                tradeItPlaceStockOrEtfOrderResponse.status = TradeItResponseStatus.ERROR
-                tradeItPlaceStockOrEtfOrderResponse.code = TradeItErrorCode.PARAMETER_ERROR
-
-                Response<TradeItPreviewStockOrEtfOrderResponse> response = Response.success(tradeItPlaceStockOrEtfOrderResponse);
-                callback.onResponse(call, response);
+                TradeItCallback<TradeItPlaceStockOrEtfOrderResponse> callback = args[1]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.PARAMETER_ERROR, "My short error message", ["My long error message"]))
             }
 
         when: "calling preview order"
             TradeItErrorResult errorResult = null
-            order.placeOrder("My Order Id", new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+            order.placeOrder("My Order Id", new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
                 @Override
                 void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
                     successfulCallbackCount++

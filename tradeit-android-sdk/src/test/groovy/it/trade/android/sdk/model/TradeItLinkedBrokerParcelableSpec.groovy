@@ -1,21 +1,27 @@
 package it.trade.android.sdk.model
 
-import it.trade.tradeitapi.API.TradeItApiClient
-import it.trade.tradeitapi.model.*
+import it.trade.model.TradeItErrorResult
+import it.trade.model.TradeItSecurityQuestion
+import it.trade.model.callback.AuthenticationCallback
+import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl
+import it.trade.model.reponse.TradeItAuthenticateResponse
+import it.trade.model.reponse.TradeItBrokerAccount
+import it.trade.model.reponse.TradeItErrorCode
+import it.trade.model.reponse.TradeItResponseStatus
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import spock.lang.Specification
 
-class TradeItLinkedBrokerSpec extends Specification {
-    TradeItApiClient apiClient = Mock(TradeItApiClient);
-    TradeItLinkedLogin linkedLogin = Mock(TradeItLinkedLogin)
+class TradeItLinkedBrokerParcelableSpec extends Specification {
+    TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable);
+    TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable)
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
-    TradeItLinkedBroker linkedBroker;
+    TradeItLinkedBrokerParcelable linkedBroker;
 
 
     void setup() {
-        linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache)
+        linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache)
     }
 
     def "authenticate handles a successful response from trade it api"() {
@@ -29,25 +35,24 @@ class TradeItLinkedBrokerSpec extends Specification {
             TradeItBrokerAccount account2 = new TradeItBrokerAccount();
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
-            List<TradeItLinkedBrokerAccount> accountsExpected = [new TradeItLinkedBrokerAccount(linkedBroker, account1), new TradeItLinkedBrokerAccount(linkedBroker, account2)]
+            List<TradeItLinkedBrokerAccountParcelable> accountsExpected = [new TradeItLinkedBrokerAccountParcelable(linkedBroker, account1), new TradeItLinkedBrokerAccountParcelable(linkedBroker, account2)]
             1 * apiClient.authenticate(linkedLogin, _) >> { args ->
-                Callback<TradeItAuthenticateResponse> callback = args[1]
-                Call<TradeItAuthenticateResponse> call = Mock(Call)
+                AuthenticationCallback<TradeItAuthenticateResponse, TradeItSecurityQuestion> callback = args[1]
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
                 tradeItAuthenticateResponse.longMessages = null
                 tradeItAuthenticateResponse.status = TradeItResponseStatus.SUCCESS
                 tradeItAuthenticateResponse.accounts = [account1, account2]
                 Response<TradeItAuthenticateResponse> response = Response.success(tradeItAuthenticateResponse);
-                callback.onResponse(call, response);
+                callback.onResponse(Mock(Call), response)
             }
 
         when: "calling authenticate"
-            List<TradeItBrokerAccount> accountsResult = null
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+            List<TradeItLinkedBrokerAccountParcelable> accountsResult = null
+            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
 
                 @Override
-                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
                     successCallBackCount++
                     accountsResult = accounts
                 }
@@ -68,7 +73,7 @@ class TradeItLinkedBrokerSpec extends Specification {
             securityQuestionCallbackCount == 0
             errorCallBackCount == 0
 
-        and: "expects a list of TradeItLinkedBrokerAccount"
+        and: "expects a list of TradeItLinkedBrokerAccountParcelable"
             accountsResult == accountsExpected
 
         and: "the list is kept in memory"
@@ -83,22 +88,21 @@ class TradeItLinkedBrokerSpec extends Specification {
 
             1 * apiClient.authenticate(linkedLogin, _) >> { args ->
                 Callback<TradeItAuthenticateResponse> callback = args[1]
-                Call<TradeItAuthenticateResponse> call = Mock(Call)
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
                 tradeItAuthenticateResponse.longMessages = null
                 tradeItAuthenticateResponse.status = TradeItResponseStatus.INFORMATION_NEEDED
                 tradeItAuthenticateResponse.securityQuestion = "My security question"
                 Response<TradeItAuthenticateResponse> response = Response.success(tradeItAuthenticateResponse);
-                callback.onResponse(call, response);
+                callback.onResponse(Mock(Call), response);
             }
 
         when: "calling authenticate"
             TradeItSecurityQuestion tradeItSecurityQuestion = null
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
 
                 @Override
-                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
                     successCallBackCount++
                 }
 
@@ -131,7 +135,6 @@ class TradeItLinkedBrokerSpec extends Specification {
 
             1 * apiClient.authenticate(linkedLogin, _) >> { args ->
                 Callback<TradeItAuthenticateResponse> callback = args[1]
-                Call<TradeItAuthenticateResponse> call = Mock(Call)
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
                 tradeItAuthenticateResponse.longMessages = null
@@ -141,15 +144,15 @@ class TradeItLinkedBrokerSpec extends Specification {
                 tradeItAuthenticateResponse.code = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
 
                 Response<TradeItAuthenticateResponse> response = Response.success(tradeItAuthenticateResponse);
-                callback.onResponse(call, response);
+                callback.onResponse(Mock(Call), response);
             }
 
         when: "calling authenticate"
             TradeItErrorResult tradeItErrorResult = null
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
 
                 @Override
-                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
                     successCallBackCount++
                 }
 
@@ -182,7 +185,7 @@ class TradeItLinkedBrokerSpec extends Specification {
             int successCallbackCount = 0
             int securityQuestionCallbackCount = 0
             int errorCallbackCount = 0
-            TradeItErrorResult errorResult = new TradeItErrorResult()
+            TradeItErrorResultParcelable errorResult = new TradeItErrorResultParcelable()
             errorResult.errorCode = TradeItErrorCode.BROKER_ACCOUNT_ERROR
             linkedBroker.error = errorResult
 
@@ -192,26 +195,25 @@ class TradeItLinkedBrokerSpec extends Specification {
             TradeItBrokerAccount account2 = new TradeItBrokerAccount();
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
-            List<TradeItLinkedBrokerAccount> accountsExpected = [new TradeItLinkedBrokerAccount(linkedBroker, account1), new TradeItLinkedBrokerAccount(linkedBroker, account2)]
+            List<TradeItLinkedBrokerAccountParcelable> accountsExpected = [new TradeItLinkedBrokerAccountParcelable(linkedBroker, account1), new TradeItLinkedBrokerAccountParcelable(linkedBroker, account2)]
 
             1 * apiClient.authenticate(linkedLogin, _) >> { args ->
-                Callback<TradeItAuthenticateResponse> callback = args[1]
-                Call<TradeItAuthenticateResponse> call = Mock(Call)
+                AuthenticationCallback<TradeItAuthenticateResponse, TradeItSecurityQuestion> callback = args[1]
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
                 tradeItAuthenticateResponse.sessionToken = "My session token"
                 tradeItAuthenticateResponse.longMessages = null
                 tradeItAuthenticateResponse.status = TradeItResponseStatus.SUCCESS
                 tradeItAuthenticateResponse.accounts = [account1, account2]
                 Response<TradeItAuthenticateResponse> response = Response.success(tradeItAuthenticateResponse);
-                callback.onResponse(call, response);
+                callback.onResponse(Mock(Call), response)
             }
 
         when: "calling authenticateIfNeeded"
-            List<TradeItBrokerAccount> accountsResult = null
-            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+            List<TradeItLinkedBrokerAccountParcelable> accountsResult = null
+            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
 
                 @Override
-                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
                     successCallbackCount++
                     accountsResult = accounts
                 }
@@ -232,7 +234,7 @@ class TradeItLinkedBrokerSpec extends Specification {
             securityQuestionCallbackCount == 0
             errorCallbackCount == 0
 
-        and: "expects a list of TradeItLinkedBrokerAccount"
+        and: "expects a list of TradeItLinkedBrokerAccountParcelable"
             accountsResult == accountsExpected
 
         and: "the list is kept in memory"
@@ -243,22 +245,21 @@ class TradeItLinkedBrokerSpec extends Specification {
 
     }
 
-    def "authenticateIfNeeded return an error if there is an error that requires relink"() {
+    def "authenticateIfNeeded returns an error if there is an error that requires relink"() {
         given: "An error that requires relink"
             int successCallbackCount = 0
             int securityQuestionCallbackCount = 0
             int errorCallbackCount = 0
-            TradeItErrorResult errorResult = new TradeItErrorResult()
+            TradeItErrorResultParcelable errorResult = new TradeItErrorResultParcelable()
             errorResult.errorCode = TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED
             linkedBroker.error = errorResult
 
         when: "calling authenticateIfNeeded"
-            TradeItErrorResult expectedError = null
-            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+            TradeItErrorResultParcelable expectedError = null
+            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
                 @Override
-                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
                     successCallbackCount++
-                    accountsResult = accounts
                 }
 
                 @Override
@@ -291,16 +292,16 @@ class TradeItLinkedBrokerSpec extends Specification {
             int successCallbackCount = 0
             int securityQuestionCallbackCount = 0
             int errorCallbackCount = 0
-            TradeItErrorResult errorResult = new TradeItErrorResult()
+            TradeItErrorResultParcelable errorResult = new TradeItErrorResultParcelable()
             errorResult.errorCode = TradeItErrorCode.BROKER_EXECUTION_ERROR
             linkedBroker.error = errorResult
 
         when: "calling authenticateIfNeeded"
-            List<TradeItBrokerAccount> accountsResult = null
-            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItBrokerAccount>>() {
+            List<TradeItLinkedBrokerAccountParcelable> accountsResult = null
+            linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
 
                 @Override
-                void onSuccess(List<TradeItBrokerAccount> accounts) {
+                void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
                     successCallbackCount++
                     accountsResult = accounts
                 }

@@ -7,7 +7,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccount;
+import it.trade.android.sdk.model.TradeItBalanceParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.callback.TradeItCallback;
 
 import static it.trade.android.exampleapp.MainActivity.LINKED_BROKER_ACCOUNTS_PARAMETER;
 
@@ -20,11 +23,22 @@ public class LinkedBrokerAccountsActivity extends AppCompatActivity {
         TextView textView = (TextView) this.findViewById(R.id.linked_broker_accounts_textview);
 
         Intent intent = getIntent();
-        List<TradeItLinkedBrokerAccount> linkedBrokerAccounts = intent.getParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER);
+        List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = intent.getParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER);
 
         if (linkedBrokerAccounts.isEmpty()) {
             textView.setText("No linked broker accounts!");
         } else {
+            linkedBrokerAccounts.get(0).refreshBalance(new TradeItCallback<TradeItBalanceParcelable>() {
+                @Override
+                public void onSuccess(TradeItBalanceParcelable type) {
+
+                }
+
+                @Override
+                public void onError(TradeItErrorResult error) {
+
+                }
+            });
             textView.setText("# of linkedBroker accounts: " + linkedBrokerAccounts.size() + " : " + linkedBrokerAccounts.toString());
         }
 

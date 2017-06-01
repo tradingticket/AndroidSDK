@@ -3,20 +3,20 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import it.trade.android.sdk.enums.TradeItOrderPriceType;
-import it.trade.android.sdk.internal.DefaultCallbackWithErrorHandling;
-import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderRequest;
-import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
-import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderRequest;
-import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
-import retrofit2.Response;
 import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
-import it.trade.android.sdk.internal.PreviewTradeCallback;
+import it.trade.android.sdk.enums.TradeItOrderPriceType;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.callback.TradeItCallback;
+import it.trade.model.callback.TradeItCallback;
+import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
+import it.trade.model.reponse.TradeItPreviewStockOrEtfOrderResponse;
+import it.trade.model.request.TradeItPreviewStockOrEtfOrderRequest;
 
-public class TradeItOrder implements Parcelable {
 
-    private TradeItLinkedBrokerAccount linkedBrokerAccount;
+public class TradeItOrderParcelable implements Parcelable {
+
+    private TradeItLinkedBrokerAccountParcelable linkedBrokerAccount;
     private String symbol;
     private int quantity = 1;
     private Double limitPrice;
@@ -26,7 +26,7 @@ public class TradeItOrder implements Parcelable {
     private TradeItOrderPriceType priceType = TradeItOrderPriceType.MARKET;
     private TradeItOrderExpiration expiration = TradeItOrderExpiration.GOOD_FOR_DAY;
 
-    public TradeItOrder(TradeItLinkedBrokerAccount linkedBrokerAccount, String symbol) {
+    public TradeItOrderParcelable(TradeItLinkedBrokerAccountParcelable linkedBrokerAccount, String symbol) {
         this.linkedBrokerAccount = linkedBrokerAccount;
         this.symbol = symbol;
     }
@@ -40,30 +40,33 @@ public class TradeItOrder implements Parcelable {
                 (this.limitPrice != null ? this.limitPrice.toString() : null),
                 (this.stopPrice != null ? this.stopPrice.toString() : null),
                 this.expiration.getExpirationValue());
-        final TradeItOrder order = this;
-        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new PreviewTradeCallback<TradeItPreviewStockOrEtfOrderResponse, TradeItPreviewStockOrEtfOrderResponse>(callback) {
-
+        final TradeItOrderParcelable order = this;
+        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
             @Override
-            public void onSuccessResponse(Response<TradeItPreviewStockOrEtfOrderResponse> response) {
-                callback.onSuccess(response.body());
+            public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
+                callback.onSuccess(response);
             }
 
             @Override
-            public void onErrorResponse(TradeItErrorResult errorResult) {
-                order.linkedBrokerAccount.setErrorOnLinkedBroker(errorResult);
-                callback.onError(errorResult);
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                order.linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable);
+                callback.onError(errorResultParcelable);
             }
-
         });
     }
 
     public void placeOrder(String orderId, final TradeItCallback<TradeItPlaceStockOrEtfOrderResponse> callback) {
-        TradeItPlaceStockOrEtfOrderRequest placeStockOrEtfOrderRequest = new TradeItPlaceStockOrEtfOrderRequest(orderId);
-        this.linkedBrokerAccount.getTradeItApiClient().placeStockOrEtfOrder(placeStockOrEtfOrderRequest, new DefaultCallbackWithErrorHandling<TradeItPlaceStockOrEtfOrderResponse, TradeItPlaceStockOrEtfOrderResponse>(callback) {
+        this.linkedBrokerAccount.getTradeItApiClient().placeStockOrEtfOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
+            @Override
+            public void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
+                callback.onSuccess(response);
+            }
 
             @Override
-            public void onSuccessResponse(Response<TradeItPlaceStockOrEtfOrderResponse> response) {
-                callback.onSuccess(response.body());
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                callback.onError(errorResultParcelable);
             }
         });
     }
@@ -132,7 +135,7 @@ public class TradeItOrder implements Parcelable {
         this.expiration = expiration;
     }
 
-    public TradeItLinkedBrokerAccount getLinkedBrokerAccount() {
+    public TradeItLinkedBrokerAccountParcelable getLinkedBrokerAccount() {
         return linkedBrokerAccount;
     }
 
@@ -154,8 +157,8 @@ public class TradeItOrder implements Parcelable {
         dest.writeInt(this.expiration == null ? -1 : this.expiration.ordinal());
     }
 
-    protected TradeItOrder(Parcel in) {
-        this.linkedBrokerAccount = in.readParcelable(TradeItLinkedBrokerAccount.class.getClassLoader());
+    protected TradeItOrderParcelable(Parcel in) {
+        this.linkedBrokerAccount = in.readParcelable(TradeItLinkedBrokerAccountParcelable.class.getClassLoader());
         this.symbol = in.readString();
         this.quantity = in.readInt();
         this.limitPrice = (Double) in.readValue(Double.class.getClassLoader());
@@ -169,15 +172,15 @@ public class TradeItOrder implements Parcelable {
         this.expiration = tmpExpiration == -1 ? null : TradeItOrderExpiration.values()[tmpExpiration];
     }
 
-    public static final Parcelable.Creator<TradeItOrder> CREATOR = new Parcelable.Creator<TradeItOrder>() {
+    public static final Parcelable.Creator<TradeItOrderParcelable> CREATOR = new Parcelable.Creator<TradeItOrderParcelable>() {
         @Override
-        public TradeItOrder createFromParcel(Parcel source) {
-            return new TradeItOrder(source);
+        public TradeItOrderParcelable createFromParcel(Parcel source) {
+            return new TradeItOrderParcelable(source);
         }
 
         @Override
-        public TradeItOrder[] newArray(int size) {
-            return new TradeItOrder[size];
+        public TradeItOrderParcelable[] newArray(int size) {
+            return new TradeItOrderParcelable[size];
         }
     };
 }

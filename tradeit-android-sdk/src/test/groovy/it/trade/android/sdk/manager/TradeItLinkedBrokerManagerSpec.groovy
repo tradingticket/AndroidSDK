@@ -1,21 +1,22 @@
 package it.trade.android.sdk.manager
 
-import it.trade.android.sdk.model.TradeItCallBackImpl
-import it.trade.android.sdk.model.TradeItErrorResult
-import it.trade.android.sdk.model.TradeItLinkedBroker
+import it.trade.android.sdk.internal.TradeItKeystoreService
+import it.trade.android.sdk.model.TradeItApiClientParcelable
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache
-import it.trade.tradeitapi.API.TradeItApiClient
-import it.trade.tradeitapi.API.TradeItBrokerLinker
-import it.trade.tradeitapi.model.*
-import it.trade.tradeitapi.model.TradeItAvailableBrokersResponse.Broker
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable
+import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
+import it.trade.model.TradeItErrorResult
+import it.trade.model.callback.TradeItCallback
+import it.trade.model.reponse.*
+import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker
+import it.trade.model.request.TradeItEnvironment
+import it.trade.model.request.TradeItLinkedLogin
+import it.trade.model.request.TradeItOAuthAccessTokenRequest
 import spock.lang.Specification
 
 class TradeItLinkedBrokerManagerSpec extends Specification {
 
-    TradeItBrokerLinker brokerLinker = Mock(TradeItBrokerLinker)
+    TradeItKeystoreService keystoreService = Mock(TradeItKeystoreService)
     TradeItLinkedBrokerManager linkedBrokerManager
     String accountLabel = "My account label"
     String myUserId = "My trade it userId"
@@ -23,20 +24,19 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     String apiKey = "test api key"
     TradeItEnvironment environment = TradeItEnvironment.QA
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
-
+    TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable)
+    
     void setup() {
-        brokerLinker.getTradeItEnvironment() >> TradeItEnvironment.QA
-        brokerLinker.getLinkedLogins() >> []
-        linkedBrokerManager = new TradeItLinkedBrokerManager(apiKey, environment, linkedBrokerCache, brokerLinker);
+        keystoreService.getLinkedLogins() >> []
+        apiClient.getEnvironment() >> TradeItEnvironment.QA
+        apiClient.getApiKey() >> apiClient
+        linkedBrokerManager = new TradeItLinkedBrokerManager(apiClient, linkedBrokerCache, keystoreService);
     }
 
     def "GetAvailableBrokers handles a successful response from trade it api"() {
         given: "a successful response from trade it"
-            1 * brokerLinker.getAvailableBrokers(_) >> { args ->
-                Callback<TradeItAvailableBrokersResponse> callback = args[0]
-                Call<TradeItAvailableBrokersResponse> call = Mock(Call)
-                TradeItAvailableBrokersResponse tradeItAvailableBrokersResponse = new TradeItAvailableBrokersResponse()
-
+            1 * apiClient.getAvailableBrokers(_) >> { args ->
+                TradeItCallback<List<Broker>> callback = args[0]
                 Broker broker1 = Mock(Broker)
                 broker1.shortName = "Broker1"
                 broker1.longName = "My long Broker1"
@@ -50,13 +50,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 broker3.longName = "My long Broker3"
 
                 List<Broker> brokerList = [broker1, broker2, broker3]
-                tradeItAvailableBrokersResponse.brokerList = brokerList
-                tradeItAvailableBrokersResponse.code = null
-                tradeItAvailableBrokersResponse.sessionToken = "My session token"
-                tradeItAvailableBrokersResponse.longMessages = null
-                tradeItAvailableBrokersResponse.status = TradeItResponseStatus.SUCCESS
-                Response<TradeItAvailableBrokersResponse> response = Response.success(tradeItAvailableBrokersResponse);
-                callback.onResponse(call, response);
+                callback.onSuccess(brokerList)
             }
 
 
@@ -64,7 +58,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int successCallBackCount = 0
             int errorCallBackCount = 0
             List<TradeItAvailableBrokersResponse.Broker> brokerList = null
-            linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
+            linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
                 @Override
                 public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
                     successCallBackCount++
@@ -93,30 +87,18 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
     def "GetAvailableBrokers handles an error response from trade it api"() {
         given: "an error response from trade it"
-            1 * brokerLinker.getAvailableBrokers(_) >> { args ->
-                Callback<TradeItAvailableBrokersResponse> callback = args[0]
-                Call<TradeItAvailableBrokersResponse> call = Mock(Call)
-                TradeItAvailableBrokersResponse tradeItAvailableBrokersResponse = new TradeItAvailableBrokersResponse()
-                tradeItAvailableBrokersResponse.code = TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED
-                tradeItAvailableBrokersResponse.status = TradeItResponseStatus.ERROR
-                tradeItAvailableBrokersResponse.brokerList = null
-                tradeItAvailableBrokersResponse.shortMessage = "This is the short message for the session expired error"
-                tradeItAvailableBrokersResponse.longMessages = ["This is the long message for the session expired error"]
-                tradeItAvailableBrokersResponse.sessionToken = "My session token"
-
-                Response<TradeItAvailableBrokersResponse> response = Response.success(tradeItAvailableBrokersResponse);
-                callback.onResponse(call, response);
+            1 * apiClient.getAvailableBrokers(_) >> { args ->
+                TradeItCallback<List<Broker>> callback = args[0]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.TOKEN_INVALID_OR_EXPIRED, "This is the short message for the session expired error", ["This is the long message for the session expired error"]))
             }
 
         when: "calling getAvailableBrokers"
             int successCallBackCount = 0
             int errorCallBackCount = 0
-            List<TradeItAvailableBrokersResponse.Broker> brokerList = null
-            linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
+            linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
                 @Override
                 public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
                     successCallBackCount++
-                    brokerList = brokerListResponse
                 }
 
                 @Override
@@ -125,37 +107,26 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
                 }
             });
 
-        then: "expects the successCallback called once"
-            successCallBackCount == 1
-            errorCallBackCount == 0
-
-        and: "expects an empty list"
-            brokerList.isEmpty() == true;
+        then: "expects the errorCallBack called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
     }
 
     def "linkBroker handles a successful response from trade it api"() {
         given: "a successful response from trade it api"
             int successCallBackCount = 0
             int errorCallBackCount = 0
-            1 * brokerLinker.linkBrokerAccount(_, _) >> { args ->
-                Callback<TradeItLinkLoginResponse> callback = args[1]
-                Call<TradeItLinkLoginResponse> call = Mock(Call)
-                TradeItLinkLoginResponse tradeItLinkLoginResponse = new TradeItLinkLoginResponse()
-                tradeItLinkLoginResponse.sessionToken = "My session token"
-                tradeItLinkLoginResponse.longMessages = null
-                tradeItLinkLoginResponse.status = TradeItResponseStatus.SUCCESS
-                tradeItLinkLoginResponse.userId = myUserId
-                tradeItLinkLoginResponse.userToken = myUserToken
-                Response<TradeItLinkLoginResponse> response = Response.success(tradeItLinkLoginResponse);
-                callback.onResponse(call, response);
+            1 * apiClient.linkBrokerAccount("My username", "My password", "My broker 1",  _ as TradeItCallback) >> { args ->
+                TradeItCallback<TradeItLinkedLogin> callback = args[3]
+                callback.onSuccess(new TradeItLinkedLogin("My broker 1", myUserId, myUserToken))
             }
 
         when: "calling linkBroker"
-            TradeItLinkedBroker linkedBrokerResult = null
-            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            TradeItLinkedBrokerParcelable linkedBrokerResult = null
+            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
-                void onSuccess(TradeItLinkedBroker linkedBroker) {
+                void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
                     successCallBackCount++
                     linkedBrokerResult = linkedBroker
                 }
@@ -170,8 +141,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             successCallBackCount == 1
             errorCallBackCount == 0
 
-        and: "the brokerLinker static method save was called"
-            1 * brokerLinker.saveLinkedLogin(_, _)
+        and: "the saveLinkedLogin was called"
+            1 * keystoreService.saveLinkedLogin(_, _)
 
         and: "expects a linkedBroker containing userId and userToken"
             linkedBrokerResult.getLinkedLogin().userId == myUserId
@@ -185,27 +156,17 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int errorCallBackCount = 0
             TradeItErrorCode errorCode = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
             String shortMessage = "My error when linking broker"
-            1 * brokerLinker.linkBrokerAccount(_, _) >> { args ->
-                Callback<TradeItLinkLoginResponse> callback = args[1]
-                Call<TradeItLinkLoginResponse> call = Mock(Call)
-                TradeItLinkLoginResponse tradeItLinkLoginResponse = new TradeItLinkLoginResponse()
-                tradeItLinkLoginResponse.sessionToken = "My session token"
-                tradeItLinkLoginResponse.longMessages = null
-                tradeItLinkLoginResponse.status = TradeItResponseStatus.ERROR
-                tradeItLinkLoginResponse.code = errorCode
-                tradeItLinkLoginResponse.shortMessage = shortMessage
-                tradeItLinkLoginResponse.userId = null
-                tradeItLinkLoginResponse.userToken = null
-                Response<TradeItLinkLoginResponse> response = Response.success(tradeItLinkLoginResponse);
-                callback.onResponse(call, response);
+        1 * apiClient.linkBrokerAccount("My username", "My password", "My broker 1",  _ as TradeItCallback) >> { args ->
+            TradeItCallback<TradeItLinkedLogin> callback = args[3]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.BROKER_AUTHENTICATION_ERROR, shortMessage, null))
             }
 
         when: "calling linkBroker"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            linkedBrokerManager.linkBroker(accountLabel, "My broker 1", "My username", "My password", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
-                void onSuccess(TradeItLinkedBroker linkedBroker) {
+                void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
                     successCallBackCount++
                 }
 
@@ -230,22 +191,15 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int successCallBackCount = 0
             int errorCallBackCount = 0
             String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
-            1 * brokerLinker.getOAuthLoginPopupUrlForMobile(_, _) >> { args ->
-                Callback<TradeItOAuthLoginPopupUrlForMobileResponse> callback = args[1]
-                Call<TradeItOAuthLoginPopupUrlForMobileResponse> call = Mock(Call)
-                TradeItOAuthLoginPopupUrlForMobileResponse tradeItOAuthLoginPopupUrlForMobileResponse = new TradeItOAuthLoginPopupUrlForMobileResponse()
-                tradeItOAuthLoginPopupUrlForMobileResponse.sessionToken = "My session token"
-                tradeItOAuthLoginPopupUrlForMobileResponse.longMessages = null
-                tradeItOAuthLoginPopupUrlForMobileResponse.status = TradeItResponseStatus.SUCCESS
-                tradeItOAuthLoginPopupUrlForMobileResponse.oAuthURL = mySpecialUrl
-                Response<TradeItOAuthLoginPopupUrlForMobileResponse> response = Response.success(tradeItOAuthLoginPopupUrlForMobileResponse);
-                callback.onResponse(call, response);
+            1 * apiClient.getOAuthLoginPopupUrlForMobile(_, _, _) >> { args ->
+                TradeItCallback<String> callback = args[2]
+                callback.onSuccess(mySpecialUrl)
             }
 
         when: "calling getOAuthLoginPopupUrl"
             TradeItErrorResult errorResult = null
             String oAuthUrlResult = null
-            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallback<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {
@@ -273,24 +227,14 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int errorCallBackCount = 0
             TradeItErrorCode errorCode = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
             String shortMessage = "My error when linking broker"
-            1 * brokerLinker.getOAuthLoginPopupUrlForMobile(_, _) >> { args ->
-                Callback<TradeItOAuthLoginPopupUrlForMobileResponse> callback = args[1]
-                Call<TradeItOAuthLoginPopupUrlForMobileRequest> call = Mock(Call)
-                TradeItOAuthLoginPopupUrlForMobileResponse tradeItOAuthLoginPopupUrlForMobileResponse = new TradeItOAuthLoginPopupUrlForMobileResponse()
-                tradeItOAuthLoginPopupUrlForMobileResponse.sessionToken = "My session token"
-                tradeItOAuthLoginPopupUrlForMobileResponse.longMessages = null
-                tradeItOAuthLoginPopupUrlForMobileResponse.status = TradeItResponseStatus.ERROR
-                tradeItOAuthLoginPopupUrlForMobileResponse.code = errorCode
-                tradeItOAuthLoginPopupUrlForMobileResponse.shortMessage = shortMessage
-                tradeItOAuthLoginPopupUrlForMobileResponse.oAuthURL = null
-
-                Response<TradeItOAuthLoginPopupUrlForMobileResponse> response = Response.success(tradeItOAuthLoginPopupUrlForMobileResponse);
-                callback.onResponse(call, response);
+            1 * apiClient.getOAuthLoginPopupUrlForMobile("My broker 1", "my internal app callback", _ as TradeItCallback) >> { args ->
+                TradeItCallback<String> callback = args[2]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.BROKER_AUTHENTICATION_ERROR, shortMessage, null))
             }
 
         when: "calling getOAuthLoginPopupUrl"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupUrl("My broker 1", "my internal app callback", new TradeItCallback<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {
@@ -318,27 +262,19 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         given: "a successful response from trade it api"
             int successCallBackCount = 0
             int errorCallBackCount = 0
-            1 * brokerLinker.getOAuthAccessToken(_, _) >> { args ->
-                Callback<TradeItOAuthAccessTokenResponse> callback = args[1]
-                Call<TradeItOAuthAccessTokenResponse> call = Mock(Call)
-                TradeItOAuthAccessTokenResponse tradeItOAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse()
-                tradeItOAuthAccessTokenResponse.sessionToken = "My session token"
-                tradeItOAuthAccessTokenResponse.longMessages = null
-                tradeItOAuthAccessTokenResponse.status = TradeItResponseStatus.SUCCESS
-                tradeItOAuthAccessTokenResponse.userId = myUserId
-                tradeItOAuthAccessTokenResponse.userToken = myUserToken
-                tradeItOAuthAccessTokenResponse.broker = "My broker 1"
-                Response<TradeItLinkLoginResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
-                callback.onResponse(call, response);
+
+            1 * apiClient.linkBrokerWithOauthVerifier(_, _) >> { args ->
+                TradeItCallback<TradeItLinkedLogin> callback = args[1]
+                callback.onSuccess(new TradeItLinkedLogin("My broker 1", myUserId, myUserToken))
             }
 
 
         when: "calling linkBrokerWithOauthVerifier"
-            TradeItLinkedBroker linkedBrokerResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            TradeItLinkedBrokerParcelable linkedBrokerResult = null
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
-                void onSuccess(TradeItLinkedBroker linkedBroker) {
+                void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
                     successCallBackCount++
                     linkedBrokerResult = linkedBroker
                 }
@@ -353,8 +289,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             successCallBackCount == 1
             errorCallBackCount == 0
 
-        and: "the brokerLinker static method save was called"
-            1 * brokerLinker.saveLinkedLogin(_, _)
+        and: "saveLinkedLogin method was called"
+            1 * keystoreService.saveLinkedLogin(_, _)
 
         and: "expects a linkedBroker containing userId and userToken"
             linkedBrokerResult.getLinkedLogin().userId == myUserId
@@ -366,18 +302,9 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         given: "a successful response from trade it api"
             int successCallBackCount = 0
             int errorCallBackCount = 0
-            1 * brokerLinker.getOAuthAccessToken(_, _) >> { args ->
-                Callback<TradeItOAuthAccessTokenResponse> callback = args[1]
-                Call<TradeItOAuthAccessTokenResponse> call = Mock(Call)
-                TradeItOAuthAccessTokenResponse tradeItOAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse()
-                tradeItOAuthAccessTokenResponse.sessionToken = "My session token"
-                tradeItOAuthAccessTokenResponse.longMessages = null
-                tradeItOAuthAccessTokenResponse.status = TradeItResponseStatus.SUCCESS
-                tradeItOAuthAccessTokenResponse.userId = myUserId
-                tradeItOAuthAccessTokenResponse.userToken = myUserToken
-                tradeItOAuthAccessTokenResponse.broker = "My broker 1"
-                Response<TradeItLinkLoginResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
-                callback.onResponse(call, response);
+            1 * apiClient.linkBrokerWithOauthVerifier(_, _) >> { args ->
+                TradeItCallback<TradeItLinkedLogin> callback = args[1]
+                callback.onSuccess(new TradeItLinkedLogin("My broker 1", myUserId, myUserToken))
             }
 
         and: "an already linked broker with this user id"
@@ -386,19 +313,19 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             response.userId = myUserId
             response.userToken = "My old userToken"
             response.broker = "My broker 1"
-            TradeItLinkedLogin linkedLogin = new TradeItLinkedLogin(request, response);
-            TradeItApiClient apiClient = new TradeItApiClient(apiKey, TradeItEnvironment.QA)
-            TradeItLinkedBroker existingLinkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache)
+            TradeItLinkedLoginParcelable linkedLogin = new TradeItLinkedLoginParcelable(request, response);
+            TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable)
+            TradeItLinkedBrokerParcelable existingLinkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache)
             linkedBrokerManager.linkedBrokers = [existingLinkedBroker]
 
 
 
         when: "calling linkBrokerWithOauthVerifier"
-            TradeItLinkedBroker linkedBrokerResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            TradeItLinkedBrokerParcelable linkedBrokerResult = null
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
-                void onSuccess(TradeItLinkedBroker linkedBroker) {
+                void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
                     successCallBackCount++
                     linkedBrokerResult = linkedBroker
                 }
@@ -413,8 +340,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             successCallBackCount == 1
             errorCallBackCount == 0
 
-        and: "the brokerLinker static method update was called"
-            1 * brokerLinker.updateLinkedLogin(_)
+        and: "the updateLinkedLogin method was called"
+            1 * keystoreService.updateLinkedLogin(_)
 
         and: "expects a linkedBroker containing userId and updated userToken"
             linkedBrokerResult.getLinkedLogin().userId == myUserId
@@ -433,27 +360,17 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int errorCallBackCount = 0
             TradeItErrorCode errorCode = TradeItErrorCode.BROKER_AUTHENTICATION_ERROR
             String shortMessage = "My error when linking broker"
-            1 * brokerLinker.getOAuthAccessToken(_, _) >> { args ->
-                Callback<TradeItOAuthAccessTokenResponse> callback = args[1]
-                Call<TradeItOAuthAccessTokenResponse> call = Mock(Call)
-                TradeItOAuthAccessTokenResponse tradeItOAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse()
-                tradeItOAuthAccessTokenResponse.sessionToken = "My session token"
-                tradeItOAuthAccessTokenResponse.longMessages = null
-                tradeItOAuthAccessTokenResponse.status = TradeItResponseStatus.ERROR
-                tradeItOAuthAccessTokenResponse.code = errorCode
-                tradeItOAuthAccessTokenResponse.shortMessage = shortMessage
-                tradeItOAuthAccessTokenResponse.userId = null
-                tradeItOAuthAccessTokenResponse.userToken = null
-                Response<TradeItLinkLoginResponse> response = Response.success(tradeItOAuthAccessTokenResponse);
-                callback.onResponse(call, response);
+            1 * apiClient.linkBrokerWithOauthVerifier(_, _) >> { args ->
+                TradeItCallback<String> callback = args[1]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.BROKER_AUTHENTICATION_ERROR, shortMessage, null))
             }
 
         when: "calling linkBrokerWithOauthVerifier"
             TradeItErrorResult errorResult = null
-            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallBackImpl<TradeItLinkedBroker>() {
+            linkedBrokerManager.linkBrokerWithOauthVerifier(accountLabel, "My oAuthVerifier", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
 
                 @Override
-                void onSuccess(TradeItLinkedBroker linkedBroker) {
+                void onSuccess(TradeItLinkedBrokerParcelable linkedBroker) {
                     successCallBackCount++
                 }
 
@@ -475,27 +392,25 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
     def "unlinkBroker handles a successful response from trade it api "() {
         given: "a linked broker to unlink"
-            TradeItApiClient apiClient = Mock(TradeItApiClient)
-            TradeItLinkedLogin linkedLogin = Mock(TradeItLinkedLogin)
-            TradeItLinkedBroker linkedBroker = new TradeItLinkedBroker(apiClient, linkedLogin, linkedBrokerCache)
+            TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable)
+            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable)
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache)
 
         and: "a successful response from trade it api"
             int successCallBackCount = 0
             int errorCallBackCount = 0
-            1 * brokerLinker.unlinkBrokerAccount(_, _) >> { args ->
-                Callback<TradeItResponse> callback = args[1]
-                Call<TradeItResponse> call = Mock(Call)
+            1 * this.apiClient.unlinkBrokerAccount(_, _) >> { args ->
+                TradeItCallback callback = args[1]
                 TradeItResponse tradeItResponse = new TradeItResponse()
                 tradeItResponse.sessionToken = "My session token"
                 tradeItResponse.longMessages = null
                 tradeItResponse.status = TradeItResponseStatus.SUCCESS
-                Response<TradeItResponse> response = Response.success(tradeItResponse);
-                callback.onResponse(call, response);
+                callback.onSuccess(tradeItResponse)
             }
             linkedBrokerManager.linkedBrokers = [linkedBroker]
 
         when: "calling unlinkBroker"
-            linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl<TradeItResponse>() {
+            linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback<TradeItResponse>() {
                 @Override
                 void onSuccess(TradeItResponse response) {
                     successCallBackCount++
@@ -511,8 +426,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             successCallBackCount == 1
             errorCallBackCount == 0
 
-        and: "the delete brokerLinker static method was called"
-            1 * brokerLinker.deleteLinkedLogin(_)
+        and: "the deleteLinkedLogin method was called"
+            1 * keystoreService.deleteLinkedLogin(_)
 
         and: "The linkedBroker is removed from cache"
             1 * linkedBrokerCache.removeFromCache(linkedBroker)
@@ -527,33 +442,20 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int errorCallBackCount = 0
             String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
 
-            TradeItLinkedLogin linkedLogin = Mock(TradeItLinkedLogin.class)
+            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable.class)
             linkedLogin.userId = "My userId"
 
-            TradeItLinkedBroker linkedBroker = Mock(TradeItLinkedBroker.class)
+            TradeItLinkedBrokerParcelable linkedBroker = Mock(TradeItLinkedBrokerParcelable.class)
             1 * linkedBroker.getBrokerName() >> "My broker 1"
             1 * linkedBroker.getLinkedLogin() >> linkedLogin
 
-            1 * brokerLinker.getOAuthLoginPopupUrlForTokenUpdate(
-                    { TradeItOAuthLoginPopupUrlForTokenUpdateRequest request ->
-                        (request.userId == "My userId"
-                                && request.broker == "My broker 1"
-                                && request.interAppAddressCallback == "my internal app callback")
-                    },
-                    _) >> { _, Callback<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> callback ->
-                Call<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> call = Mock(Call)
-                TradeItOAuthLoginPopupUrlForTokenUpdateResponse tradeItOAuthLoginPopupUrlForTokenUpdateResponse = new TradeItOAuthLoginPopupUrlForTokenUpdateResponse()
-                tradeItOAuthLoginPopupUrlForTokenUpdateResponse.sessionToken = "My session token"
-                tradeItOAuthLoginPopupUrlForTokenUpdateResponse.longMessages = null
-                tradeItOAuthLoginPopupUrlForTokenUpdateResponse.status = TradeItResponseStatus.SUCCESS
-                tradeItOAuthLoginPopupUrlForTokenUpdateResponse.oAuthURL = mySpecialUrl
-                Response<TradeItOAuthLoginPopupUrlForTokenUpdateResponse> response = Response.success(tradeItOAuthLoginPopupUrlForTokenUpdateResponse);
-                callback.onResponse(call, response);
+            1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", "My userId", "my internal app callback", _) >> { broker, userId, userToken,  TradeItCallback<String> callback ->
+                callback.onSuccess(mySpecialUrl);
             }
 
         when: "calling getOAuthLoginPopupForTokenUpdateUrl"
             String oAuthUrlResult = null
-            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "my internal app callback", new TradeItCallBackImpl<String>() {
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "my internal app callback", new TradeItCallback<String>() {
 
                 @Override
                 void onSuccess(String oAuthUrl) {

@@ -1,5 +1,5 @@
 #Android Trade.it SDK 
-Android SDK that wraps the Trade.it Android API (https://github.com/tradingticket/AndroidAPI).
+Android SDK that wraps the Trade.it Java API (https://github.com/tradingticket/JavaApi).
 
 Detailed Trade It API documentation can be found here: https://www.trade.it/api.
 
@@ -10,7 +10,7 @@ For examples usage, see the example app and tests included with the SDK.
 #Quick Start
 Add the following dependency in your project:
 ```
-compile 'it.trade.tradeit:tradeit-android-sdk:0.0.6'
+compile 'it.trade.tradeit:tradeit-android-sdk:1.0.0'
 ```
 You have to configure once the sdk in your application.
 In order to initialize the configuration, obtain an API key from Trade.it, or test with "tradeit-test-api-key"
@@ -18,15 +18,19 @@ Example in the onCreate method of your main application:
 ```Java
 TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
 ```
+If you want to inject cookies on each request you have to implement the `RequestCookieProviderParcelable` and implements the `provideCookies` method (see `RequestCookieProviderParcelableImpl` for example), and initialize the SDK like this:
+```Java
+TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA, new RequestCookieProviderParcelableImpl());
+```
 Get an instance of the TradeItLinkedBrokerManager in your application: 
 ```Java
 TradeItLinkedBrokerManager linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
 ```
 Query which brokers are available for your key:
 ```Java
-linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvailableBrokersResponse.Broker>>() {
+linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
     @Override
-    public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
+    public void onSuccess(List<Broker> brokerList) {
         // a list of broker is returned 
     }
     
@@ -39,7 +43,7 @@ linkedBrokerManager.getAvailableBrokers(new TradeItCallBackImpl<List<TradeItAvai
 Link (authorize) a user's broker account: There are several steps to follow:
 ```Java
 // get the oauthURL
-linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "yourSpecificApp://yourSpecificHost", new TradeItCallBackImpl<String>() {
+linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "yourSpecificApp://yourSpecificHost", new TradeItCallback<String>() {
     @Override
     public void onSuccess(String oAuthUrl) {
         // display the url in a webview in order to the user complete his brokerage login. 
@@ -74,7 +78,7 @@ String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
 ```
 And the last step is to link the broker thanks to the oAuthVerifier. 
 ```Java
-linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", "Dummy", oAuthVerifier, new TradeItCallBackImpl<TradeItLinkedBroker>() {
+linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallback<TradeItLinkedBroker>() {
     @Override
     public void onSuccess(TradeItLinkedBroker linkedBroker) {
         // successfully linked broker
@@ -92,7 +96,7 @@ linkedBrokerManager.getLinkedBrokers();
 ```
 To update the credentials of a linked broker, you have to follow the same steps as if it was a new link, but call the getOAuthLoginPopupForTokenUpdateUrl method in the first step with the linked broker to relink:
 ```Java
-linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "yourSpecificApp://yourSpecificHost", new TradeItCallBackImpl<String>() {
+linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "yourSpecificApp://yourSpecificHost", new TradeItCallback<String>() {
      @Override
      public void onSuccess(String oAuthUrl) {
         // display the url in a webview in order to the user complete his brokerage login.
@@ -106,7 +110,7 @@ linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "yourSpeci
 ```
 To unlink a broker:
 ```Java
-linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallBackImpl<TradeItResponse>() {
+linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback<TradeItResponse>() {
     @Override
     public void onSuccess(TradeItResponse response) {
         //successfully unlink the broker
@@ -147,7 +151,7 @@ linkedBroker.getAccounts();
 ```
 To get the balance of an account:
 ```Java
-linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItGetAccountOverviewResponse>() {
+linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverviewResponse>() {
     @Override
     public void onSuccess(TradeItGetAccountOverviewResponse balance) {
         // refreshes balance successful
@@ -160,7 +164,7 @@ linkedBrokerAccount.refreshBalance(new TradeItCallBackImpl<TradeItGetAccountOver
 ```
 To get the positions of an account:
 ```Java
-linkedBrokerAccount.refreshPositions(new TradeItCallBackImpl<List<TradeItGetPositionsResponse.Position>>() {
+linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItGetPositionsResponse.Position>>() {
     @Override
     public void onSuccess(List<TradeItGetPositionsResponse.Position> positions) {
         // successfully got the positions 
@@ -183,7 +187,7 @@ order.setExpiration(TradeItOrderExpiration.GOOD_UNTIL_CANCELED);
 ```
 To preview an order:
 ```Java
-order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
     @Override
     public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
         //successfully reviewed the order
@@ -198,7 +202,7 @@ order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse
 To place an order:
 ```Java
 String orderId = response.orderId; // get the orderId from the previewResponse
-order.placeOrder(orderId, new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+order.placeOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
     @Override
     public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
         //Successfully placed the order

@@ -9,18 +9,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import it.trade.android.sdk.model.TradeItCallBackImpl;
-import it.trade.android.sdk.model.TradeItErrorResult;
-import it.trade.android.sdk.model.TradeItOrder;
-import it.trade.tradeitapi.model.TradeItPlaceStockOrEtfOrderResponse;
-import it.trade.tradeitapi.model.TradeItPreviewStockOrEtfOrderResponse;
+import it.trade.android.sdk.model.TradeItOrderParcelable;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.callback.TradeItCallback;
+import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
+import it.trade.model.reponse.TradeItPreviewStockOrEtfOrderResponse;
 
 import static it.trade.android.exampleapp.MainActivity.PREVIEW_ORDER_PARAMETER;
 
 public class PreviewOrderActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
     private String orderId;
-    private TradeItOrder order;
+    private TradeItOrderParcelable order;
     private TextView textView;
 
     @Override
@@ -32,7 +32,7 @@ public class PreviewOrderActivity extends AppCompatActivity {
         Intent intent = getIntent();
         order = intent.getParcelableExtra(PREVIEW_ORDER_PARAMETER);
         final Button placeOrderButton = (Button) this.findViewById(R.id.place_trade_button);
-        order.previewOrder(new TradeItCallBackImpl<TradeItPreviewStockOrEtfOrderResponse>() {
+        order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
             @Override
             public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
                 textView.setText(response.toString());
@@ -49,7 +49,7 @@ public class PreviewOrderActivity extends AppCompatActivity {
     }
 
     public void placeTrade(View view) {
-        order.placeOrder(orderId, new TradeItCallBackImpl<TradeItPlaceStockOrEtfOrderResponse>() {
+        order.placeOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
             @Override
             public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
                 textView.append(placeOrderResponse.toString());

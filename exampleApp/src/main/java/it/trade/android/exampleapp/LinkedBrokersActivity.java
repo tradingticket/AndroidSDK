@@ -11,7 +11,11 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
-import it.trade.android.sdk.model.TradeItLinkedBroker;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
+import it.trade.model.TradeItErrorResult;
+import it.trade.model.TradeItSecurityQuestion;
+import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 
 import static it.trade.android.exampleapp.MainActivity.LINKED_BROKERS_PARAMETER;
 
@@ -24,7 +28,7 @@ public class LinkedBrokersActivity extends AppCompatActivity {
         final TextView textView = (TextView) this.findViewById(R.id.linked_brokers_textview);
         textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        List<TradeItLinkedBroker> linkedBrokers = intent.getParcelableArrayListExtra(LINKED_BROKERS_PARAMETER);
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = intent.getParcelableArrayListExtra(LINKED_BROKERS_PARAMETER);
 
         if (linkedBrokers.isEmpty()) {
             textView.setText("No linked brokers!");
@@ -34,12 +38,28 @@ public class LinkedBrokersActivity extends AppCompatActivity {
             output += "=== " + linkedBrokers.size() + " PARCELED LINKED BROKERS ===\n\n";
 
             Gson gson = new Gson();
-            for (TradeItLinkedBroker linkedBroker : linkedBrokers) {
+            for (TradeItLinkedBrokerParcelable linkedBroker : linkedBrokers) {
                 String json = "LINKED LOGIN: " + gson.toJson(linkedBroker.getLinkedLogin());
                 json += "\nLINKED BROKER: " + gson.toJson(linkedBroker);
                 output += json + "\n\n===\n\n";
                 Log.d("TEST", json);
             }
+            linkedBrokers.get(0).authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+                @Override
+                public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+
+                }
+
+                @Override
+                public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> type) {
+
+                }
+
+                @Override
+                public void onError(TradeItErrorResult error) {
+
+                }
+            });
             textView.setText(output);
             Log.d("TEST", "==========");
         }
