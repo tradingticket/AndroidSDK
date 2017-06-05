@@ -1,4 +1,4 @@
-#Android Trade.it SDK 
+# Android Trade.it SDK 
 Android SDK that wraps the Trade.it Java API (https://github.com/tradingticket/JavaApi).
 
 Detailed Trade It API documentation can be found here: https://www.trade.it/api.
@@ -7,7 +7,7 @@ The JCenter repo can be found here: https://bintray.com/tradeit/maven/tradeit-an
 
 For examples usage, see the example app and tests included with the SDK.  
 
-#Quick Start
+# Quick Start
 Add the following dependency in your project:
 ```
 compile 'it.trade.tradeit:tradeit-android-sdk:1.0.0'
