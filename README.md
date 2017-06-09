@@ -8,25 +8,45 @@ The JCenter repo can be found here: https://bintray.com/tradeit/maven/tradeit-an
 For examples usage, see the example app and tests included with the SDK.  
 
 # Quick Start
-Add the following dependency in your project:
+
+Add the following dependency to your project:
 ```
 compile 'it.trade.tradeit:tradeit-android-sdk:1.0.0'
 ```
-You have to configure once the sdk in your application.
-In order to initialize the configuration, obtain an API key from Trade.it, or test with "tradeit-test-api-key"
+
+### Configuring the SDK
+
+To use the SDK you will first need to call it's configuration method. You will also need to obtain an API key from https://trade.it or test with "tradeit-test-api-key".
+
 Example in the onCreate method of your main application:
+
 ```Java
-TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+public class MainActivity extends AppCompatActivity {
+    ...
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        ...
+        TradeItSDK.configure(
+            this.getApplicationContext(),
+            "tradeit-test-api-key",
+            TradeItEnvironment.QA
+        );
+        ....
+    }
+    ....
 ```
-If you want to inject cookies on each request you have to implement the `RequestCookieProviderParcelable` and implements the `provideCookies` method (see `RequestCookieProviderParcelableImpl` for example), and initialize the SDK like this:
-```Java
-TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA, new RequestCookieProviderParcelableImpl());
-```
-Get an instance of the TradeItLinkedBrokerManager in your application: 
+
+Interacting with the TradeIt API is done via `TradeItLinkedBroker` and `TradeItLinkedBrokerAccount`objects managed by the `TradeItLinkedBrokerManager` instance on the `TradeItSDK`: 
+
 ```Java
 TradeItLinkedBrokerManager linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
 ```
-Query which brokers are available for your key:
+
+### Linking a user's broker
+
+First the user must be prompted to choose which broker they wish to link. To retrieve the list of available brokers:
+
 ```Java
 linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
     @Override
@@ -40,23 +60,30 @@ linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<TradeItAvailabl
     }
 });
 ```
-Link (authorize) a user's broker account: There are several steps to follow:
+
+Once a broker has been selected, link the user's broker account by sending the user to the OAuth login URL. 
+
 ```Java
 // get the oauthURL
-linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "yourSpecificApp://yourSpecificHost", new TradeItCallback<String>() {
-    @Override
-    public void onSuccess(String oAuthUrl) {
-        // display the url in a webview in order to the user complete his brokerage login. 
-    }
+linkedBrokerManager.getOAuthLoginPopupUrl(
+    "Dummy",
+    "yourScheme://yourHost", // This URL is a deep link into your app that will be used to complete OAuth. More info below...
+    new TradeItCallback<String>() {
+        @Override
+        public void onSuccess(String oAuthUrl) {
+            // launch the OAuth page by loading the url in a webview 
+        }
 
-    @Override
-    public void onError(TradeItErrorResult error) {
-        // an error occured 
+        @Override
+        public void onError(TradeItErrorResult error) {
+            // an error occured 
+        }
     }
-});
+);
 ```
-Notice the second parameter is a deep link where to redirect back into your app once the user has completed his brokerage login.
-Android custom URI schemes are handled in the AndroidManifest.xml file as intents. You’ll be adding an activity similar to this:
+
+The second parameter is an Android deep link URL that should redirect back into your app once the user has completed their OAuth login.
+Android custom URI schemes are handled in the `AndroidManifest.xml` file as intents. Here is an example activity:
 ```xml
 <activity xmlns:android="http://schemas.android.com/apk/res/android"
           android:name="myapp.handleOAuth"
@@ -65,18 +92,24 @@ Android custom URI schemes are handled in the AndroidManifest.xml file as intent
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
-         <data android:scheme="yourSpecificApp"
-                            android:host="yourSpecificHost" />
+        <data android:scheme="yourScheme"
+              android:host="yourHost" />
     </intent-filter>
 </activity>
 
 ```
-Then the oAuthFlow will use your callback like: yourSpecificAppName://yourSpecificHost?oAuthVerifier=370676d4-f584-4d71-8c37-432aa8948059
-When your deep link is called, you have to get the oAuthVerifier from your intent:
+For more info on configuring deep linking see the documentation: https://developer.android.com/training/app-indexing/deep-linking.html
+
+If successful, the OAuthFlow will redirect to your deep link URL and append the `oAuthVerifier` token as a query parameter: `yourScheme://yourHost?oAuthVerifier=370676d4-f584-4d71-8c37-432aa8948059`
+
+The `oAuthVerifier` can be parsed out like this:
+
 ```Java
 String oAuthVerifier = intent.getData().getQueryParameter("oAuthVerifier");
 ```
-And the last step is to link the broker thanks to the oAuthVerifier. 
+
+The last step is to complete the broker linking by submitting the oAuthVerifier.
+
 ```Java
 linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier, new TradeItCallback<TradeItLinkedBroker>() {
     @Override
@@ -90,66 +123,100 @@ linkedBrokerManager.linkBrokerWithOauthVerifier("MyAccountLabel", oAuthVerifier,
     }
 });
 ```
-To get the linked brokers:
-```Java
-linkedBrokerManager.getLinkedBrokers();
-```
-To update the credentials of a linked broker, you have to follow the same steps as if it was a new link, but call the getOAuthLoginPopupForTokenUpdateUrl method in the first step with the linked broker to relink:
-```Java
-linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "yourSpecificApp://yourSpecificHost", new TradeItCallback<String>() {
-     @Override
-     public void onSuccess(String oAuthUrl) {
-        // display the url in a webview in order to the user complete his brokerage login.
-     }
-     
-     @Override
-     public void onError(TradeItErrorResult error) {
-         // an error occured
-     }
-});
-```
-To unlink a broker:
-```Java
-linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback<TradeItResponse>() {
-    @Override
-    public void onSuccess(TradeItResponse response) {
-        //successfully unlink the broker
-    }
-    
-    @Override
-    public void onError(TradeItErrorResult error) {
-        // an error occured    
-    }
-});
-```
-To authenticate a linkedBroker:
-```Java
-linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
-    @Override
-    public void onSuccess(final List<TradeItLinkedBrokerAccount> accounts) {
-        //the linked broker is successfully authenticated, his accounts are returned
-    });
-    
-    @Override
-    public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-        //there is a security question the user need to answer before being authenticated
-        
-        //to answer the security question call this method:
-        this.submitSecurityAnswer("my answer"); // then one of the three callbacks will be called (onSuccess, onSecurityQuestion, onError)
-    }
 
-    @Override
-    public void onError(TradeItErrorResult error) {
-        // an error occured
-    }
-    
-});
-```
-To get the accounts of a linked broker:
+This will result in the creation of a `TradeItLinkedBroker` object. The linked broker object is automatically persisted in the Android secure keystore and added to the list of linked brokers on the linked broker manager:
+
 ```Java
-linkedBroker.getAccounts();
+List<TradeItLinkedBroker> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
 ```
-To get the balance of an account:
+
+When the user restarts the app, the list of linked brokers is automatically repopulated upon initialization and configuration of the `TradeItSDK`.
+
+### Relinking
+
+To update the credentials of a linked broker, follow the same steps as linking except use the `getOAuthLoginPopupForTokenUpdateUrl` method instead of the `getOAuthLoginPopupUrl` method:
+```Java
+linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(
+    linkedBroker,
+    "yourScheme://yourHost",
+    new TradeItCallback<String>() {
+        @Override
+        public void onSuccess(String oAuthUrl) {
+            // display the url in a webview in order to the user complete his brokerage login.
+        }
+
+        @Override
+        public void onError(TradeItErrorResult error) {
+            // an error occured
+        }
+    }
+);
+```
+
+### Unlinking
+
+To unlink a broker:
+
+```Java
+linkedBrokerManager.unlinkBroker(
+    linkedBroker,
+    new TradeItCallback<TradeItResponse>() {
+        @Override
+        public void onSuccess(TradeItResponse response) {
+            //successfully unlink the broker
+        }
+
+        @Override
+        public void onError(TradeItErrorResult error) {
+            // an error occured    
+        }
+    }
+);
+```
+
+### Authenticating
+
+Once a broker is linked via OAuth, it needs to be authenticated to perform actions on behalf of the user. Successfully authenticating will result in a session (that will time out after 15 minutes of inactivity). Obtain a session by calling `authenticate`:
+
+```Java
+linkedBroker.authenticate(
+    new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
+        @Override
+        public void onSuccess(
+            final List<TradeItLinkedBrokerAccount> accounts) {
+                // The linked broker is successfully authenticated and the accounts associated with that broker login are populated on the linked broker object (and returned to the callback)
+            }
+        )
+
+        @Override
+        public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+            // Sometimes there is a security question the user need to answer before being authenticated
+
+            // Prompt the user for an answer and submit the answer like this
+            this.submitSecurityAnswer("my answer"); // then one of the three callbacks will be called (onSuccess, onSecurityQuestion, onError)
+        }
+
+        @Override
+        public void onError(TradeItErrorResult error) {
+            // an error occured
+        }
+    }
+);
+```
+
+Use the linked broker accounts to perform actions on behalf of the user:
+
+```Java
+List<TradeItLinkedBrokerAccount> accounts = linkedBroker.getAccounts();
+accounts.get(0).refreshPositions(...);
+```
+
+See below for more examples of actions that can be performed on a linked broker account.
+
+### Balance info
+
+To get the balance info of an account:
+
 ```Java
 linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverviewResponse>() {
     @Override
@@ -162,12 +229,16 @@ linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverview
     }
 }
 ```
-To get the positions of an account:
+
+# Portfolio positions
+
+To get the portfolio positions of an account:
+
 ```Java
 linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItGetPositionsResponse.Position>>() {
     @Override
     public void onSuccess(List<TradeItGetPositionsResponse.Position> positions) {
-        // successfully got the positions 
+        // successfully fetched positions 
     }
     
     @Override
@@ -176,7 +247,11 @@ linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItGetPosition
     }
 
 ```
-Create a new order:
+
+# Trading
+
+First create a `TradeItOrder` object to encapsulate the user's intended trade:
+
 ```Java
 TradeItOrder order = new TradeItOrder(linkedBrokerAccount, "GE"); // by default it is a market order, quantity: 1, action: buy, expiration: good for day
 order.setAction(TradeItOrderAction.SELL);
@@ -185,32 +260,69 @@ order.setsetLimitPrice(20.0);
 order.setQuantity(10);
 order.setExpiration(TradeItOrderExpiration.GOOD_UNTIL_CANCELED);
 ```
-To preview an order:
+
+Then preview the order:
+
 ```Java
-order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
-    @Override
-    public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
-        //successfully reviewed the order
+order.previewOrder(
+    new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
+        @Override
+        public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
+            // Present the order preview info to the user and prompt them to submit the trade
+        }
+
+        @Override
+        public void onError(TradeItErrorResult error) {
+            //an error occured
+        }
     }
-    
-    @Override
-    public void onError(TradeItErrorResult error) {
-        //an error occured
-    }
-});
+);
 ```
-To place an order:
+
+Finally, submit the order:
+
 ```Java
 String orderId = response.orderId; // get the orderId from the previewResponse
-order.placeOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
-    @Override
-    public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
-        //Successfully placed the order
-    }
+order.placeOrder(
+    orderId,
+    new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
+        @Override
+        public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
+            // Successfully placed the order. Display returned order info to the user.
+        }
 
-    @Override
-    public void onError(TradeItErrorResult error) {
-        // an error occured
+        @Override
+        public void onError(TradeItErrorResult error) {
+            // an error occured
+        }
     }
-});
+);
+```
+
+# Special Cases
+
+### Custom server host
+
+To point the SDK at a custom host, initialize the SDK like this:
+
+```Java
+TradeItSDK.configure(
+    this.getApplicationContext(),
+    "tradeit-test-api-key",
+    TradeItEnvironment.QA,
+    "https://mycustomhost.com/some/path/"
+);
+```
+
+### Custom cookies
+
+To inject cookies on each request, implement the `RequestCookieProviderParcelable` and the `provideCookies` method (see `RequestCookieProviderParcelableImpl` for example), and then initialize the SDK like this:
+
+```Java
+TradeItSDK.configure(
+    this.getApplicationContext(),
+    "tradeit-test-api-key",
+    TradeItEnvironment.QA,
+    new RequestCookieProviderParcelableImpl()
+);
 ```
