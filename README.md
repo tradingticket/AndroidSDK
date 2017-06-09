@@ -230,7 +230,7 @@ linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverview
 }
 ```
 
-# Portfolio positions
+### Portfolio positions
 
 To get the portfolio positions of an account:
 
@@ -248,7 +248,7 @@ linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItGetPosition
 
 ```
 
-# Trading
+### Trading
 
 First create a `TradeItOrder` object to encapsulate the user's intended trade:
 
