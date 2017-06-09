@@ -310,6 +310,7 @@ TradeItSDK.configure(
     this.getApplicationContext(),
     "tradeit-test-api-key",
     TradeItEnvironment.QA,
-    "https://mycustomhost.com/some/path/"
+    "https://mycustomhost.com/some/path/",
+    new RequestCookieProviderParcelableImpl()
 );
 ```
