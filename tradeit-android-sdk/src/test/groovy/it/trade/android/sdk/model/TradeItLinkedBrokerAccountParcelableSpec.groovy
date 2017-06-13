@@ -2,13 +2,7 @@ package it.trade.android.sdk.model
 
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
-import it.trade.model.callback.TradeItCallback
-import it.trade.model.reponse.TradeItBrokerAccount
-import it.trade.model.reponse.TradeItErrorCode
-import it.trade.model.reponse.TradeItGetAccountOverviewResponse
-import it.trade.model.reponse.TradeItGetPositionsResponse
-import it.trade.model.reponse.TradeItPosition
-import it.trade.model.reponse.TradeItResponseStatus
+import it.trade.model.reponse.*
 import spock.lang.Specification
 
 class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
@@ -35,25 +29,28 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
                 int successCallbackCount = 0
                 int errorCallbackCount = 0
                 tradeItApiClient.getAccountOverview(_, _) >> { args ->
-                    TradeItCallback<TradeItGetAccountOverviewResponse> callback = args[1]
-                    TradeItGetAccountOverviewResponse tradeItGetAccountOverviewResponse = new TradeItGetAccountOverviewResponse()
-                    tradeItGetAccountOverviewResponse.availableCash = 1200.54
-                    tradeItGetAccountOverviewResponse.buyingPower = 2604.45
-                    tradeItGetAccountOverviewResponse.dayAbsoluteReturn = 100
-                    tradeItGetAccountOverviewResponse.dayPercentReturn = 0.45
-                    tradeItGetAccountOverviewResponse.totalAbsoluteReturn = -234.98
-                    tradeItGetAccountOverviewResponse.totalPercentReturn = -2.34
-                    tradeItGetAccountOverviewResponse.totalValue = 12983.34
-                    tradeItGetAccountOverviewResponse.status = TradeItResponseStatus.SUCCESS
-                    callback.onSuccess(tradeItGetAccountOverviewResponse)
+                    TradeItCallback<TradeItAccountOverviewResponse> callback = args[1]
+                    TradeItAccountOverviewResponse accountOverviewResponse = new TradeItAccountOverviewResponse()
+
+                    TradeItAccountOverview tradeItAccountOverview = new TradeItAccountOverview()
+                    tradeItAccountOverview.availableCash = 1200.54
+                    tradeItAccountOverview.buyingPower = 2604.45
+                    tradeItAccountOverview.dayAbsoluteReturn = 100
+                    tradeItAccountOverview.dayPercentReturn = 0.45
+                    tradeItAccountOverview.totalAbsoluteReturn = -234.98
+                    tradeItAccountOverview.totalPercentReturn = -2.34
+                    tradeItAccountOverview.totalValue = 12983.34
+                    accountOverviewResponse.accountOverview = tradeItAccountOverview
+                    accountOverviewResponse.status = TradeItResponseStatus.SUCCESS
+                    callback.onSuccess(accountOverviewResponse)
 
                 }
 
         when: "calling refresh balance on the linked broker account"
             TradeItBalanceParcelable balance = null
-            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalanceParcelable>() {
+            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalance>() {
                 @Override
-                void onSuccess(TradeItBalanceParcelable response) {
+                void onSuccess(TradeItBalance response) {
                     balance = response
                     successCallbackCount++
                 }
@@ -87,16 +84,16 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
             int successCallbackCount = 0
             int errorCallbackCount = 0
             tradeItApiClient.getAccountOverview(_, _) >> { args ->
-                TradeItCallback<TradeItGetAccountOverviewResponse> callback = args[1]
+                TradeItCallback<TradeItAccountOverviewResponse> callback = args[1]
                 callback.onError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "My short message", ["My long message"]))
 
             }
 
         when: "calling refresh balance on the linked broker account"
             TradeItErrorResult errorResult = null
-            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverviewResponse>() {
+            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalance>() {
                 @Override
-                void onSuccess(TradeItGetAccountOverviewResponse response) {
+                void onSuccess(TradeItBalance response) {
                     successCallbackCount++
                 }
 
