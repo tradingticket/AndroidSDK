@@ -218,10 +218,11 @@ See below for more examples of actions that can be performed on a linked broker 
 To get the balance info of an account:
 
 ```Java
-linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalance>() {
+linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
     @Override
-    public void onSuccess(TradeItBalance balance) {
-        // refreshes balance successful
+    public void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccount) {
+        // refreshes balance successful, to get the balance:
+        linkedBrokerAccount.getBalance()
     }
     @Override
     public void onError(TradeItErrorResult error) {
