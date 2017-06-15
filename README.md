@@ -11,8 +11,9 @@ For examples usage, see the example app and tests included with the SDK.
 
 Add the following dependency to your project:
 ```
-compile 'it.trade.tradeit:tradeit-android-sdk:1.0.0'
+compile 'it.trade.tradeit:tradeit-android-sdk:1.X.X'
 ```
+(Find the latest version here: https://bintray.com/tradeit/maven/tradeit-android-sdk)
 
 ### Configuring the SDK
 
