@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import it.trade.model.reponse.TradeItFxAccountOverview;
 
-public class TradeItFxBalanceParcelable implements TradeItBalance {
+public class TradeItFxBalanceParcelable implements Parcelable {
 
     public Double buyingPowerBaseCurrency;
 

@@ -6,7 +6,7 @@ import android.os.Parcelable;
 
 import it.trade.model.reponse.TradeItAccountOverview;
 
-public class TradeItBalanceParcelable implements TradeItBalance {
+public class TradeItBalanceParcelable implements Parcelable {
 
     public Double availableCash;
 

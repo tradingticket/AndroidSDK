@@ -96,9 +96,9 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
                         return Single.create(new SingleOnSubscribe<TradeItLinkedBrokerAccountParcelable>() {
                             @Override
                             public void subscribe(@NonNull final SingleEmitter<TradeItLinkedBrokerAccountParcelable> emmiter) throws Exception {
-                                linkedBrokerAccountParcelable.refreshBalance(new TradeItCallback<TradeItBalance>() {
+                                linkedBrokerAccountParcelable.refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
                                     @Override
-                                    public void onSuccess(TradeItBalance balance) {
+                                    public void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) {
                                         emmiter.onSuccess(linkedBrokerAccountParcelable);
                                     }
 

@@ -93,26 +93,23 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         this.positions = positions;
     }
 
-    public void refreshBalance(final TradeItCallback<TradeItBalance> callback) {
+    public void refreshBalance(final TradeItCallback<TradeItLinkedBrokerAccountParcelable> callback) {
         final TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = this;
         this.getTradeItApiClient().getAccountOverview(accountNumber, new TradeItCallback<TradeItAccountOverviewResponse>() {
             @Override
             public void onSuccess(TradeItAccountOverviewResponse response) {
-                TradeItBalance balanceToReturn = null;
                 if (response.accountOverview != null) {
                     TradeItBalanceParcelable balance = new TradeItBalanceParcelable(response.accountOverview);
                     linkedBrokerAccount.balance = balance;
                     linkedBrokerAccount.fxBalance = null;
-                    balanceToReturn = balance;
                 } else if (response.fxAccountOverview != null) {
                     TradeItFxBalanceParcelable fxBalance = new TradeItFxBalanceParcelable(response.fxAccountOverview);
                     linkedBrokerAccount.balance = null;
                     linkedBrokerAccount.fxBalance = fxBalance;
-                    balanceToReturn = fxBalance;
                 }
                 linkedBrokerAccount.balanceLastUpdated = new Date();
                 linkedBroker.cache();
-                callback.onSuccess(balanceToReturn);
+                callback.onSuccess(linkedBrokerAccount);
             }
 
             @Override

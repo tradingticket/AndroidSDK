@@ -48,10 +48,10 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             TradeItBalanceParcelable balance = null
-            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalance>() {
+            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
                 @Override
-                void onSuccess(TradeItBalance response) {
-                    balance = response
+                void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) {
+                    balance = linkedBrokerAccountParcelable.balance
                     successCallbackCount++
                 }
 
@@ -91,9 +91,9 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
         when: "calling refresh balance on the linked broker account"
             TradeItErrorResult errorResult = null
-            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalance>() {
+            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
                 @Override
-                void onSuccess(TradeItBalance response) {
+                void onSuccess(TradeItLinkedBrokerAccountParcelable accountParcelable) {
                     successCallbackCount++
                 }
 

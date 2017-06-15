@@ -23,7 +23,6 @@ import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
-import it.trade.android.sdk.model.TradeItBalance;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
@@ -396,11 +395,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
             TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = linkedBroker.getAccounts().get(0);
-            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItBalance>() {
+            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
                 @Override
-                public void onSuccess(TradeItBalance balance) {
+                public void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) {
                     Intent intent = new Intent(mainActivity, BalancesActivity.class);
-                    intent.putExtra(BALANCES_PARAMETER, balance);
+                    intent.putExtra(BALANCES_PARAMETER, linkedBrokerAccountParcelable.getBalance());
                     startActivity(intent);
                 }
 
