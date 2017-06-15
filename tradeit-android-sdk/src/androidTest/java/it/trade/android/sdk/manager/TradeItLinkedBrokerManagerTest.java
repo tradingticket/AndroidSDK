@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
-import it.trade.android.sdk.model.TradeItBalanceParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
@@ -98,10 +97,10 @@ public class TradeItLinkedBrokerManagerTest {
                     @Override
                     public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
                         assertThat("The authentication is successful", !accounts.isEmpty(), is(true));
-                        accounts.get(0).refreshBalance(new TradeItCallback<TradeItBalanceParcelable>() {
+                        accounts.get(0).refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
                             @Override
-                            public void onSuccess(TradeItBalanceParcelable balance) {
-                                assertThat("refreshBalance returns available cash", balance.availableCash, notNullValue());
+                            public void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) {
+                                assertThat("refreshBalance returns available cash", linkedBrokerAccountParcelable.getBalance().availableCash, notNullValue());
                                 accounts.get(0).refreshPositions(new TradeItCallback<List<TradeItPositionParcelable>>() {
                                     @Override
                                     public void onSuccess(List<TradeItPositionParcelable> positions) {

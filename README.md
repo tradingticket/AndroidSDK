@@ -179,22 +179,22 @@ linkedBrokerManager.unlinkBroker(
 Once a broker is linked via OAuth, it needs to be authenticated to perform actions on behalf of the user. Successfully authenticating will result in a session (that will time out after 15 minutes of inactivity). Obtain a session by calling `authenticate`:
 
 ```Java
-linkedBroker.authenticate(
-    new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccount>>() {
-        @Override
-        public void onSuccess(
-            final List<TradeItLinkedBrokerAccount> accounts) {
-                // The linked broker is successfully authenticated and the accounts associated with that broker login are populated on the linked broker object (and returned to the callback)
-            }
-        )
-
-        @Override
-        public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-            // Sometimes there is a security question the user need to answer before being authenticated
-
-            // Prompt the user for an answer and submit the answer like this
-            this.submitSecurityAnswer("my answer"); // then one of the three callbacks will be called (onSuccess, onSecurityQuestion, onError)
-        }
+linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+    @Override
+    public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
+        // The linked broker is successfully authenticated and the accounts associated with that broker login are populated on the linked broker object (and returned to the callback)
+    });
+    
+    @Override
+    public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+        // Sometimes there is a security question the user need to answer before being authenticated
+        
+        // Prompt the user for an answer and submit the answer like this
+        this.submitSecurityAnswer("my answer"); // then one of the three callbacks will be called (onSuccess, onSecurityQuestion, onError)
+        
+        //or to cancel the security question
+        this.cancelSecurityQuestion();
+    }
 
         @Override
         public void onError(TradeItErrorResult error) {
@@ -218,10 +218,11 @@ See below for more examples of actions that can be performed on a linked broker 
 To get the balance info of an account:
 
 ```Java
-linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverviewResponse>() {
+linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
     @Override
-    public void onSuccess(TradeItGetAccountOverviewResponse balance) {
-        // refreshes balance successful
+    public void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccount) {
+        // refreshes balance successful, to get the balance:
+        linkedBrokerAccount.getBalance()
     }
     @Override
     public void onError(TradeItErrorResult error) {
@@ -235,10 +236,10 @@ linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItGetAccountOverview
 To get the portfolio positions of an account:
 
 ```Java
-linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItGetPositionsResponse.Position>>() {
+linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItPositionParcelable>>() {
     @Override
-    public void onSuccess(List<TradeItGetPositionsResponse.Position> positions) {
-        // successfully fetched positions 
+    public void onSuccess(List<TradeItPositionParcelable> positions) {
+        // successfully fetched positions
     }
     
     @Override
@@ -253,7 +254,7 @@ linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItGetPosition
 First create a `TradeItOrder` object to encapsulate the user's intended trade:
 
 ```Java
-TradeItOrder order = new TradeItOrder(linkedBrokerAccount, "GE"); // by default it is a market order, quantity: 1, action: buy, expiration: good for day
+TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokerAccount, "GE"); // by default it is a market order, quantity: 1, action: buy, expiration: good for day
 order.setAction(TradeItOrderAction.SELL);
 order.setPriceType(TradeItOrderPriceType.LIMIT);
 order.setsetLimitPrice(20.0);

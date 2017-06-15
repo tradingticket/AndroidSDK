@@ -4,7 +4,7 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import it.trade.model.reponse.TradeItGetAccountOverviewResponse;
+import it.trade.model.reponse.TradeItAccountOverview;
 
 public class TradeItBalanceParcelable implements Parcelable {
 
@@ -24,14 +24,14 @@ public class TradeItBalanceParcelable implements Parcelable {
 
     TradeItBalanceParcelable() {}
 
-    TradeItBalanceParcelable(TradeItGetAccountOverviewResponse getAccountOverviewResponse) {
-        this.availableCash = getAccountOverviewResponse.availableCash;
-        this.buyingPower = getAccountOverviewResponse.buyingPower;
-        this.dayAbsoluteReturn = getAccountOverviewResponse.dayAbsoluteReturn;
-        this.dayPercentReturn = getAccountOverviewResponse.dayPercentReturn;
-        this.totalAbsoluteReturn = getAccountOverviewResponse.totalAbsoluteReturn;
-        this.totalPercentReturn = getAccountOverviewResponse.totalPercentReturn;
-        this.totalValue = getAccountOverviewResponse.totalValue;
+    TradeItBalanceParcelable(TradeItAccountOverview accountOverview) {
+        this.availableCash = accountOverview.availableCash;
+        this.buyingPower = accountOverview.buyingPower;
+        this.dayAbsoluteReturn = accountOverview.dayAbsoluteReturn;
+        this.dayPercentReturn = accountOverview.dayPercentReturn;
+        this.totalAbsoluteReturn = accountOverview.totalAbsoluteReturn;
+        this.totalPercentReturn = accountOverview.totalPercentReturn;
+        this.totalValue = accountOverview.totalValue;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class TradeItBalanceParcelable implements Parcelable {
                 ", totalAbsoluteReturn=" + totalAbsoluteReturn +
                 ", totalPercentReturn=" + totalPercentReturn +
                 ", totalValue=" + totalValue +
-                "}, ";
+                '}';
     }
 
     @Override

@@ -3,8 +3,8 @@ package it.trade.android.sdk.model
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import it.trade.model.reponse.TradeItAccountOverview
 import it.trade.model.reponse.TradeItBrokerAccount
-import it.trade.model.reponse.TradeItGetAccountOverviewResponse
 import it.trade.model.reponse.TradeItLinkLoginResponse
 import it.trade.model.request.TradeItLinkLoginRequest
 import spock.lang.Specification
@@ -188,7 +188,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
                 account1.accountBaseCurrency = "My Account base currency"
-                account1.balance = new TradeItGetAccountOverviewResponse()
+                account1.balance = new TradeItAccountOverview()
                 account1.balance.availableCash = 20000
                 linkedBrokerCached.accountsLastUpdated = new Date()
                 linkedBrokerCached.accounts = [account1]
@@ -221,7 +221,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
                 account1.accountName = "My Account Name"
                 account1.accountNumber = "My Account Number"
                 account1.accountBaseCurrency = "My Account base currency"
-                account1.balance = new TradeItGetAccountOverviewResponse()
+                account1.balance = new TradeItAccountOverview()
                 account1.balance.availableCash = 20000
                 linkedBrokerCached.accountsLastUpdated = new Date()
                 linkedBrokerCached.accounts = [account1]
