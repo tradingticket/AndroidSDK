@@ -13,8 +13,8 @@ import java.util.Map;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
+import it.trade.model.reponse.TradeItAccountOverviewResponse;
 import it.trade.model.reponse.TradeItBrokerAccount;
-import it.trade.model.reponse.TradeItGetAccountOverviewResponse;
 import it.trade.model.reponse.TradeItPosition;
 
 import static it.trade.model.reponse.TradeItErrorCode.BROKER_EXECUTION_ERROR;
@@ -28,6 +28,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     public transient TradeItLinkedBrokerParcelable linkedBroker;
     private TradeItBalanceParcelable balance;
+    private TradeItFxBalanceParcelable fxBalance;
     private Date balanceLastUpdated;
     private List<TradeItPositionParcelable> positions;
     private String userId;
@@ -92,16 +93,23 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         this.positions = positions;
     }
 
-    public void refreshBalance(final TradeItCallback<TradeItBalanceParcelable> callback) {
+    public void refreshBalance(final TradeItCallback<TradeItLinkedBrokerAccountParcelable> callback) {
         final TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = this;
-        this.getTradeItApiClient().getAccountOverview(accountNumber, new TradeItCallback<TradeItGetAccountOverviewResponse>() {
+        this.getTradeItApiClient().getAccountOverview(accountNumber, new TradeItCallback<TradeItAccountOverviewResponse>() {
             @Override
-            public void onSuccess(TradeItGetAccountOverviewResponse response) {
-                TradeItBalanceParcelable balance = new TradeItBalanceParcelable(response);
-                linkedBrokerAccount.balance = balance;
+            public void onSuccess(TradeItAccountOverviewResponse response) {
+                if (response.accountOverview != null) {
+                    TradeItBalanceParcelable balance = new TradeItBalanceParcelable(response.accountOverview);
+                    linkedBrokerAccount.balance = balance;
+                    linkedBrokerAccount.fxBalance = null;
+                } else if (response.fxAccountOverview != null) {
+                    TradeItFxBalanceParcelable fxBalance = new TradeItFxBalanceParcelable(response.fxAccountOverview);
+                    linkedBrokerAccount.balance = null;
+                    linkedBrokerAccount.fxBalance = fxBalance;
+                }
                 linkedBrokerAccount.balanceLastUpdated = new Date();
                 linkedBroker.cache();
-                callback.onSuccess(balance);
+                callback.onSuccess(linkedBrokerAccount);
             }
 
             @Override
