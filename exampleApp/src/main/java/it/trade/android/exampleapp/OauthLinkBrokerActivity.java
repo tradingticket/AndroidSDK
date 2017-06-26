@@ -23,7 +23,8 @@ import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker;
 
 public class OauthLinkBrokerActivity extends AppCompatActivity {
 
-    public final static String OAUTH_URL_PARAMETER = "it.trade.android.exampleapp.OAUTH_URL";
+    public static final String OAUTH_URL_PARAMETER = "it.trade.android.exampleapp.OAUTH_URL";
+    public static final String APP_DEEP_LINK = "exampleapp://tradeit";
     TradeItLinkedBrokerManager linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     TextView oAuthResultTextView;
     Spinner brokersSpinner;
@@ -84,7 +85,7 @@ public class OauthLinkBrokerActivity extends AppCompatActivity {
         if (brokerSelected == null) {
             return;
         }
-        linkedBrokerManager.getOAuthLoginPopupUrl(brokerSelected.shortName, "exampleapp://tradeit", new TradeItCallback<String>() {
+        linkedBrokerManager.getOAuthLoginPopupUrl(brokerSelected.shortName, APP_DEEP_LINK, new TradeItCallback<String>() {
             @Override
             public void onSuccess(String oAuthUrl) {
                 Intent intent = new Intent(context, WebViewActivity.class);

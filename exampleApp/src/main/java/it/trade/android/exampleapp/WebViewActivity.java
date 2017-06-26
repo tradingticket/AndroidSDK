@@ -10,6 +10,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import static it.trade.android.exampleapp.OauthLinkBrokerActivity.APP_DEEP_LINK;
 import static it.trade.android.exampleapp.OauthLinkBrokerActivity.OAUTH_URL_PARAMETER;
 
 public class WebViewActivity extends AppCompatActivity {
@@ -33,11 +34,15 @@ public class WebViewActivity extends AppCompatActivity {
         myWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView webView, String url) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(url));
-                setResult(Activity.RESULT_OK, intent);
-                finish();
-                return true;
+                if (url.contains(APP_DEEP_LINK)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(url));
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
     }
