@@ -10,24 +10,18 @@ import it.trade.model.request.TradeItRequestWithKey;
 
 public class TradeItApiClientParcelable extends TradeItApiClient implements Parcelable {
 
-    private RequestCookieProviderParcelable requestCookieProviderParcelable;
     private RequestInterceptorParcelable requestInterceptorParcelable;
 
     public TradeItApiClientParcelable(String apiKey, TradeItEnvironment environment) {
-        this(apiKey, environment, null, null);
+        this(apiKey, environment, null);
     }
-    public TradeItApiClientParcelable(String apiKey, TradeItEnvironment environment, RequestCookieProviderParcelable requestCookieProviderParcelable, RequestInterceptorParcelable requestInterceptorParcelable) {
-        super(apiKey, environment, requestCookieProviderParcelable, requestInterceptorParcelable);
-        this.requestCookieProviderParcelable = requestCookieProviderParcelable;
+    public TradeItApiClientParcelable(String apiKey, TradeItEnvironment environment, RequestInterceptorParcelable requestInterceptorParcelable) {
+        super(apiKey, environment, requestInterceptorParcelable);
         this.requestInterceptorParcelable = requestInterceptorParcelable;
     }
 
     protected TradeItApiClientParcelable(TradeItApi tradeItApi) {
         super(tradeItApi);
-    }
-
-    public RequestCookieProviderParcelable getRequestCookieProviderParcelable() {
-        return requestCookieProviderParcelable;
     }
 
     public RequestInterceptorParcelable getRequestInterceptorParcelable() {
@@ -41,7 +35,6 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(this.requestCookieProviderParcelable, flags);
         dest.writeParcelable(this.requestInterceptorParcelable, flags);
         dest.writeString(this.serverUuid);
         dest.writeString(this.sessionToken);
@@ -50,7 +43,6 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
     }
 
     protected TradeItApiClientParcelable(Parcel in) {
-        this.requestCookieProviderParcelable = in.readParcelable(RequestCookieProviderParcelable.class.getClassLoader());
         this.requestInterceptorParcelable = in.readParcelable(RequestInterceptorParcelable.class.getClassLoader());
         this.serverUuid = in.readString();
         this.sessionToken = in.readString();
@@ -58,7 +50,7 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
         this.environment = tmpEnvironment == -1 ? null : TradeItEnvironment.values()[tmpEnvironment];
         this.apiKey = in.readString();
         TradeItRequestWithKey.API_KEY = apiKey;
-        this.tradeItApi = this.createTradeItApi(environment, requestCookieProviderParcelable, requestInterceptorParcelable);
+        this.tradeItApi = this.createTradeItApi(environment, requestInterceptorParcelable);
     }
 
     public static final Creator<TradeItApiClientParcelable> CREATOR = new Creator<TradeItApiClientParcelable>() {

@@ -7,7 +7,6 @@ import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSDKConfigurationException;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
-import it.trade.android.sdk.model.RequestCookieProviderParcelable;
 import it.trade.android.sdk.model.RequestInterceptorParcelable;
 import it.trade.android.sdk.model.TradeItApiClientParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
@@ -28,10 +27,10 @@ public class TradeItSdkInstance {
         if (baseUrl != null && !baseUrl.isEmpty()) {
             environment.setBaseUrl(baseUrl);
         }
-        initializeTradeItSdkInstance(configurationBuilder.getContext(), configurationBuilder.getApiKey(), configurationBuilder.getEnvironment(), configurationBuilder.getRequestCookieProviderParcelable(), configurationBuilder.getRequestInterceptorParcelable());
+        initializeTradeItSdkInstance(configurationBuilder.getContext(), configurationBuilder.getApiKey(), configurationBuilder.getEnvironment(), configurationBuilder.getRequestInterceptorParcelable());
     }
 
-    private void initializeTradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, RequestCookieProviderParcelable requestCookieProviderParcelable, RequestInterceptorParcelable requestInterceptorParcelable) {
+    private void initializeTradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, RequestInterceptorParcelable requestInterceptorParcelable) {
         this.context = context;
         this.apiKey = apiKey;
         this.environment = environment;
@@ -44,7 +43,7 @@ public class TradeItSdkInstance {
         }
 
         try {
-            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(apiKey, environment, requestCookieProviderParcelable, requestInterceptorParcelable), linkedBrokerCache, keyStoreService);
+            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(apiKey, environment, requestInterceptorParcelable), linkedBrokerCache, keyStoreService);
         } catch (TradeItRetrieveLinkedLoginException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e);
         }

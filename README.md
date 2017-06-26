@@ -303,20 +303,6 @@ order.placeOrder(
 
 # Special Cases
 
-### Custom server host and cookies
-
-To point the SDK at a custom host and inject cookies on each request, implement the `RequestCookieProviderParcelable` and the `provideCookies` method (see `RequestCookieProviderParcelableImpl` for example), and then initialize the SDK like this:
-
-```Java
-TradeItConfigurationBuilder configurationBuilder = new TradeItConfigurationBuilder(
-                        this.getApplicationContext(),
-                        "tradeit-test-api-key",
-                        TradeItEnvironment.QA)
-                        .withBaseUrl("https://mycustomhost.com/some/path/")
-                        .withRequestCookieProviderParcelable(new RequestCookieProviderParcelableImpl());
-        TradeItSDK.configure(configurationBuilder);
-```
-
 ### Custom server host and headers
 
 To point the SDK at a custom host and inject cookies on each request, implement the `RequestInterceptorParcelable`  (see `RequestInterceptorParcelableImpl` for example), and then initialize the SDK like this:
