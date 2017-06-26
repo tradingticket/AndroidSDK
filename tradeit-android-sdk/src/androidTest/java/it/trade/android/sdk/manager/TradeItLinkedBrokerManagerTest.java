@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
@@ -62,7 +63,7 @@ public class TradeItLinkedBrokerManagerTest {
     public void createTradeItLinkedBrokerManager() {
         instrumentationCtx = InstrumentationRegistry.getTargetContext();
         TradeItSDK.clearConfig();
-        TradeItSDK.configure(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+        TradeItSDK.configure(new TradeItConfigurationBuilder(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA));
         linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     }
 

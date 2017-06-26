@@ -8,6 +8,7 @@ import it.trade.android.sdk.exceptions.TradeItSDKConfigurationException;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.RequestCookieProviderParcelable;
+import it.trade.android.sdk.model.RequestInterceptorParcelable;
 import it.trade.android.sdk.model.TradeItApiClientParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
 import it.trade.model.request.TradeItEnvironment;
@@ -22,25 +23,15 @@ public class TradeItSdkInstance {
     private TradeItKeystoreService keyStoreService;
     private static final String TRADE_IT_LINKED_BROKERS_ALIAS = "TRADE_IT_LINKED_BROKERS_ALIAS";
 
-    public TradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment) {
-        initializeTradeItSdkInstance(context, apiKey, environment, null);
+    public TradeItSdkInstance(TradeItConfigurationBuilder configurationBuilder) {
+        String baseUrl = configurationBuilder.getBaseUrl();
+        if (baseUrl != null && !baseUrl.isEmpty()) {
+            environment.setBaseUrl(baseUrl);
+        }
+        initializeTradeItSdkInstance(configurationBuilder.getContext(), configurationBuilder.getApiKey(), configurationBuilder.getEnvironment(), configurationBuilder.getRequestCookieProviderParcelable(), configurationBuilder.getRequestInterceptorParcelable());
     }
 
-    public TradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, RequestCookieProviderParcelable requestCookieProviderParcelable) {
-        initializeTradeItSdkInstance(context, apiKey, environment, requestCookieProviderParcelable);
-    }
-
-    public TradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, String baseUrl) {
-        environment.setBaseUrl(baseUrl);
-        initializeTradeItSdkInstance(context, apiKey, environment, null);
-    }
-
-    public TradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, String baseUrl, RequestCookieProviderParcelable requestCookieProviderParcelable) {
-        environment.setBaseUrl(baseUrl);
-        initializeTradeItSdkInstance(context, apiKey, environment, requestCookieProviderParcelable);
-    }
-
-    private void initializeTradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, RequestCookieProviderParcelable requestCookieProviderParcelable) {
+    private void initializeTradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, RequestCookieProviderParcelable requestCookieProviderParcelable, RequestInterceptorParcelable requestInterceptorParcelable) {
         this.context = context;
         this.apiKey = apiKey;
         this.environment = environment;
@@ -53,7 +44,7 @@ public class TradeItSdkInstance {
         }
 
         try {
-            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(apiKey, environment, requestCookieProviderParcelable), linkedBrokerCache, keyStoreService);
+            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(apiKey, environment, requestCookieProviderParcelable, requestInterceptorParcelable), linkedBrokerCache, keyStoreService);
         } catch (TradeItRetrieveLinkedLoginException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e);
         }
