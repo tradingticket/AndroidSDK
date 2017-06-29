@@ -25,7 +25,7 @@ public class TradeItSdkInstance {
     public TradeItSdkInstance(TradeItConfigurationBuilder configurationBuilder) {
         String baseUrl = configurationBuilder.getBaseUrl();
         if (baseUrl != null && !baseUrl.isEmpty()) {
-            environment.setBaseUrl(baseUrl);
+            configurationBuilder.getEnvironment().setBaseUrl(baseUrl);
         }
         initializeTradeItSdkInstance(configurationBuilder.getContext(), configurationBuilder.getApiKey(), configurationBuilder.getEnvironment(), configurationBuilder.getRequestInterceptorParcelable());
     }
