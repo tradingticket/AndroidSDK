@@ -350,6 +350,26 @@ public class TradeItLinkedBrokerManager {
         }
     }
 
+    private TradeItLinkedBrokerParcelable getLinkedBrokerByUserId(String userId) {
+        TradeItLinkedBrokerParcelable linkedBrokerParcelable = null;
+        for (TradeItLinkedBrokerParcelable linkedBroker : this.getLinkedBrokers()) {
+            if (linkedBroker.getLinkedLogin().userId.equals(userId)) {
+                linkedBrokerParcelable = linkedBroker;
+                break;
+            }
+        }
+        return linkedBrokerParcelable;
+    }
+
+    public void unlinkBrokerByUserId(String userId, final TradeItCallback callback) {
+        TradeItLinkedBrokerParcelable linkedBroker = getLinkedBrokerByUserId(userId);
+        if (linkedBroker == null) {
+            callback.onError(new TradeItErrorResultParcelable("Unlink broker error", "No linked broker was found for userId " + userId));
+        } else {
+            unlinkBroker(linkedBroker, callback);
+        }
+    }
+
     /**
      * @deprecated Use the new OAuth flow and the #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback) method instead
      */

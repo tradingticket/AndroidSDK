@@ -464,6 +464,87 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             linkedBrokerManager.linkedBrokers.size() == 0
     }
 
+    def "unlinkBrokerByUserId handles a successful response from trade it api"() {
+        given: "a userId to unlink"
+            String userId = "MyUserId"
+
+        and: "The linked broker exist for this userId"
+            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable)
+            linkedLogin.userId >> userId
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache)
+            linkedBroker.linkedLogin.userId = userId
+            linkedBrokerManager.linkedBrokers = [linkedBroker]
+
+        and: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            1 * this.apiClient.unlinkBrokerAccount(_, _) >> { args ->
+                TradeItCallback callback = args[1]
+                TradeItResponse tradeItResponse = new TradeItResponse()
+                tradeItResponse.sessionToken = "My session token"
+                tradeItResponse.longMessages = null
+                tradeItResponse.status = TradeItResponseStatus.SUCCESS
+                callback.onSuccess(tradeItResponse)
+            }
+
+        when: "calling unlinkBrokerByUserId"
+            linkedBrokerManager.unlinkBrokerByUserId(userId, new TradeItCallback<TradeItResponse>() {
+            @Override
+            void onSuccess(TradeItResponse response) {
+                successCallBackCount++
+            }
+
+            @Override
+            void onError(TradeItErrorResult error) {
+                errorCallBackCount++
+            }
+        })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "the deleteLinkedLogin method was called"
+            1 * keystoreService.deleteLinkedLogin(_)
+
+        and: "The linkedBroker is removed from cache"
+            1 * linkedBrokerCache.removeFromCache(linkedBroker)
+
+        and: "the linkedbrokers list is empty"
+            linkedBrokerManager.linkedBrokers.size() == 0
+    }
+
+    def "unlinkBrokerByUserId returns a TradeItError when the linkedBroker is not found"() {
+        given: "a userId to unlink"
+            String userId = "MyUserId"
+
+        and: "The linked broker doesn't exist for this userId"
+            linkedBrokerManager.linkedBrokers = []
+
+
+        when: "calling unlinkBrokerByUserId"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            linkedBrokerManager.unlinkBrokerByUserId(userId, new TradeItCallback<TradeItResponse>() {
+                @Override
+                void onSuccess(TradeItResponse response) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the errorCallback called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
+
+        and: "the method on the api was not called"
+            0 * this.apiClient.unlinkBrokerAccount(_, _)
+    }
+
     def "getOAuthLoginPopupForTokenUpdateUrl handles a successful response from trade it api"() {
         given: "a successful response from trade it api"
             int successCallBackCount = 0
