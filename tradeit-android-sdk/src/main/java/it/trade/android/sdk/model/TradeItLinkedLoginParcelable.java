@@ -31,6 +31,22 @@ public class TradeItLinkedLoginParcelable extends TradeItLinkedLogin implements 
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TradeItLinkedLoginParcelable that = (TradeItLinkedLoginParcelable) o;
+
+        return userId.equals(that.userId);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return userId.hashCode();
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }

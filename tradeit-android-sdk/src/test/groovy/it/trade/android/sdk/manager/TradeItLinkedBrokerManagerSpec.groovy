@@ -653,4 +653,49 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         and: "expects the api eas not called"
             0 * apiClient.getOAuthLoginPopupUrlForTokenUpdate(_, myUserId, _, _)
     }
+
+    def "syncLinkedBrokers sync correctly"() {
+        given: "A list of linkedLoginParcelable to synch from"
+            TradeItLinkedLoginParcelable linkedLoginParcelable1 = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable1 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable1, linkedBrokerCache)
+
+            TradeItLinkedLoginParcelable linkedLoginParcelable2 = new TradeItLinkedLoginParcelable("", "MyUserId2", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable2 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable2, linkedBrokerCache)
+
+            TradeItLinkedLoginParcelable linkedLoginParcelable3 = new TradeItLinkedLoginParcelable("", "MyUserId3", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable3 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable3, linkedBrokerCache)
+
+            List<TradeItLinkedLoginParcelable> listToSynchFrom = [linkedLoginParcelable1, linkedLoginParcelable2, linkedLoginParcelable3]
+
+        and: "The following already existing linkedBrokers"
+            TradeItLinkedLoginParcelable linkedLoginParcelable  = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable, linkedBrokerCache)
+            TradeItLinkedLoginParcelable linkedLoginParcelable5  = new TradeItLinkedLoginParcelable("", "MyUserId5", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable5 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable5, linkedBrokerCache)
+
+            linkedBrokerManager.linkedBrokers = [linkedBrokerParcelable, linkedBrokerParcelable5]
+
+        when: "Calling syncLinkedBrokers"
+            linkedBrokerManager.syncLinkedBrokers(listToSynchFrom)
+
+        then: "expects these calls to delete the linkedLogin from the keystore"
+            1 * keystoreService.deleteLinkedLogin(linkedLoginParcelable5)
+
+        and: "expects these calls to add the linkedLogin to the keystore"
+            1 * keystoreService.saveLinkedLogin(linkedLoginParcelable2, linkedLoginParcelable2.label)
+            1 * keystoreService.saveLinkedLogin(linkedLoginParcelable3, linkedLoginParcelable3.label)
+
+        and: "expects these calls to remove from the cache"
+            1 * linkedBrokerCache.removeFromCache(linkedBrokerParcelable5);
+
+        and: "expects these calls to add to the cache"
+            1 * linkedBrokerCache.cache(linkedBrokerParcelable2);
+            1 * linkedBrokerCache.cache(linkedBrokerParcelable3);
+
+        and: "linkedBrokers contains linkedBrokerParcelable1, linkedBrokerParcelable2, linkedBrokerParcelable3"
+            linkedBrokerManager.linkedBrokers.size() == 3
+            linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable1)
+            linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable2)
+            linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable3)
+    }
 }

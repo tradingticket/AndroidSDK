@@ -75,18 +75,46 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
+    public void syncLinkedBrokers(List<TradeItLinkedLoginParcelable> linkedLoginParcelables) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = this.linkedBrokers;
+
+        // Add missing linkedBrokers
+        for (TradeItLinkedLoginParcelable linkedLoginParcelable: linkedLoginParcelables) {
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable);
+            if (!linkedBrokers.contains(linkedBrokerParcelable)) {
+                linkedBrokerCache.cache(linkedBrokerParcelable);
+                linkedBrokers.add(linkedBrokerParcelable);
+                keystoreService.saveLinkedLogin(linkedLoginParcelable, linkedLoginParcelable.label);
+            }
+        }
+
+        // Remove non existing linkedBrokers
+        for (TradeItLinkedBrokerParcelable linkedBroker: new ArrayList<>(linkedBrokers)) {
+            if (!linkedLoginParcelables.contains(linkedBroker.getLinkedLogin())) {
+                linkedBrokerCache.removeFromCache(linkedBroker);
+                linkedBrokers.remove(linkedBroker);
+                keystoreService.deleteLinkedLogin(linkedBroker.getLinkedLogin());
+            }
+        }
+
+    }
     private void loadLinkedBrokersFromSharedPreferences() throws TradeItRetrieveLinkedLoginException {
         List<TradeItLinkedLoginParcelable> linkedLoginList = keystoreService.getLinkedLogins();
         for (TradeItLinkedLoginParcelable linkedLogin : linkedLoginList) {
-            TradeItApiClientParcelable
-                    apiClient = new TradeItApiClientParcelable(this.apiClient.getApiKey(), this.apiClient.getEnvironment(), this.apiClient.getRequestInterceptorParcelable());
-            //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
-            apiClient.setSessionToken("invalid-default-token");
-
-            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
+            TradeItLinkedBrokerParcelable linkedBroker = createNewLinkedBroker(linkedLogin);
             linkedBrokerCache.syncFromCache(linkedBroker);
             linkedBrokers.add(linkedBroker);
         }
+    }
+
+    private TradeItLinkedBrokerParcelable createNewLinkedBroker(TradeItLinkedLoginParcelable linkedLoginParcelable) {
+        TradeItApiClientParcelable
+                apiClientParcelable = new TradeItApiClientParcelable(this.apiClient.getApiKey(), this.apiClient.getEnvironment(), this.apiClient.getRequestInterceptorParcelable());
+        //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
+        apiClientParcelable.setSessionToken("invalid-default-token");
+
+        return new TradeItLinkedBrokerParcelable(apiClientParcelable, linkedLoginParcelable, linkedBrokerCache);
+
     }
 
     public void authenticateAll(final TradeItCallbackWithSecurityQuestionAndCompletion callback) {
