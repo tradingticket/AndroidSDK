@@ -552,13 +552,13 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
 
             TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable.class)
-            linkedLogin.userId = "My userId"
+            linkedLogin.userId = myUserId
 
             TradeItLinkedBrokerParcelable linkedBroker = Mock(TradeItLinkedBrokerParcelable.class)
             1 * linkedBroker.getBrokerName() >> "My broker 1"
             1 * linkedBroker.getLinkedLogin() >> linkedLogin
 
-            1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", "My userId", "my internal app callback", _) >> { broker, userId, userToken,  TradeItCallback<String> callback ->
+            1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", myUserId, "my internal app callback", _) >> { broker, userId, userToken,  TradeItCallback<String> callback ->
                 callback.onSuccess(mySpecialUrl);
             }
 
@@ -584,5 +584,73 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         and: "expects the oAuthUrl to be populated"
             oAuthUrlResult == mySpecialUrl
+    }
+
+    def "getOAuthLoginPopupForTokenUpdateUrlByUserId handles a successful response from trade it api"() {
+        given: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
+
+            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable.class)
+            linkedLogin.userId = myUserId
+
+            TradeItLinkedBrokerParcelable linkedBroker = Mock(TradeItLinkedBrokerParcelable.class)
+            1 * linkedBroker.getBrokerName() >> "My broker 1"
+            2 * linkedBroker.getLinkedLogin() >> linkedLogin
+            1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", myUserId, "my internal app callback", _) >> { broker, userId, userToken,  TradeItCallback<String> callback ->
+                callback.onSuccess(mySpecialUrl);
+            }
+            this.linkedBrokerManager.linkedBrokers  = [linkedBroker]
+
+        when: "calling getOAuthLoginPopupForTokenUpdateUrl"
+            String oAuthUrlResult = null
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrlByUserId(myUserId, "my internal app callback", new TradeItCallback<String>() {
+
+                @Override
+                void onSuccess(String oAuthUrl) {
+                    successCallBackCount++
+                    oAuthUrlResult = oAuthUrl
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "expects the oAuthUrl to be populated"
+            oAuthUrlResult == mySpecialUrl
+    }
+
+    def "getOAuthLoginPopupForTokenUpdateUrlByUserId returns a TradeItError when the linkedBroker is not found"() {
+        given: "The linked broker doesn't exist for this userId"
+            linkedBrokerManager.linkedBrokers = []
+
+        when: "calling getOAuthLoginPopupForTokenUpdateUrlByUserId"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrlByUserId(myUserId, "my internal app callback", new TradeItCallback<String>() {
+                @Override
+                void onSuccess(String oAuthUrl) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the errorCallBackCount called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
+
+        and: "expects the api eas not called"
+            0 * apiClient.getOAuthLoginPopupUrlForTokenUpdate(_, myUserId, _, _)
     }
 }

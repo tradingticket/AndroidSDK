@@ -290,6 +290,15 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
+    public void getOAuthLoginPopupForTokenUpdateUrlByUserId(String userId, String deepLinkCallback, final TradeItCallback<String> callback) {
+        TradeItLinkedBrokerParcelable linkedBroker = getLinkedBrokerByUserId(userId);
+        if (linkedBroker == null) {
+            callback.onError(new TradeItErrorResultParcelable("getOAuthLoginPopupForTokenUpdateUrlByUserId error", "No linked broker was found for userId " + userId));
+        } else {
+            getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, deepLinkCallback, callback);
+        }
+    }
+
     public void linkBrokerWithOauthVerifier(final String accountLabel, String oAuthVerifier, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
         apiClient.linkBrokerWithOauthVerifier(oAuthVerifier, new TradeItCallback<TradeItLinkedLogin>() {
             @Override
