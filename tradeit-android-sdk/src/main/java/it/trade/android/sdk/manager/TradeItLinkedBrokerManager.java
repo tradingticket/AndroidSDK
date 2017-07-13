@@ -359,7 +359,7 @@ public class TradeItLinkedBrokerManager {
         }
     }
 
-    private TradeItLinkedBrokerParcelable getLinkedBrokerByUserId(String userId) {
+    public TradeItLinkedBrokerParcelable getLinkedBrokerByUserId(String userId) {
         TradeItLinkedBrokerParcelable linkedBrokerParcelable = null;
         for (TradeItLinkedBrokerParcelable linkedBroker : this.getLinkedBrokers()) {
             if (linkedBroker.getLinkedLogin().userId.equals(userId)) {
