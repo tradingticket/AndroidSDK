@@ -13,7 +13,7 @@ public class TradeItConfigurationBuilder {
     private String baseUrl;
     private RequestInterceptorParcelable requestInterceptorParcelable;
 
-    public TradeItConfigurationBuilder() {
+    private TradeItConfigurationBuilder() {
     }
 
     public TradeItConfigurationBuilder(Context context, String apiKey, TradeItEnvironment environment) {
