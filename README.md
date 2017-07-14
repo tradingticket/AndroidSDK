@@ -28,11 +28,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ...
-        TradeItSDK.configure(
-            this.getApplicationContext(),
-            "tradeit-test-api-key",
-            TradeItEnvironment.QA
-        );
+        TradeItConfigurationBuilder configurationBuilder = new TradeItConfigurationBuilder(
+                        this.getApplicationContext(),
+                        "tradeit-test-api-key",
+                        TradeItEnvironment.LOCAL);
+        TradeItSDK.configure(configurationBuilder);
         ....
     }
     ....
@@ -303,16 +303,16 @@ order.placeOrder(
 
 # Special Cases
 
-### Custom server host and cookies
+### Custom server host and headers
 
-To point the SDK at a custom host and inject cookies on each request, implement the `RequestCookieProviderParcelable` and the `provideCookies` method (see `RequestCookieProviderParcelableImpl` for example), and then initialize the SDK like this:
+To point the SDK at a custom host and inject cookies on each request, implement the `RequestInterceptorParcelable`  (see `RequestInterceptorParcelableImpl` for example), and then initialize the SDK like this:
 
 ```Java
-TradeItSDK.configure(
-    this.getApplicationContext(),
-    "tradeit-test-api-key",
-    TradeItEnvironment.QA,
-    "https://mycustomhost.com/some/path/",
-    new RequestCookieProviderParcelableImpl()
-);
+TradeItConfigurationBuilder configurationBuilder = new TradeItConfigurationBuilder(
+                        this.getApplicationContext(),
+                        "tradeit-test-api-key",
+                        TradeItEnvironment.QA)
+                        .withBaseUrl("https://mycustomhost.com/some/path/")
+                        .withRequestCookieProviderParcelable(new RequestCookieProviderParcelableImpl());
+        TradeItSDK.configure(configurationBuilder);
 ```
