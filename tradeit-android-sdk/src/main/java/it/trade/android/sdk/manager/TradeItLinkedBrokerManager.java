@@ -5,16 +5,10 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.Callable;
-
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
@@ -23,7 +17,6 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.internal.operators.observable.BlockingObservableMostRecent;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
@@ -75,7 +68,7 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
-    public void syncLinkedBrokers(List<TradeItLinkedLoginParcelable> linkedLoginParcelables) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
+    public synchronized void syncLinkedBrokers(List<TradeItLinkedLoginParcelable> linkedLoginParcelables) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
         List<TradeItLinkedBrokerParcelable> linkedBrokers = this.linkedBrokers;
 
         // Add missing linkedBrokers
