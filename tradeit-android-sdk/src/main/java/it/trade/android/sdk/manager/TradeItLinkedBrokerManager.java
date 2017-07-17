@@ -290,6 +290,15 @@ public class TradeItLinkedBrokerManager {
         });
     }
 
+    public void getOAuthLoginPopupForTokenUpdateUrlByUserId(String userId, String deepLinkCallback, final TradeItCallback<String> callback) {
+        TradeItLinkedBrokerParcelable linkedBroker = getLinkedBrokerByUserId(userId);
+        if (linkedBroker == null) {
+            callback.onError(new TradeItErrorResultParcelable("getOAuthLoginPopupForTokenUpdateUrlByUserId error", "No linked broker was found for userId " + userId));
+        } else {
+            getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, deepLinkCallback, callback);
+        }
+    }
+
     public void linkBrokerWithOauthVerifier(final String accountLabel, String oAuthVerifier, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
         apiClient.linkBrokerWithOauthVerifier(oAuthVerifier, new TradeItCallback<TradeItLinkedLogin>() {
             @Override
@@ -347,6 +356,26 @@ public class TradeItLinkedBrokerManager {
         } catch (TradeItDeleteLinkedLoginException e) {
             Log.e(this.getClass().getName(), e.getMessage(), e);
             callback.onError(new TradeItErrorResultParcelable("Unlink broker error", "An error occured while unlinking the broker, please try again later"));
+        }
+    }
+
+    public TradeItLinkedBrokerParcelable getLinkedBrokerByUserId(String userId) {
+        TradeItLinkedBrokerParcelable linkedBrokerParcelable = null;
+        for (TradeItLinkedBrokerParcelable linkedBroker : this.getLinkedBrokers()) {
+            if (linkedBroker.getLinkedLogin().userId.equals(userId)) {
+                linkedBrokerParcelable = linkedBroker;
+                break;
+            }
+        }
+        return linkedBrokerParcelable;
+    }
+
+    public void unlinkBrokerByUserId(String userId, final TradeItCallback callback) {
+        TradeItLinkedBrokerParcelable linkedBroker = getLinkedBrokerByUserId(userId);
+        if (linkedBroker == null) {
+            callback.onError(new TradeItErrorResultParcelable("Unlink broker error", "No linked broker was found for userId " + userId));
+        } else {
+            unlinkBroker(linkedBroker, callback);
         }
     }
 
