@@ -3,8 +3,6 @@ package it.trade.android.sdk.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.google.gson.Gson;
 
@@ -21,7 +19,7 @@ public class TradeItLinkedBrokerCache {
         this.context = context;
     }
 
-    void cache(TradeItLinkedBrokerParcelable linkedBroker) {
+    public void cache(TradeItLinkedBrokerParcelable linkedBroker) {
         String linkedBrokerSerializedJson = gson.toJson(linkedBroker);
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
