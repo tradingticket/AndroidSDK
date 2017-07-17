@@ -5,9 +5,16 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;
@@ -16,6 +23,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.internal.operators.observable.BlockingObservableMostRecent;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
@@ -47,12 +55,24 @@ public class TradeItLinkedBrokerManager {
     private TradeItLinkedBrokerCache linkedBrokerCache;
     private TradeItApiClientParcelable apiClient;
     private static final String TAG = TradeItLinkedBrokerManager.class.getName();
+    private List<TradeItAvailableBrokersResponse.Broker> availableBrokers = null;
+    private Queue<TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>> availableBrokersCallbackQueue = new LinkedList<>();
+    private final Object availableBrokersLock = new Object();
 
     public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
         this.keystoreService = keystoreService;
         this.linkedBrokerCache = linkedBrokerCache;
         this.apiClient = apiClient;
         this.loadLinkedBrokersFromSharedPreferences();
+
+        // Start fetching available brokers asap so that it is cached
+        this.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
+            @Override
+            public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {}
+
+            @Override
+            public void onError(TradeItErrorResult error) {}
+        });
     }
 
     private void loadLinkedBrokersFromSharedPreferences() throws TradeItRetrieveLinkedLoginException {
@@ -99,6 +119,7 @@ public class TradeItLinkedBrokerManager {
                 Log.w(TAG, "Undeliverable exception received, not sure what to do", e);
             }
         });
+
         Observable.fromIterable(this.getLinkedBrokers())
             .observeOn(AndroidSchedulers.mainThread(), true)
             .subscribeOn(Schedulers.io())
@@ -198,18 +219,45 @@ public class TradeItLinkedBrokerManager {
     }
 
     public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
-        apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
-            @Override
-            public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
-                callback.onSuccess(brokerList);
-            }
+        synchronized (availableBrokersLock) {
+            if (this.availableBrokers != null) {
+                callback.onSuccess(this.availableBrokers);
+            } else if (availableBrokersCallbackQueue.isEmpty()) {
+                availableBrokersCallbackQueue.add(callback);
 
-            @Override
-            public void onError(TradeItErrorResult error) {
-                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
-                callback.onError(errorResultParcelable);
+                apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
+                    @Override
+                    public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
+                        synchronized (availableBrokersLock) {
+                            availableBrokers = brokerList;
+
+                            while(availableBrokersCallbackQueue.peek() != null) {
+                                TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback = availableBrokersCallbackQueue.poll();
+                                if (callback != null) {
+                                    callback.onSuccess(brokerList);
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(TradeItErrorResult error) {
+                        synchronized (availableBrokersLock) {
+                            TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+
+                            while (availableBrokersCallbackQueue.peek() != null) {
+                                TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback = availableBrokersCallbackQueue.poll();
+                                if (callback != null) {
+                                    callback.onError(errorResultParcelable);
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                availableBrokersCallbackQueue.add(callback);
             }
-        });
+        }
     }
 
     public void getOAuthLoginPopupUrl(String broker, String deepLinkCallback, final TradeItCallback<String> callback) {

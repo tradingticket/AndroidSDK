@@ -25,7 +25,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     TradeItEnvironment environment = TradeItEnvironment.QA
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
     TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable)
-    
+
     void setup() {
         keystoreService.getLinkedLogins() >> []
         apiClient.getEnvironment() >> TradeItEnvironment.QA
@@ -55,34 +55,62 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
 
         when: "calling getAvailableBrokers"
-            int successCallBackCount = 0
-            int errorCallBackCount = 0
-            List<TradeItAvailableBrokersResponse.Broker> brokerList = null
+            int successCallBackCount1 = 0
+            int successCallBackCount2 = 0
+            int errorCallBackCount1 = 0
+            int errorCallBackCount2 = 0
+
+            List<TradeItAvailableBrokersResponse.Broker> brokerList1 = null
+            List<TradeItAvailableBrokersResponse.Broker> brokerList2 = null
+
             linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
                 @Override
                 public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
-                    successCallBackCount++
-                    brokerList = brokerListResponse
+                    successCallBackCount1++
+                    brokerList1 = brokerListResponse
                 }
 
                 @Override
                 public void onError(TradeItErrorResult error) {
-                    errorCallBackCount++
+                    errorCallBackCount1++
+                }
+            });
+
+            linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
+                @Override
+                public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
+                    successCallBackCount2++
+                    brokerList2 = brokerListResponse
+                }
+
+                @Override
+                public void onError(TradeItErrorResult error) {
+                    errorCallBackCount2++
                 }
             });
 
         then: "expects the successCallback called once"
-            successCallBackCount == 1
-            errorCallBackCount == 0
+            successCallBackCount1 == 1
+            errorCallBackCount1 == 0
+            successCallBackCount2 == 1
+            errorCallBackCount2 == 0
 
         and: "expects a list of 3 brokers"
-            brokerList?.size() == 3
-            brokerList[0].shortName == "Broker1"
-            brokerList[0].longName == "My long Broker1"
-            brokerList[1].shortName == "Broker2"
-            brokerList[1].longName == "My long Broker2"
-            brokerList[2].shortName == "Broker3"
-            brokerList[2].longName == "My long Broker3"
+            brokerList1?.size() == 3
+            brokerList1[0].shortName == "Broker1"
+            brokerList1[0].longName == "My long Broker1"
+            brokerList1[1].shortName == "Broker2"
+            brokerList1[1].longName == "My long Broker2"
+            brokerList1[2].shortName == "Broker3"
+            brokerList1[2].longName == "My long Broker3"
+
+            brokerList2?.size() == 3
+            brokerList2[0].shortName == "Broker1"
+            brokerList2[0].longName == "My long Broker1"
+            brokerList2[1].shortName == "Broker2"
+            brokerList2[1].longName == "My long Broker2"
+            brokerList2[2].shortName == "Broker3"
+            brokerList2[2].longName == "My long Broker3"
     }
 
     def "GetAvailableBrokers handles an error response from trade it api"() {
