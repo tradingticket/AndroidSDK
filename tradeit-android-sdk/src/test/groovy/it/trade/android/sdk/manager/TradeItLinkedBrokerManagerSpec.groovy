@@ -25,7 +25,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
     TradeItEnvironment environment = TradeItEnvironment.QA
     TradeItLinkedBrokerCache linkedBrokerCache = Mock(TradeItLinkedBrokerCache)
     TradeItApiClientParcelable apiClient = Mock(TradeItApiClientParcelable)
-    
+
     void setup() {
         keystoreService.getLinkedLogins() >> []
         apiClient.getEnvironment() >> TradeItEnvironment.QA
@@ -55,34 +55,62 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
 
         when: "calling getAvailableBrokers"
-            int successCallBackCount = 0
-            int errorCallBackCount = 0
-            List<TradeItAvailableBrokersResponse.Broker> brokerList = null
+            int successCallBackCount1 = 0
+            int successCallBackCount2 = 0
+            int errorCallBackCount1 = 0
+            int errorCallBackCount2 = 0
+
+            List<TradeItAvailableBrokersResponse.Broker> brokerList1 = null
+            List<TradeItAvailableBrokersResponse.Broker> brokerList2 = null
+
             linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
                 @Override
                 public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
-                    successCallBackCount++
-                    brokerList = brokerListResponse
+                    successCallBackCount1++
+                    brokerList1 = brokerListResponse
                 }
 
                 @Override
                 public void onError(TradeItErrorResult error) {
-                    errorCallBackCount++
+                    errorCallBackCount1++
+                }
+            });
+
+            linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
+                @Override
+                public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerListResponse) {
+                    successCallBackCount2++
+                    brokerList2 = brokerListResponse
+                }
+
+                @Override
+                public void onError(TradeItErrorResult error) {
+                    errorCallBackCount2++
                 }
             });
 
         then: "expects the successCallback called once"
-            successCallBackCount == 1
-            errorCallBackCount == 0
+            successCallBackCount1 == 1
+            errorCallBackCount1 == 0
+            successCallBackCount2 == 1
+            errorCallBackCount2 == 0
 
         and: "expects a list of 3 brokers"
-            brokerList?.size() == 3
-            brokerList[0].shortName == "Broker1"
-            brokerList[0].longName == "My long Broker1"
-            brokerList[1].shortName == "Broker2"
-            brokerList[1].longName == "My long Broker2"
-            brokerList[2].shortName == "Broker3"
-            brokerList[2].longName == "My long Broker3"
+            brokerList1?.size() == 3
+            brokerList1[0].shortName == "Broker1"
+            brokerList1[0].longName == "My long Broker1"
+            brokerList1[1].shortName == "Broker2"
+            brokerList1[1].longName == "My long Broker2"
+            brokerList1[2].shortName == "Broker3"
+            brokerList1[2].longName == "My long Broker3"
+
+            brokerList2?.size() == 3
+            brokerList2[0].shortName == "Broker1"
+            brokerList2[0].longName == "My long Broker1"
+            brokerList2[1].shortName == "Broker2"
+            brokerList2[1].longName == "My long Broker2"
+            brokerList2[2].shortName == "Broker3"
+            brokerList2[2].longName == "My long Broker3"
     }
 
     def "GetAvailableBrokers handles an error response from trade it api"() {
@@ -436,6 +464,87 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             linkedBrokerManager.linkedBrokers.size() == 0
     }
 
+    def "unlinkBrokerByUserId handles a successful response from trade it api"() {
+        given: "a userId to unlink"
+            String userId = "MyUserId"
+
+        and: "The linked broker exist for this userId"
+            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable)
+            linkedLogin.userId >> userId
+            TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache)
+            linkedBroker.linkedLogin.userId = userId
+            linkedBrokerManager.linkedBrokers = [linkedBroker]
+
+        and: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            1 * this.apiClient.unlinkBrokerAccount(_, _) >> { args ->
+                TradeItCallback callback = args[1]
+                TradeItResponse tradeItResponse = new TradeItResponse()
+                tradeItResponse.sessionToken = "My session token"
+                tradeItResponse.longMessages = null
+                tradeItResponse.status = TradeItResponseStatus.SUCCESS
+                callback.onSuccess(tradeItResponse)
+            }
+
+        when: "calling unlinkBrokerByUserId"
+            linkedBrokerManager.unlinkBrokerByUserId(userId, new TradeItCallback<TradeItResponse>() {
+            @Override
+            void onSuccess(TradeItResponse response) {
+                successCallBackCount++
+            }
+
+            @Override
+            void onError(TradeItErrorResult error) {
+                errorCallBackCount++
+            }
+        })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "the deleteLinkedLogin method was called"
+            1 * keystoreService.deleteLinkedLogin(_)
+
+        and: "The linkedBroker is removed from cache"
+            1 * linkedBrokerCache.removeFromCache(linkedBroker)
+
+        and: "the linkedbrokers list is empty"
+            linkedBrokerManager.linkedBrokers.size() == 0
+    }
+
+    def "unlinkBrokerByUserId returns a TradeItError when the linkedBroker is not found"() {
+        given: "a userId to unlink"
+            String userId = "MyUserId"
+
+        and: "The linked broker doesn't exist for this userId"
+            linkedBrokerManager.linkedBrokers = []
+
+
+        when: "calling unlinkBrokerByUserId"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            linkedBrokerManager.unlinkBrokerByUserId(userId, new TradeItCallback<TradeItResponse>() {
+                @Override
+                void onSuccess(TradeItResponse response) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the errorCallback called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
+
+        and: "the method on the api was not called"
+            0 * this.apiClient.unlinkBrokerAccount(_, _)
+    }
+
     def "getOAuthLoginPopupForTokenUpdateUrl handles a successful response from trade it api"() {
         given: "a successful response from trade it api"
             int successCallBackCount = 0
@@ -443,13 +552,13 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
 
             TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable.class)
-            linkedLogin.userId = "My userId"
+            linkedLogin.userId = myUserId
 
             TradeItLinkedBrokerParcelable linkedBroker = Mock(TradeItLinkedBrokerParcelable.class)
             1 * linkedBroker.getBrokerName() >> "My broker 1"
             1 * linkedBroker.getLinkedLogin() >> linkedLogin
 
-            1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", "My userId", "my internal app callback", _) >> { broker, userId, userToken,  TradeItCallback<String> callback ->
+            1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", myUserId, "my internal app callback", _) >> { broker, userId, userToken,  TradeItCallback<String> callback ->
                 callback.onSuccess(mySpecialUrl);
             }
 
@@ -475,5 +584,118 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
         and: "expects the oAuthUrl to be populated"
             oAuthUrlResult == mySpecialUrl
+    }
+
+    def "getOAuthLoginPopupForTokenUpdateUrlByUserId handles a successful response from trade it api"() {
+        given: "a successful response from trade it api"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
+
+            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable.class)
+            linkedLogin.userId = myUserId
+
+            TradeItLinkedBrokerParcelable linkedBroker = Mock(TradeItLinkedBrokerParcelable.class)
+            1 * linkedBroker.getBrokerName() >> "My broker 1"
+            2 * linkedBroker.getLinkedLogin() >> linkedLogin
+            1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", myUserId, "my internal app callback", _) >> { broker, userId, userToken,  TradeItCallback<String> callback ->
+                callback.onSuccess(mySpecialUrl);
+            }
+            this.linkedBrokerManager.linkedBrokers  = [linkedBroker]
+
+        when: "calling getOAuthLoginPopupForTokenUpdateUrl"
+            String oAuthUrlResult = null
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrlByUserId(myUserId, "my internal app callback", new TradeItCallback<String>() {
+
+                @Override
+                void onSuccess(String oAuthUrl) {
+                    successCallBackCount++
+                    oAuthUrlResult = oAuthUrl
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallBackCount == 1
+            errorCallBackCount == 0
+
+        and: "expects the oAuthUrl to be populated"
+            oAuthUrlResult == mySpecialUrl
+    }
+
+    def "getOAuthLoginPopupForTokenUpdateUrlByUserId returns a TradeItError when the linkedBroker is not found"() {
+        given: "The linked broker doesn't exist for this userId"
+            linkedBrokerManager.linkedBrokers = []
+
+        when: "calling getOAuthLoginPopupForTokenUpdateUrlByUserId"
+            int successCallBackCount = 0
+            int errorCallBackCount = 0
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrlByUserId(myUserId, "my internal app callback", new TradeItCallback<String>() {
+                @Override
+                void onSuccess(String oAuthUrl) {
+                    successCallBackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallBackCount++
+                }
+            })
+
+        then: "expects the errorCallBackCount called once"
+            successCallBackCount == 0
+            errorCallBackCount == 1
+
+        and: "expects the api eas not called"
+            0 * apiClient.getOAuthLoginPopupUrlForTokenUpdate(_, myUserId, _, _)
+    }
+
+    def "syncLinkedBrokers sync correctly"() {
+        given: "A list of linkedLoginParcelable to synch from"
+            TradeItLinkedLoginParcelable linkedLoginParcelable1 = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable1 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable1, linkedBrokerCache)
+
+            TradeItLinkedLoginParcelable linkedLoginParcelable2 = new TradeItLinkedLoginParcelable("", "MyUserId2", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable2 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable2, linkedBrokerCache)
+
+            TradeItLinkedLoginParcelable linkedLoginParcelable3 = new TradeItLinkedLoginParcelable("", "MyUserId3", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable3 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable3, linkedBrokerCache)
+
+            List<TradeItLinkedLoginParcelable> listToSynchFrom = [linkedLoginParcelable1, linkedLoginParcelable2, linkedLoginParcelable3]
+
+        and: "The following already existing linkedBrokers"
+            TradeItLinkedLoginParcelable linkedLoginParcelable  = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable, linkedBrokerCache)
+            TradeItLinkedLoginParcelable linkedLoginParcelable5  = new TradeItLinkedLoginParcelable("", "MyUserId5", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable5 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable5, linkedBrokerCache)
+
+            linkedBrokerManager.linkedBrokers = [linkedBrokerParcelable, linkedBrokerParcelable5]
+
+        when: "Calling syncLinkedBrokers"
+            linkedBrokerManager.syncLinkedBrokers(listToSynchFrom)
+
+        then: "expects these calls to delete the linkedLogin from the keystore"
+            1 * keystoreService.deleteLinkedLogin(linkedLoginParcelable5)
+
+        and: "expects these calls to add the linkedLogin to the keystore"
+            1 * keystoreService.saveLinkedLogin(linkedLoginParcelable2, linkedLoginParcelable2.label)
+            1 * keystoreService.saveLinkedLogin(linkedLoginParcelable3, linkedLoginParcelable3.label)
+
+        and: "expects these calls to remove from the cache"
+            1 * linkedBrokerCache.removeFromCache(linkedBrokerParcelable5);
+
+        and: "expects these calls to add to the cache"
+            1 * linkedBrokerCache.cache(linkedBrokerParcelable2);
+            1 * linkedBrokerCache.cache(linkedBrokerParcelable3);
+
+        and: "linkedBrokers contains linkedBrokerParcelable1, linkedBrokerParcelable2, linkedBrokerParcelable3"
+            linkedBrokerManager.linkedBrokers.size() == 3
+            linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable1)
+            linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable2)
+            linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable3)
     }
 }

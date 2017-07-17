@@ -19,6 +19,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
@@ -90,7 +91,12 @@ public class MainActivity extends AppCompatActivity {
 
         initTable();
 
-        TradeItSDK.configure(this.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+        TradeItConfigurationBuilder configurationBuilder = new TradeItConfigurationBuilder(
+                this.getApplicationContext(),
+                "tradeit-test-api-key",
+                TradeItEnvironment.QA);
+
+        TradeItSDK.configure(configurationBuilder);
 
         linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     }

@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.reponse.TradeItBrokerAccount;
@@ -34,7 +35,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
     public void createTradeItLinkedBrokerAccount() {
         Context instrumentationCtx = InstrumentationRegistry.getTargetContext();
         TradeItSDK.clearConfig();
-        TradeItSDK.configure(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA);
+        TradeItSDK.configure(new TradeItConfigurationBuilder(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA));
 
         TradeItOAuthAccessTokenRequest oAuthAccessTokenRequest = new TradeItOAuthAccessTokenRequest("MyOauthVerifier");
         oAuthAccessTokenRequest.apiKey = "MyApiKey";
