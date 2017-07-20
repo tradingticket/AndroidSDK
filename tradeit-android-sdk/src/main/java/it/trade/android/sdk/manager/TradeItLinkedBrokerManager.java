@@ -39,10 +39,10 @@ import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
-import it.trade.model.reponse.TradeItAvailableBrokersResponse;
+import it.trade.model.reponse.Instrument;
+import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker;
 import it.trade.model.reponse.TradeItResponse;
 import it.trade.model.request.TradeItLinkedLogin;
-
 public class TradeItLinkedBrokerManager {
 
     private List<TradeItLinkedBrokerParcelable> linkedBrokers = new ArrayList<>();
@@ -311,6 +311,99 @@ public class TradeItLinkedBrokerManager {
             return singleCache;
         }
     }
+
+    public void getAllFeaturedBrokers(final TradeItCallback<List<Broker>> callback) {
+        getAvailableBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokersList) {
+                callback.onSuccess(getFeaturedBrokerList(brokersList));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void getFeaturedBrokersForInstrumentType(final Instrument instrumentType, final TradeItCallback<List<Broker>> callback) {
+        getAllFeaturedBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokersList) {
+                callback.onSuccess(getBrokerListForInstrumentType(brokersList, instrumentType));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void getAllNonFeaturedBrokers(final TradeItCallback<List<Broker>> callback) {
+        getAvailableBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokersList) {
+                callback.onSuccess(getNonFeaturedBrokerList(brokersList));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void getNonFeaturedBrokersForInstrumentType(final Instrument instrumentType, final TradeItCallback<List<Broker>> callback) {
+        getAllNonFeaturedBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokerList) {
+                callback.onSuccess(getBrokerListForInstrumentType(brokerList, instrumentType));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    private List<Broker> getBrokerListForInstrumentType(List<Broker> brokersList, Instrument instrumentType) {
+        List<Broker> filteredBrokerList = new ArrayList<>();
+        for (Broker broker: brokersList) {
+            for (Broker.BrokerInstrument brokerInstrument: broker.brokerInstruments) {
+                if (brokerInstrument.getInstrument() == instrumentType) {
+                    filteredBrokerList.add(broker);
+                }
+            }
+        }
+        return filteredBrokerList;
+    }
+
+    private List<Broker> getFeaturedBrokerList(List<Broker> brokersList) {
+        List<Broker> featuredBrokersList = new ArrayList<>();
+        for (Broker broker: brokersList) {
+            for (Broker.BrokerInstrument instrument: broker.brokerInstruments) {
+                if (instrument.isFeatured) {
+                    featuredBrokersList.add(broker);
+                }
+            }
+        }
+        return  featuredBrokersList;
+    }
+
+    private List<Broker> getNonFeaturedBrokerList(List<Broker> brokersList) {
+        List<Broker> featuredBrokersList = new ArrayList<>();
+        for (Broker broker: brokersList) {
+            for (Broker.BrokerInstrument instrument: broker.brokerInstruments) {
+                if (!instrument.isFeatured) {
+                    featuredBrokersList.add(broker);
+                }
+            }
+        }
+        return  featuredBrokersList;
+    }
+
 
     public void getOAuthLoginPopupUrl(String broker, String deepLinkCallback, final TradeItCallback<String> callback) {
         apiClient.getOAuthLoginPopupUrlForMobile(broker, deepLinkCallback, new TradeItCallback<String>() {
