@@ -5,9 +5,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -39,10 +37,10 @@ import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
-import it.trade.model.reponse.TradeItAvailableBrokersResponse;
+import it.trade.model.reponse.Instrument;
+import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker;
 import it.trade.model.reponse.TradeItResponse;
 import it.trade.model.request.TradeItLinkedLogin;
-
 public class TradeItLinkedBrokerManager {
 
     private List<TradeItLinkedBrokerParcelable> linkedBrokers = new ArrayList<>();
@@ -50,7 +48,7 @@ public class TradeItLinkedBrokerManager {
     private TradeItLinkedBrokerCache linkedBrokerCache;
     private TradeItApiClientParcelable apiClient;
     private static final String TAG = TradeItLinkedBrokerManager.class.getName();
-    private SingleCache<List<TradeItAvailableBrokersResponse.Broker>> availableBrokersSingleCache = null;
+    private SingleCache<List<Broker>> availableBrokersSingleCache = null;
 
     public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
         this.keystoreService = keystoreService;
@@ -233,11 +231,11 @@ public class TradeItLinkedBrokerManager {
             });
     }
 
-    public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
+    public void getAvailableBrokers(final TradeItCallback<List<Broker>> callback) {
         this.getAvailableBrokersSingleCache().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-            new Consumer<List<TradeItAvailableBrokersResponse.Broker>>() {
+            new Consumer<List<Broker>>() {
                 @Override
-                public void accept(@NonNull List<TradeItAvailableBrokersResponse.Broker> brokers) throws Exception {
+                public void accept(@NonNull List<Broker> brokers) throws Exception {
                     callback.onSuccess(brokers);
                 }
             },
@@ -251,13 +249,13 @@ public class TradeItLinkedBrokerManager {
         );
     }
 
-    private synchronized SingleCache<List<TradeItAvailableBrokersResponse.Broker>> getAvailableBrokersSingleCache() {
+    private synchronized SingleCache<List<Broker>> getAvailableBrokersSingleCache() {
         if (this.availableBrokersSingleCache != null) {
             return availableBrokersSingleCache;
         } else {
-            Single single = Single.create(new SingleOnSubscribe<List<TradeItAvailableBrokersResponse.Broker>>() {
+            Single single = Single.create(new SingleOnSubscribe<List<Broker>>() {
                 @Override
-                public void subscribe(@NonNull final SingleEmitter<List<TradeItAvailableBrokersResponse.Broker>> emitter) throws Exception {
+                public void subscribe(@NonNull final SingleEmitter<List<Broker>> emitter) throws Exception {
                     RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
                         @Override
                         public void accept(@NonNull Throwable e) throws Exception {
@@ -288,9 +286,9 @@ public class TradeItLinkedBrokerManager {
                         }
                     });
 
-                    apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
+                    apiClient.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
                         @Override
-                        public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {
+                        public void onSuccess(List<Broker> brokersList) {
                             emitter.onSuccess(brokersList);
                         }
 
@@ -311,6 +309,99 @@ public class TradeItLinkedBrokerManager {
             return singleCache;
         }
     }
+
+    public void getAllFeaturedBrokers(final TradeItCallback<List<Broker>> callback) {
+        getAvailableBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokersList) {
+                callback.onSuccess(getFeaturedBrokerList(brokersList));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void getFeaturedBrokersForInstrumentType(final Instrument instrumentType, final TradeItCallback<List<Broker>> callback) {
+        getAllFeaturedBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokersList) {
+                callback.onSuccess(getBrokerListForInstrumentType(brokersList, instrumentType));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void getAllNonFeaturedBrokers(final TradeItCallback<List<Broker>> callback) {
+        getAvailableBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokersList) {
+                callback.onSuccess(getNonFeaturedBrokerList(brokersList));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    public void getNonFeaturedBrokersForInstrumentType(final Instrument instrumentType, final TradeItCallback<List<Broker>> callback) {
+        getAllNonFeaturedBrokers(new TradeItCallback<List<Broker>>() {
+            @Override
+            public void onSuccess(List<Broker> brokerList) {
+                callback.onSuccess(getBrokerListForInstrumentType(brokerList, instrumentType));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                callback.onError(error);
+            }
+        });
+    }
+
+    private List<Broker> getBrokerListForInstrumentType(List<Broker> brokersList, Instrument instrumentType) {
+        List<Broker> filteredBrokerList = new ArrayList<>();
+        for (Broker broker: brokersList) {
+            for (Broker.BrokerInstrument brokerInstrument: broker.brokerInstruments) {
+                if (brokerInstrument.getInstrument() == instrumentType) {
+                    filteredBrokerList.add(broker);
+                }
+            }
+        }
+        return filteredBrokerList;
+    }
+
+    private List<Broker> getFeaturedBrokerList(List<Broker> brokersList) {
+        List<Broker> featuredBrokersList = new ArrayList<>();
+        for (Broker broker: brokersList) {
+            for (Broker.BrokerInstrument instrument: broker.brokerInstruments) {
+                if (instrument.isFeatured) {
+                    featuredBrokersList.add(broker);
+                }
+            }
+        }
+        return  featuredBrokersList;
+    }
+
+    private List<Broker> getNonFeaturedBrokerList(List<Broker> brokersList) {
+        List<Broker> featuredBrokersList = new ArrayList<>();
+        for (Broker broker: brokersList) {
+            for (Broker.BrokerInstrument instrument: broker.brokerInstruments) {
+                if (!instrument.isFeatured) {
+                    featuredBrokersList.add(broker);
+                }
+            }
+        }
+        return  featuredBrokersList;
+    }
+
 
     public void getOAuthLoginPopupUrl(String broker, String deepLinkCallback, final TradeItCallback<String> callback) {
         apiClient.getOAuthLoginPopupUrlForMobile(broker, deepLinkCallback, new TradeItCallback<String>() {
