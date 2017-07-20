@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
@@ -17,6 +18,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.internal.operators.single.SingleCache;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
@@ -48,7 +50,7 @@ public class TradeItLinkedBrokerManager {
     private TradeItLinkedBrokerCache linkedBrokerCache;
     private TradeItApiClientParcelable apiClient;
     private static final String TAG = TradeItLinkedBrokerManager.class.getName();
-    private List<TradeItAvailableBrokersResponse.Broker> availableBrokers = null;
+    private SingleCache<List<TradeItAvailableBrokersResponse.Broker>> availableBrokersSingleCache = null;
     private Queue<TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>> availableBrokersCallbackQueue = new LinkedList<>();
     private final Object availableBrokersLock = new Object();
 
@@ -59,13 +61,8 @@ public class TradeItLinkedBrokerManager {
         this.loadLinkedBrokersFromSharedPreferences();
 
         // Start fetching available brokers asap so that it is cached
-        this.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
-            @Override
-            public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {}
+        this.availableBrokersSingleCache = this.getAvailableBrokersSingleCache();
 
-            @Override
-            public void onError(TradeItErrorResult error) {}
-        });
     }
 
     public synchronized void syncLinkedBrokers(List<TradeItLinkedLoginParcelable> linkedLoginParcelables) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
@@ -240,44 +237,77 @@ public class TradeItLinkedBrokerManager {
     }
 
     public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
-        synchronized (availableBrokersLock) {
-            if (this.availableBrokers != null) {
-                callback.onSuccess(this.availableBrokers);
-            } else if (availableBrokersCallbackQueue.isEmpty()) {
-                availableBrokersCallbackQueue.add(callback);
-
-                apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
+        this.getAvailableBrokersSingleCache().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                new Consumer<List<TradeItAvailableBrokersResponse.Broker>>() {
                     @Override
-                    public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokerList) {
-                        synchronized (availableBrokersLock) {
-                            availableBrokers = brokerList;
-
-                            while(availableBrokersCallbackQueue.peek() != null) {
-                                TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback = availableBrokersCallbackQueue.poll();
-                                if (callback != null) {
-                                    callback.onSuccess(brokerList);
-                                }
-                            }
-                        }
+                    public void accept(@NonNull List<TradeItAvailableBrokersResponse.Broker> brokers) throws Exception {
+                        callback.onSuccess(brokers);
                     }
-
+                },
+                new Consumer<Throwable>() {
                     @Override
-                    public void onError(TradeItErrorResult error) {
-                        synchronized (availableBrokersLock) {
-                            TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
-
-                            while (availableBrokersCallbackQueue.peek() != null) {
-                                TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback = availableBrokersCallbackQueue.poll();
-                                if (callback != null) {
-                                    callback.onError(errorResultParcelable);
-                                }
-                            }
-                        }
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        Log.e(TAG, "getAvailableBrokers error: " + throwable.getMessage());
+                        availableBrokersSingleCache = null;
+                        callback.onError(new TradeItErrorResultParcelable(throwable));
                     }
-                });
-            } else {
-                availableBrokersCallbackQueue.add(callback);
-            }
+                }
+        );
+    }
+
+    private SingleCache<List<TradeItAvailableBrokersResponse.Broker>> getAvailableBrokersSingleCache() {
+        if (this.availableBrokersSingleCache != null) {
+            return availableBrokersSingleCache;
+        } else {
+            SingleCache singleCache =  new SingleCache<>(Single.create(new SingleOnSubscribe<List<TradeItAvailableBrokersResponse.Broker>>() {
+                @Override
+                public void subscribe(@NonNull final SingleEmitter<List<TradeItAvailableBrokersResponse.Broker>> emmiter) throws Exception {
+                    RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
+                        @Override
+                        public void accept(@NonNull Throwable e) throws Exception {
+                            if (e instanceof UndeliverableException) {
+                                e = e.getCause();
+                            }
+                            if ((e instanceof IOException) || (e instanceof SocketException)) {
+                                // fine, irrelevant network problem or API that throws on cancellation
+                                return;
+                            }
+                            if (e instanceof InterruptedException) {
+                                // fine, some blocking code was interrupted by a dispose call
+                                return;
+                            }
+                            if ((e instanceof NullPointerException) || (e instanceof IllegalArgumentException)) {
+                                // that's likely a bug in the application
+                                Thread.currentThread().getUncaughtExceptionHandler()
+                                        .uncaughtException(Thread.currentThread(), e);
+                                return;
+                            }
+                            if (e instanceof IllegalStateException) {
+                                // that's a bug in RxJava or in a custom operator
+                                Thread.currentThread().getUncaughtExceptionHandler()
+                                        .uncaughtException(Thread.currentThread(), e);
+                                return;
+                            }
+                            Log.w(TAG, "Undeliverable exception received, not sure what to do", e);
+                        }
+                    });
+                    apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
+                        @Override
+                        public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {
+                            emmiter.onSuccess(brokersList);
+                        }
+
+                        @Override
+                        public void onError(TradeItErrorResult error) {
+                            Log.e(TAG, error.toString());
+                            //TODO refactor error
+                            emmiter.onError(new RuntimeException(error.toString()));
+                        }
+                    });
+                }
+            }));
+            singleCache.subscribe();
+            return singleCache;
         }
     }
 
