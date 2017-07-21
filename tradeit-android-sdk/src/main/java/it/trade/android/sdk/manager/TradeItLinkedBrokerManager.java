@@ -261,7 +261,7 @@ public class TradeItLinkedBrokerManager {
         } else {
             SingleCache singleCache =  new SingleCache<>(Single.create(new SingleOnSubscribe<List<TradeItAvailableBrokersResponse.Broker>>() {
                 @Override
-                public void subscribe(@NonNull final SingleEmitter<List<TradeItAvailableBrokersResponse.Broker>> emmiter) throws Exception {
+                public void subscribe(@NonNull final SingleEmitter<List<TradeItAvailableBrokersResponse.Broker>> emitter) throws Exception {
                     RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
                         @Override
                         public void accept(@NonNull Throwable e) throws Exception {
@@ -294,14 +294,13 @@ public class TradeItLinkedBrokerManager {
                     apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
                         @Override
                         public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {
-                            emmiter.onSuccess(brokersList);
+                            emitter.onSuccess(brokersList);
                         }
 
                         @Override
                         public void onError(TradeItErrorResult error) {
                             Log.e(TAG, error.toString());
-                            //TODO refactor error
-                            emmiter.onError(new RuntimeException(error.toString()));
+                            emitter.onError(new RuntimeException(error.toString()));
                         }
                     });
                 }
