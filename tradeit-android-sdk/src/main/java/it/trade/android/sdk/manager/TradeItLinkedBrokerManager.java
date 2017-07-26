@@ -288,8 +288,6 @@ public class TradeItLinkedBrokerManager {
                         }
                     });
 
-                    Log.w("LOL", "=====> *\n\nOMG WTF CALLED SO MANY TIMES!!!!\n\n*"); // AKAKTRACE
-
                     apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
                         @Override
                         public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {
