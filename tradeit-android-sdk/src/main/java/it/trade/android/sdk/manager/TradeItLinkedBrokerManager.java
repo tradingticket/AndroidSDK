@@ -61,8 +61,7 @@ public class TradeItLinkedBrokerManager {
         this.loadLinkedBrokersFromSharedPreferences();
 
         // Start fetching available brokers asap so that it is cached
-        this.availableBrokersSingleCache = this.getAvailableBrokersSingleCache();
-
+        this.getAvailableBrokersSingleCache();
     }
 
     public synchronized void syncLinkedBrokers(List<TradeItLinkedLoginParcelable> linkedLoginParcelables) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
@@ -238,28 +237,27 @@ public class TradeItLinkedBrokerManager {
 
     public void getAvailableBrokers(final TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>> callback) {
         this.getAvailableBrokersSingleCache().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                new Consumer<List<TradeItAvailableBrokersResponse.Broker>>() {
-                    @Override
-                    public void accept(@NonNull List<TradeItAvailableBrokersResponse.Broker> brokers) throws Exception {
-                        callback.onSuccess(brokers);
-                    }
-                },
-                new Consumer<Throwable>() {
-                    @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        Log.e(TAG, "getAvailableBrokers error: " + throwable.getMessage());
-                        availableBrokersSingleCache = null;
-                        callback.onError(new TradeItErrorResultParcelable(throwable));
-                    }
+            new Consumer<List<TradeItAvailableBrokersResponse.Broker>>() {
+                @Override
+                public void accept(@NonNull List<TradeItAvailableBrokersResponse.Broker> brokers) throws Exception {
+                    callback.onSuccess(brokers);
                 }
+            },
+            new Consumer<Throwable>() {
+                @Override
+                public void accept(@NonNull Throwable throwable) throws Exception {
+                    Log.e(TAG, "getAvailableBrokers error: " + throwable.getMessage());
+                    callback.onError(new TradeItErrorResultParcelable(throwable));
+                }
+            }
         );
     }
 
-    private SingleCache<List<TradeItAvailableBrokersResponse.Broker>> getAvailableBrokersSingleCache() {
+    private synchronized SingleCache<List<TradeItAvailableBrokersResponse.Broker>> getAvailableBrokersSingleCache() {
         if (this.availableBrokersSingleCache != null) {
             return availableBrokersSingleCache;
         } else {
-            SingleCache singleCache =  new SingleCache<>(Single.create(new SingleOnSubscribe<List<TradeItAvailableBrokersResponse.Broker>>() {
+            Single single = Single.create(new SingleOnSubscribe<List<TradeItAvailableBrokersResponse.Broker>>() {
                 @Override
                 public void subscribe(@NonNull final SingleEmitter<List<TradeItAvailableBrokersResponse.Broker>> emitter) throws Exception {
                     RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
@@ -291,6 +289,9 @@ public class TradeItLinkedBrokerManager {
                             Log.w(TAG, "Undeliverable exception received, not sure what to do", e);
                         }
                     });
+
+                    Log.w("LOL", "=====> *\n\nOMG WTF CALLED SO MANY TIMES!!!!\n\n*"); // AKAKTRACE
+
                     apiClient.getAvailableBrokers(new TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>() {
                         @Override
                         public void onSuccess(List<TradeItAvailableBrokersResponse.Broker> brokersList) {
@@ -300,12 +301,17 @@ public class TradeItLinkedBrokerManager {
                         @Override
                         public void onError(TradeItErrorResult error) {
                             Log.e(TAG, error.toString());
+                            availableBrokersSingleCache = null;
                             emitter.onError(new RuntimeException(error.toString()));
                         }
                     });
                 }
-            }));
+            });
+
+            SingleCache singleCache =  new SingleCache<>(single);
             singleCache.subscribe();
+            this.availableBrokersSingleCache = singleCache;
+
             return singleCache;
         }
     }
