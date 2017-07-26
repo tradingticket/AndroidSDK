@@ -40,6 +40,7 @@ import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.Instrument;
+import it.trade.model.reponse.TradeItAvailableBrokersResponse;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker;
 import it.trade.model.reponse.TradeItResponse;
 import it.trade.model.request.TradeItLinkedLogin;
