@@ -41,8 +41,12 @@ import static it.trade.android.exampleapp.MainActivity.MainActivityActions.AUTHE
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS;
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE;
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.DELETE_ALL_LINKED_BROKERS;
+import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_ALL_FEATURED_BROKERS;
+import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_ALL_NON_FEATURED_BROKERS;
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT;
+import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_FEATURED_EQUITY_BROKERS;
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_LINKED_BROKERS;
+import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_NON_FEATURED_EQUITY_BROKERS;
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT;
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER;
 import static it.trade.android.exampleapp.MainActivity.MainActivityActions.PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT;
@@ -52,15 +56,21 @@ import static it.trade.android.exampleapp.MainActivity.MainActivityActions.REFRE
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
 
+    public static final String GET_BROKERS_LIST_PARAMETER = "it.trade.android.exampleapp.AVAILABLE_BROKERS";
     public final static String LINKED_BROKERS_PARAMETER = "it.trade.android.exampleapp.LINKED_BROKERS";
     public final static String LINKED_BROKER_ACCOUNTS_PARAMETER = "it.trade.android.exampleapp.LINKED_BROKER_ACCOUNTS";
     public final static String BALANCES_PARAMETER = "it.trade.android.exampleapp.BALANCES";
     public final static String POSITIONS_PARAMETER = "it.trade.android.exampleapp.POSITIONS";
     public final static String PREVIEW_ORDER_PARAMETER = "it.trade.android.exampleapp.PREVIEW_ORDER";
 
+
     private TradeItLinkedBrokerManager linkedBrokerManager;
 
     public enum MainActivityActions {
+        GET_ALL_NON_FEATURED_BROKERS("Get All Non Featured Brokers"),
+        GET_ALL_FEATURED_BROKERS("Get All Featured Brokers"),
+        GET_FEATURED_EQUITY_BROKERS("Get Featured Equity  Brokers"),
+        GET_NON_FEATURED_EQUITY_BROKERS("Get Non Featured Equity Brokers"),
         OAUTH_LINKED_A_BROKER("Link a broker via the oAuth flow"),
         GET_LINKED_BROKERS("getLinkedBrokers"),
         DELETE_ALL_LINKED_BROKERS("Delete all linked brokers"),
@@ -118,6 +128,10 @@ public class MainActivity extends AppCompatActivity {
         rowHeader.addView(tv);
         tableLayout.addView(rowHeader);
 
+        addRow(tableLayout, GET_ALL_FEATURED_BROKERS.label, GET_ALL_FEATURED_BROKERS.ordinal());
+        addRow(tableLayout, GET_ALL_NON_FEATURED_BROKERS.label, GET_ALL_NON_FEATURED_BROKERS.ordinal());
+        addRow(tableLayout, GET_FEATURED_EQUITY_BROKERS.label, GET_FEATURED_EQUITY_BROKERS.ordinal());
+        addRow(tableLayout, GET_NON_FEATURED_EQUITY_BROKERS.label, GET_NON_FEATURED_EQUITY_BROKERS.ordinal());
         addRow(tableLayout, OAUTH_LINKED_A_BROKER.label, OAUTH_LINKED_A_BROKER.ordinal());
         addRow(tableLayout, GET_LINKED_BROKERS.label, GET_LINKED_BROKERS.ordinal());
         addRow(tableLayout, DELETE_ALL_LINKED_BROKERS.label, DELETE_ALL_LINKED_BROKERS.ordinal());
@@ -149,7 +163,14 @@ public class MainActivity extends AppCompatActivity {
     View.OnClickListener rowListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            switch (MainActivityActions.values()[view.getId()]) {
+            MainActivityActions action = MainActivityActions.values()[view.getId()];
+            switch (action) {
+                case GET_ALL_FEATURED_BROKERS:
+                case GET_ALL_NON_FEATURED_BROKERS:
+                case GET_FEATURED_EQUITY_BROKERS:
+                case GET_NON_FEATURED_EQUITY_BROKERS:
+                    goToGetBrokersListActivity(action);
+                    break;
                 case OAUTH_LINKED_A_BROKER:
                     Log.d(TAG, "Link a broker tapped!");
                     Intent intentOauth = new Intent(view.getContext(), OauthLinkBrokerActivity.class);
@@ -506,6 +527,12 @@ public class MainActivity extends AppCompatActivity {
     private void goToLinkedBrokerAccountsActivity(List<TradeItLinkedBrokerAccountParcelable> accounts) {
         Intent intent = new Intent(this.getApplicationContext(), LinkedBrokerAccountsActivity.class);
         intent.putParcelableArrayListExtra(LINKED_BROKER_ACCOUNTS_PARAMETER, (ArrayList<? extends Parcelable>) accounts);
+        startActivity(intent);
+    }
+
+    private void goToGetBrokersListActivity(MainActivityActions action) {
+        Intent intent = new Intent(this.getApplicationContext(), BrokersListActivity.class);
+        intent.putExtra(GET_BROKERS_LIST_PARAMETER, action);
         startActivity(intent);
     }
 }
