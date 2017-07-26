@@ -391,15 +391,15 @@ public class TradeItLinkedBrokerManager {
     }
 
     private List<Broker> getNonFeaturedBrokerList(List<Broker> brokersList) {
-        List<Broker> featuredBrokersList = new ArrayList<>();
+        List<Broker> nonFeaturedBrokersList = new ArrayList<>();
         for (Broker broker: brokersList) {
             for (Broker.BrokerInstrument instrument: broker.brokerInstruments) {
                 if (!instrument.isFeatured) {
-                    featuredBrokersList.add(broker);
+                    nonFeaturedBrokersList.add(broker);
                 }
             }
         }
-        return  featuredBrokersList;
+        return  nonFeaturedBrokersList;
     }
 
 
