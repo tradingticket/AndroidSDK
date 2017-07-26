@@ -51,8 +51,6 @@ public class TradeItLinkedBrokerManager {
     private TradeItApiClientParcelable apiClient;
     private static final String TAG = TradeItLinkedBrokerManager.class.getName();
     private SingleCache<List<TradeItAvailableBrokersResponse.Broker>> availableBrokersSingleCache = null;
-    private Queue<TradeItCallback<List<TradeItAvailableBrokersResponse.Broker>>> availableBrokersCallbackQueue = new LinkedList<>();
-    private final Object availableBrokersLock = new Object();
 
     public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
         this.keystoreService = keystoreService;
