@@ -18,6 +18,10 @@ public class TradeItErrorResultParcelable extends TradeItErrorResult implements 
         this.httpCode = errorResult.getHttpCode();
     }
 
+    public TradeItErrorResultParcelable(Throwable throwable) {
+        this.systemMessage = throwable.getMessage();
+    }
+
     public TradeItErrorResultParcelable(TradeItErrorCode errorCode, String shortMessage, List<String> longMessages) {
         super(errorCode, shortMessage, longMessages);
     }
