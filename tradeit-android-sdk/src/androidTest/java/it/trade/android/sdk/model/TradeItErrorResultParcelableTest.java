@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import java.util.Arrays;
 import java.util.List;
 
-import it.trade.model.TradeItErrorResult;
 import it.trade.model.reponse.TradeItErrorCode;
 
 import static org.hamcrest.Matchers.is;
@@ -45,7 +44,7 @@ public class TradeItErrorResultParcelableTest {
         parcel.setDataPosition(0);
 
         // Read the data.
-        TradeItErrorResult createdFromParcel = TradeItErrorResultParcelable.CREATOR.createFromParcel(parcel);
+        TradeItErrorResultParcelable createdFromParcel = TradeItErrorResultParcelable.CREATOR.createFromParcel(parcel);
         TradeItErrorCode errorCode = createdFromParcel.getErrorCode();
         int httpCode = createdFromParcel.getHttpCode();
         List<String> longMessages = createdFromParcel.getLongMessages();

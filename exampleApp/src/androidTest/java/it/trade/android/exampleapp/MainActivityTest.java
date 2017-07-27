@@ -238,8 +238,7 @@ public class MainActivityTest {
 
         Thread.sleep(1000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponse{ackWarningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00',");
-        checkFieldContainsText(R.id.preview_order_textview,"status='REVIEW_ORDER'");
+        checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponseParcelable{orderId='1', ackWarningsList=[], warningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00', orderValueLabel='Estimated Cost', orderMessage='You are about to place a limit order to buy GE', lastPrice='null', bidPrice='null', askPrice='null', timestamp='null', buyingPower=2408.12, availableCash=1204.06, estimatedOrderCommission=3.5, longHoldings=0.0, shortHoldings=1.0, estimatedOrderValue=25.0, estimatedTotalValue=null}");
 
         //place trade
         tapOnText("Place trade");

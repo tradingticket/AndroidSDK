@@ -8,7 +8,6 @@ import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
-import it.trade.model.callback.TradeItCallback;
 import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.model.reponse.TradeItPreviewStockOrEtfOrderResponse;
 import it.trade.model.request.TradeItPreviewStockOrEtfOrderRequest;
@@ -31,7 +30,7 @@ public class TradeItOrderParcelable implements Parcelable {
         this.symbol = symbol;
     }
 
-    public void previewOrder(final TradeItCallback<TradeItPreviewStockOrEtfOrderResponse> callback) {
+    public void previewOrder(final TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable> callback) {
         TradeItPreviewStockOrEtfOrderRequest previewRequest = new TradeItPreviewStockOrEtfOrderRequest(this.linkedBrokerAccount.getAccountNumber(),
                 this.action.getActionValue(),
                 String.valueOf(this.quantity),
@@ -44,7 +43,7 @@ public class TradeItOrderParcelable implements Parcelable {
         this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
             @Override
             public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
-                callback.onSuccess(response);
+                callback.onSuccess(new TradeItPreviewStockOrEtfOrderResponseParcelable(response));
             }
 
             @Override
