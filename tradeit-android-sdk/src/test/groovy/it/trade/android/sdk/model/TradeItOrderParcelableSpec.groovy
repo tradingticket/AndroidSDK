@@ -4,7 +4,6 @@ import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpiration
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
-import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
 import spock.lang.Specification
 
@@ -44,10 +43,10 @@ class TradeItOrderParcelableSpec extends Specification {
             }
 
         when: "calling preview order"
-            TradeItPreviewStockOrEtfOrderResponse previewResponse = null
-            order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
+            TradeItPreviewStockOrEtfOrderResponseParcelable previewResponse = null
+            order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable>() {
                 @Override
-                void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
+                void onSuccess(TradeItPreviewStockOrEtfOrderResponseParcelable response) {
                     previewResponse = response
                     successfulCallbackCount++
                 }
@@ -63,7 +62,6 @@ class TradeItOrderParcelableSpec extends Specification {
             errorCallbackCount == 0
 
         and: "the preview response is correctly filled"
-            previewResponse.status == TradeItResponseStatus.REVIEW_ORDER
             previewResponse.orderId == "My Order Id"
             previewResponse.orderDetails.orderAction == "buy"
             previewResponse.orderDetails.orderSymbol == "My symbol"
@@ -135,10 +133,10 @@ class TradeItOrderParcelableSpec extends Specification {
             }
 
         when: "calling place order"
-            TradeItPlaceStockOrEtfOrderResponse placeOrderResponse = null
-            order.placeOrder("My Order Id", new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
+            TradeItPlaceStockOrEtfOrderResponseParcelable placeOrderResponse = null
+            order.placeOrder("My Order Id", new TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable>() {
                 @Override
-                void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
+                void onSuccess(TradeItPlaceStockOrEtfOrderResponseParcelable response) {
                     placeOrderResponse= response
                     successfulCallbackCount++
                 }
@@ -154,7 +152,6 @@ class TradeItOrderParcelableSpec extends Specification {
             errorCallbackCount == 0
 
         and: "the place order response is correctly filled"
-            placeOrderResponse.status == TradeItResponseStatus.SUCCESS
             placeOrderResponse.orderNumber == "My Order Id"
             placeOrderResponse.orderInfo.action == "buy"
             placeOrderResponse.orderInfo.symbol == "My symbol"
