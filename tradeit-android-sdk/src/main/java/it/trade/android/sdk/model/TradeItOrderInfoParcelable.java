@@ -8,7 +8,7 @@ import it.trade.model.reponse.Price;
 
 public class TradeItOrderInfoParcelable implements Parcelable {
     String action;
-    Integer quantity;
+    Double quantity;
     String symbol;
     TradeItPriceParcelable price;
     String expiration;
@@ -27,7 +27,7 @@ public class TradeItOrderInfoParcelable implements Parcelable {
         return action;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
@@ -70,7 +70,7 @@ public class TradeItOrderInfoParcelable implements Parcelable {
 
     protected TradeItOrderInfoParcelable(Parcel in) {
         this.action = in.readString();
-        this.quantity = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.quantity = (Double) in.readValue(Double.class.getClassLoader());
         this.symbol = in.readString();
         this.price = in.readParcelable(Price.class.getClassLoader());
         this.expiration = in.readString();

@@ -8,8 +8,8 @@ import it.trade.model.reponse.Price;
 public class TradeItPriceParcelable implements Parcelable {
 
     String type;
-    Integer limitPrice; //TODO update to Double in the java API
-    Integer stopPrice; //TODO update to Double in the java API
+    Double limitPrice;
+    Double stopPrice;
     Double last;
     Double bid;
     Double ask;
@@ -31,11 +31,11 @@ public class TradeItPriceParcelable implements Parcelable {
         return type;
     }
 
-    public Integer getLimitPrice() {
+    public Double getLimitPrice() {
         return limitPrice;
     }
 
-    public Integer getStopPrice() {
+    public Double getStopPrice() {
         return stopPrice;
     }
 
@@ -86,8 +86,8 @@ public class TradeItPriceParcelable implements Parcelable {
 
     protected TradeItPriceParcelable(Parcel in) {
         this.type = in.readString();
-        this.limitPrice = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.stopPrice = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.limitPrice = (Double) in.readValue(Double.class.getClassLoader());
+        this.stopPrice = (Double) in.readValue(Double.class.getClassLoader());
         this.last = (Double) in.readValue(Double.class.getClassLoader());
         this.bid = (Double) in.readValue(Double.class.getClassLoader());
         this.ask = (Double) in.readValue(Double.class.getClassLoader());

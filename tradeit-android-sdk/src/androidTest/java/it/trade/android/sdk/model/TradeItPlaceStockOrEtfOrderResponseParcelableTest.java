@@ -31,7 +31,7 @@ public class TradeItPlaceStockOrEtfOrderResponseParcelableTest {
         placeOrderResponse.orderInfo = new TradeItOrderInfoParcelable();
         placeOrderResponse.orderInfo.expiration = "MyExpiration";
         placeOrderResponse.orderInfo.symbol = "MySymbol";
-        placeOrderResponse.orderInfo.quantity = 4;
+        placeOrderResponse.orderInfo.quantity = 4.0;
         placeOrderResponse.orderInfo.price = new TradeItPriceParcelable();
         placeOrderResponse.orderInfo.price.ask = 20.5;
 
