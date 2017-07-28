@@ -21,6 +21,7 @@ import it.trade.android.sdk.internal.TradeItKeystoreService;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
+import it.trade.android.sdk.model.TradeItPlaceStockOrEtfOrderResponseParcelable;
 import it.trade.android.sdk.model.TradeItPositionParcelable;
 import it.trade.android.sdk.model.TradeItPreviewStockOrEtfOrderResponseParcelable;
 import it.trade.model.TradeItErrorResult;
@@ -28,13 +29,10 @@ import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse;
-import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
 import it.trade.model.reponse.TradeItResponse;
-import it.trade.model.reponse.TradeItResponseStatus;
 import it.trade.model.request.TradeItEnvironment;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -171,10 +169,10 @@ public class TradeItLinkedBrokerManagerTest {
                             @Override
                             public void onSuccess(TradeItPreviewStockOrEtfOrderResponseParcelable response) {
                                 assertThat("Preview order is successful",  response.getOrderId(), notNullValue());
-                                order.placeOrder(response.getOrderId(), new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
+                                order.placeOrder(response.getOrderId(), new TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable>() {
                                     @Override
-                                    public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
-                                        assertEquals("Place order is successful",  placeOrderResponse.status, TradeItResponseStatus.SUCCESS);
+                                    public void onSuccess(TradeItPlaceStockOrEtfOrderResponseParcelable placeOrderResponse) {
+                                        assertThat("Place order is successful",  placeOrderResponse.getConfirmationMessage(), notNullValue());
                                         lock.countDown();
                                     }
 

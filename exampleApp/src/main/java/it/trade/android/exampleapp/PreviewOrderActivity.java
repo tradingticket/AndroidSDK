@@ -10,10 +10,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import it.trade.android.sdk.model.TradeItOrderParcelable;
+import it.trade.android.sdk.model.TradeItPlaceStockOrEtfOrderResponseParcelable;
 import it.trade.android.sdk.model.TradeItPreviewStockOrEtfOrderResponseParcelable;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
-import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse;
 
 import static it.trade.android.exampleapp.MainActivity.PREVIEW_ORDER_PARAMETER;
 
@@ -49,9 +49,9 @@ public class PreviewOrderActivity extends AppCompatActivity {
     }
 
     public void placeTrade(View view) {
-        order.placeOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
+        order.placeOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable>() {
             @Override
-            public void onSuccess(TradeItPlaceStockOrEtfOrderResponse placeOrderResponse) {
+            public void onSuccess(TradeItPlaceStockOrEtfOrderResponseParcelable placeOrderResponse) {
                 textView.append(placeOrderResponse.toString());
             }
 

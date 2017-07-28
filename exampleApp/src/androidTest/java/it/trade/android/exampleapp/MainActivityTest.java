@@ -245,7 +245,7 @@ public class MainActivityTest {
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.preview_order_textview,"TradeItResponse{code=null, longMessages=[Transmitted successfully to Dummy], shortMessage='Order Successfully Submitted', status='SUCCESS'");
+        checkFieldContainsText(R.id.preview_order_textview,"TradeItPlaceStockOrEtfOrderResponseParcelable{broker='Dummy', confirmationMessage='Your order message");
 
         navigateUp();
     }

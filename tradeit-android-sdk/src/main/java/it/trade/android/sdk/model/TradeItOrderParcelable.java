@@ -55,11 +55,11 @@ public class TradeItOrderParcelable implements Parcelable {
         });
     }
 
-    public void placeOrder(String orderId, final TradeItCallback<TradeItPlaceStockOrEtfOrderResponse> callback) {
+    public void placeOrder(String orderId, final TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable> callback) {
         this.linkedBrokerAccount.getTradeItApiClient().placeStockOrEtfOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponse>() {
             @Override
             public void onSuccess(TradeItPlaceStockOrEtfOrderResponse response) {
-                callback.onSuccess(response);
+                callback.onSuccess(new TradeItPlaceStockOrEtfOrderResponseParcelable(response));
             }
 
             @Override
