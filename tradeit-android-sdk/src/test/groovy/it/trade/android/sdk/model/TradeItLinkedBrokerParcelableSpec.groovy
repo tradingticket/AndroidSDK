@@ -330,4 +330,43 @@ class TradeItLinkedBrokerParcelableSpec extends Specification {
 
     }
 
+    def "getLinkedBrokerAccount returns a TradeItLinkedBrokerAccountParcelable if the given account number exists"() {
+        given:
+            String myAccountNumberInput = "MyAccountNumber1"
+            TradeItLinkedBrokerAccountParcelable accountParcelable = Mock(TradeItLinkedBrokerAccountParcelable)
+            accountParcelable.accountNumber >> "MyAccountNumber0"
+            TradeItLinkedBrokerAccountParcelable accountParcelable1 = Mock(TradeItLinkedBrokerAccountParcelable)
+            accountParcelable1.accountNumber >> "MyAccountNumber1"
+            TradeItLinkedBrokerAccountParcelable accountParcelable2 = Mock(TradeItLinkedBrokerAccountParcelable)
+            accountParcelable2.accountNumber >> "MyAccountNumber2"
+
+            linkedBroker.accounts = [accountParcelable, accountParcelable1, accountParcelable2]
+
+        when:
+            TradeItLinkedBrokerAccountParcelable accountParcelableResult = linkedBroker.getLinkedBrokerAccount(myAccountNumberInput)
+
+        then:
+            accountParcelableResult != null
+            accountParcelableResult.accountNumber == myAccountNumberInput
+    }
+
+    def "getLinkedBrokerAccount returns null if the given account number doesn't exist"() {
+        given:
+            String myAccountNumberInput = "MyAccountNumberXXX"
+            TradeItLinkedBrokerAccountParcelable accountParcelable = Mock(TradeItLinkedBrokerAccountParcelable)
+            accountParcelable.accountNumber >> "MyAccountNumber0"
+            TradeItLinkedBrokerAccountParcelable accountParcelable1 = Mock(TradeItLinkedBrokerAccountParcelable)
+            accountParcelable1.accountNumber >> "MyAccountNumber1"
+            TradeItLinkedBrokerAccountParcelable accountParcelable2 = Mock(TradeItLinkedBrokerAccountParcelable)
+            accountParcelable2.accountNumber >> "MyAccountNumber2"
+
+            linkedBroker.accounts = [accountParcelable, accountParcelable1, accountParcelable2]
+
+        when:
+            TradeItLinkedBrokerAccountParcelable accountParcelableResult = linkedBroker.getLinkedBrokerAccount(myAccountNumberInput)
+
+        then:
+            accountParcelableResult == null
+    }
+
 }

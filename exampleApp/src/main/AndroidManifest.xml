@@ -17,9 +17,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WebViewActivity"
-            android:parentActivityName=".OauthLinkBrokerActivity"
-            android:launchMode="singleTask"/>
+        <activity
+            android:name=".WebViewActivity"
+            android:launchMode="singleTask"
+            android:parentActivityName=".OauthLinkBrokerActivity" />
         <activity
             android:name=".LinkedBrokersActivity"
             android:parentActivityName=".MainActivity" />
@@ -48,6 +49,8 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PreviewOrderActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".BrokersListActivity"
             android:parentActivityName=".MainActivity" />
     </application>
 

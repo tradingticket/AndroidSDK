@@ -53,6 +53,17 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         setUnauthenticated();
     }
 
+    public TradeItLinkedBrokerAccountParcelable getLinkedBrokerAccount(String accountNumber) {
+        TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = null;
+        for (TradeItLinkedBrokerAccountParcelable account : this.accounts) {
+            if (account.getAccountNumber().equals(accountNumber)) {
+                linkedBrokerAccount = account;
+                break;
+            }
+        }
+        return linkedBrokerAccount;
+    }
+
     protected void cache() {
         linkedBrokerCache.cache(this);
     }
