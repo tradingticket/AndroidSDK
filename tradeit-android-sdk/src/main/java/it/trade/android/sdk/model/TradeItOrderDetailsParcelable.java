@@ -14,7 +14,7 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
         this.buyingPower = orderDetails.buyingPower;
         this.estimatedOrderCommission = orderDetails.estimatedOrderCommission;
         this.estimatedOrderValue = orderDetails.estimatedOrderValue;
-        this.estimatedOrderCommission = orderDetails.estimatedOrderCommission;
+        this.estimatedTotalValue = orderDetails.estimatedTotalValue;
         this.lastPrice = orderDetails.lastPrice;
         this.orderAction = orderDetails.orderAction;
         this.orderSymbol = orderDetails.orderSymbol;
