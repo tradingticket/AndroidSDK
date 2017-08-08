@@ -66,8 +66,8 @@ public class TradeItLinkedBrokerManager {
 
         // Add missing linkedBrokers
         for (TradeItInjectBroker injectBroker: injectBrokers) {
-            TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(injectBroker.broker, injectBroker.userId, injectBroker.userToken);
-            TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable);
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(injectBroker);
+            TradeItLinkedLoginParcelable linkedLoginParcelable  = linkedBrokerParcelable.getLinkedLogin();
             if (!linkedBrokers.contains(linkedBrokerParcelable)) {
                 if (injectBroker.isLinkActivationPending){
                     linkedBrokerParcelable.setAccountLinkDelayedError();
@@ -97,6 +97,13 @@ public class TradeItLinkedBrokerManager {
         }
     }
 
+    private TradeItLinkedBrokerParcelable createNewLinkedBroker(TradeItInjectBroker injectBroker) {
+        TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(injectBroker.broker, injectBroker.userId, injectBroker.userToken);
+        TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable);
+        linkedBrokerParcelable.injectAccounts(injectBroker.injectAccounts);
+        return linkedBrokerParcelable;
+    }
+
     private TradeItLinkedBrokerParcelable createNewLinkedBroker(TradeItLinkedLoginParcelable linkedLoginParcelable) {
         TradeItApiClientParcelable
                 apiClientParcelable = new TradeItApiClientParcelable(this.apiClient.getApiKey(), this.apiClient.getEnvironment(), this.apiClient.getRequestInterceptorParcelable());
@@ -104,7 +111,6 @@ public class TradeItLinkedBrokerManager {
         apiClientParcelable.setSessionToken("invalid-default-token");
 
         return new TradeItLinkedBrokerParcelable(apiClientParcelable, linkedLoginParcelable, linkedBrokerCache);
-
     }
 
     public void authenticateAll(final TradeItCallbackWithSecurityQuestionAndCompletion callback) {
