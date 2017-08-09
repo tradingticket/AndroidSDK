@@ -1,10 +1,7 @@
 package it.trade.android.sdk.manager
 
 import it.trade.android.sdk.internal.TradeItKeystoreService
-import it.trade.android.sdk.model.TradeItApiClientParcelable
-import it.trade.android.sdk.model.TradeItLinkedBrokerCache
-import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable
-import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
+import it.trade.android.sdk.model.*
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.TradeItErrorCode
@@ -706,16 +703,18 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
     def "syncLinkedBrokers sync correctly"() {
         given: "A list of linkedLoginParcelable to synch from"
-            TradeItLinkedLoginParcelable linkedLoginParcelable1 = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
-            TradeItLinkedBrokerParcelable linkedBrokerParcelable1 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable1, linkedBrokerCache)
+            TradeItInjectBroker injectBroker1 = new TradeItInjectBroker("", "MyUserId1", "", false)
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable1 = new TradeItLinkedBrokerParcelable(apiClient, new TradeItLinkedLoginParcelable(injectBroker1.broker, injectBroker1.userId, injectBroker1.userToken), linkedBrokerCache)
 
-            TradeItLinkedLoginParcelable linkedLoginParcelable2 = new TradeItLinkedLoginParcelable("", "MyUserId2", "")
+            TradeItInjectBroker injectBroker2 = new TradeItInjectBroker("", "MyUserId2", "", true)
+            TradeItLinkedLoginParcelable linkedLoginParcelable2 = new TradeItLinkedLoginParcelable(injectBroker2.broker, injectBroker2.userId, injectBroker2.userToken)
             TradeItLinkedBrokerParcelable linkedBrokerParcelable2 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable2, linkedBrokerCache)
 
-            TradeItLinkedLoginParcelable linkedLoginParcelable3 = new TradeItLinkedLoginParcelable("", "MyUserId3", "")
+            TradeItInjectBroker injectBroker3 = new TradeItInjectBroker("", "MyUserId3", "", false)
+            TradeItLinkedLoginParcelable linkedLoginParcelable3 = new TradeItLinkedLoginParcelable(injectBroker3.broker, injectBroker3.userId, injectBroker3.userToken)
             TradeItLinkedBrokerParcelable linkedBrokerParcelable3 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable3, linkedBrokerCache)
 
-            List<TradeItLinkedLoginParcelable> listToSynchFrom = [linkedLoginParcelable1, linkedLoginParcelable2, linkedLoginParcelable3]
+            List<TradeItInjectBroker> listToSynchFrom = [injectBroker1, injectBroker2, injectBroker3]
 
         and: "The following already existing linkedBrokers"
             TradeItLinkedLoginParcelable linkedLoginParcelable  = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
@@ -725,8 +724,8 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
             linkedBrokerManager.linkedBrokers = [linkedBrokerParcelable, linkedBrokerParcelable5]
 
-        when: "Calling syncLinkedBrokers"
-            linkedBrokerManager.syncLinkedBrokers(listToSynchFrom)
+        when: "Calling syncLocalLinkedBrokers"
+            linkedBrokerManager.syncLocalLinkedBrokers(listToSynchFrom)
 
         then: "expects these calls to delete the linkedLogin from the keystore"
             1 * keystoreService.deleteLinkedLogin(linkedLoginParcelable5)
