@@ -29,8 +29,8 @@ import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
-import it.trade.android.sdk.model.TradeItInjectBroker;
-import it.trade.android.sdk.model.TradeItInjectBrokerAccount;
+import it.trade.android.sdk.model.TradeItLinkedBrokerData;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
@@ -517,21 +517,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void syncLocalLinkedBrokers() {
-        TradeItInjectBroker injectBroker1 = new TradeItInjectBroker(
+        TradeItLinkedBrokerData linkedBrokerData1 = new TradeItLinkedBrokerData(
                 "dummy",
                 "8fa14999720337719675",
                 "XZZt9cfIz9APLljOPeKhFjOuz5mSa1E9Q5Un%2Fc1ARlaD4wQixu6S%2BUIQ6rOhiUDV1RJM0stg7EqVslOH5oxGYHBvdLrKqNoi%2BdRzGscDF3nNbzBR3QJMV5SxsgyEkaLrmFETBZUiaRcfKSR6kvLznA%3D%3D"
         ).withLinkActivationPending(true);
-        injectBroker1.injectAccount(new TradeItInjectBrokerAccount("MyAccountName", "MyAccountNumber", "USD"));
+        linkedBrokerData1.injectAccount(new TradeItLinkedBrokerAccountData("MyAccountName", "MyAccountNumber", "USD"));
 
-        TradeItInjectBroker injectBroker2 = new TradeItInjectBroker(
+        TradeItLinkedBrokerData linkedBrokerData2 = new TradeItLinkedBrokerData(
                 "dummyFx",
                 "3741499971984583d2f1",
                 "ecwzVqxPiTtgalvlgPQOofmaxc%2BVj1JWnl8UfTwnXlMS8lQgNJ8zevAWAR1hcflBkyJ0V%2FWCuxvQdCe1vowLOcX7Hj9vpADuQfuBppFo1faGCV7q9UEjr0J4F8OhlFhgL2SwRLRz0uD411DokfX86g%3D%3D"
         );
 
         try {
-            linkedBrokerManager.syncLocalLinkedBrokers(Arrays.asList(injectBroker1, injectBroker2));
+            linkedBrokerManager.syncLocalLinkedBrokers(Arrays.asList(linkedBrokerData1, linkedBrokerData2));
             goToLinkedBrokersActivity();
         } catch (TradeItSaveLinkedLoginException e) {
             Log.e(TAG, e.getMessage(), e);

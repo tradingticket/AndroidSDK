@@ -3,30 +3,30 @@ package it.trade.android.sdk.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TradeItInjectBroker {
+public class TradeItLinkedBrokerData {
 
     public String broker;
     public String userId;
     public String userToken;
     public boolean isLinkActivationPending = false;
-    public List<TradeItInjectBrokerAccount> injectAccounts = new ArrayList<>();
+    public List<TradeItLinkedBrokerAccountData> linkedBrokerAccountDataList = new ArrayList<>();
 
-    public TradeItInjectBroker(String broker, String userId, String userToken) {
+    public TradeItLinkedBrokerData(String broker, String userId, String userToken) {
         this.broker = broker;
         this.userId = userId;
         this.userToken = userToken;
     }
 
-    public TradeItInjectBroker withLinkActivationPending(boolean isLinkActivationPending) {
+    public TradeItLinkedBrokerData withLinkActivationPending(boolean isLinkActivationPending) {
         this.isLinkActivationPending = isLinkActivationPending;
         return this;
     }
 
-    public void injectAccount(TradeItInjectBrokerAccount injectBrokerAccount) {
-        this.injectAccounts.add(injectBrokerAccount);
+    public void injectAccount(TradeItLinkedBrokerAccountData linkedBrokerAccountData) {
+        this.linkedBrokerAccountDataList.add(linkedBrokerAccountData);
     }
 
-    public TradeItInjectBroker(TradeItLinkedLoginParcelable linkedLoginParcelable) {
+    public TradeItLinkedBrokerData(TradeItLinkedLoginParcelable linkedLoginParcelable) {
         this.broker = linkedLoginParcelable.broker;
         this.userId = linkedLoginParcelable.userId;
         this.userToken = linkedLoginParcelable.userToken;
@@ -37,7 +37,7 @@ public class TradeItInjectBroker {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TradeItInjectBroker that = (TradeItInjectBroker) o;
+        TradeItLinkedBrokerData that = (TradeItLinkedBrokerData) o;
 
         return (userId.equals(that.userId) && userToken.equals(that.userToken));
     }

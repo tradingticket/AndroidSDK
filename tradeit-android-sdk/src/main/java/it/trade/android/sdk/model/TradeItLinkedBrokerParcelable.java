@@ -68,12 +68,12 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         linkedBrokerCache.cache(this);
     }
 
-    public void injectAccounts(List<TradeItInjectBrokerAccount> injectAccounts) {
-        for (TradeItInjectBrokerAccount injectBrokerAccount: injectAccounts) {
+    public void injectAccounts(List<TradeItLinkedBrokerAccountData> linkedBrokerAccountDataList) {
+        for (TradeItLinkedBrokerAccountData linkedBrokerAccountData: linkedBrokerAccountDataList) {
             TradeItBrokerAccount brokerAccount = new TradeItBrokerAccount();
-            brokerAccount.name = injectBrokerAccount.accountName;
-            brokerAccount.accountNumber = injectBrokerAccount.accountNumber;
-            brokerAccount.accountBaseCurrency = injectBrokerAccount.accountBaseCurrency;
+            brokerAccount.name = linkedBrokerAccountData.accountName;
+            brokerAccount.accountNumber = linkedBrokerAccountData.accountNumber;
+            brokerAccount.accountBaseCurrency = linkedBrokerAccountData.accountBaseCurrency;
             this.accounts.add(new TradeItLinkedBrokerAccountParcelable(this, brokerAccount));
         }
     }
