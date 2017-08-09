@@ -100,7 +100,7 @@ public class TradeItLinkedBrokerManager {
     private TradeItLinkedBrokerParcelable createNewLinkedBroker(TradeItLinkedBrokerData linkedBrokerData) {
         TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedBrokerData.broker, linkedBrokerData.userId, linkedBrokerData.userToken);
         TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable);
-        linkedBrokerParcelable.injectAccounts(linkedBrokerData.linkedBrokerAccountDataList);
+        linkedBrokerParcelable.injectAccounts(linkedBrokerData.linkedBrokerAccounts);
         return linkedBrokerParcelable;
     }
 

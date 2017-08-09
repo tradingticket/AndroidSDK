@@ -9,7 +9,7 @@ public class TradeItLinkedBrokerData {
     public String userId;
     public String userToken;
     public boolean isLinkActivationPending = false;
-    public List<TradeItLinkedBrokerAccountData> linkedBrokerAccountDataList = new ArrayList<>();
+    public List<TradeItLinkedBrokerAccountData> linkedBrokerAccounts = new ArrayList<>();
 
     public TradeItLinkedBrokerData(String broker, String userId, String userToken) {
         this.broker = broker;
@@ -23,7 +23,7 @@ public class TradeItLinkedBrokerData {
     }
 
     public void injectAccount(TradeItLinkedBrokerAccountData linkedBrokerAccountData) {
-        this.linkedBrokerAccountDataList.add(linkedBrokerAccountData);
+        this.linkedBrokerAccounts.add(linkedBrokerAccountData);
     }
 
     public TradeItLinkedBrokerData(TradeItLinkedLoginParcelable linkedLoginParcelable) {
