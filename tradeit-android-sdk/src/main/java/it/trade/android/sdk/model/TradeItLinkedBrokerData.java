@@ -26,6 +26,10 @@ public class TradeItLinkedBrokerData {
         this.linkedBrokerAccounts.add(linkedBrokerAccountData);
     }
 
+    public void injectAccounts(List<TradeItLinkedBrokerAccountData> linkedBrokerAccounts) {
+        this.linkedBrokerAccounts = linkedBrokerAccounts;
+    }
+
     public TradeItLinkedBrokerData(TradeItLinkedLoginParcelable linkedLoginParcelable) {
         this.broker = linkedLoginParcelable.broker;
         this.userId = linkedLoginParcelable.userId;
