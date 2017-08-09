@@ -49,7 +49,7 @@ public class TradeItLinkedBrokerCache {
             TradeItLinkedBrokerParcelable linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBrokerParcelable.class);
             linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
             linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
-
+            linkedBroker.setError(linkedBrokerDeserialized.getError());
             for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount: linkedBroker.getAccounts()) {
                 linkedBrokerAccount.setLinkedBroker(linkedBroker);
             }

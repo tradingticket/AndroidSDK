@@ -68,6 +68,18 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         linkedBrokerCache.cache(this);
     }
 
+    public void injectAccounts(List<TradeItLinkedBrokerAccountData> linkedBrokerAccounts) {
+        for (TradeItLinkedBrokerAccountData linkedBrokerAccountData: linkedBrokerAccounts) {
+            TradeItBrokerAccount brokerAccount = new TradeItBrokerAccount();
+            brokerAccount.name = linkedBrokerAccountData.accountName;
+            brokerAccount.accountNumber = linkedBrokerAccountData.accountNumber;
+            brokerAccount.accountBaseCurrency = linkedBrokerAccountData.accountBaseCurrency;
+            this.accounts.add(new TradeItLinkedBrokerAccountParcelable(this, brokerAccount));
+        }
+    }
+    protected TradeItErrorResultParcelable getError() {
+        return this.error;
+    }
     public void refreshAccountBalances(final TradeItCallBackCompletion callback) {
         RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
             @Override
@@ -180,6 +192,10 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         this.setError(new TradeItErrorResultParcelable(TradeItErrorCode.SESSION_EXPIRED, "Authentication required", Arrays.asList("Linked broker was not authenticated after initializing.")));
     }
 
+    public void setAccountLinkDelayedError() {
+        this.setError(new TradeItErrorResultParcelable(TradeItErrorCode.BROKER_ACCOUNT_NOT_AVAILABLE, "Activation In Progress", Arrays.asList("Your " + this.getBrokerName() + " account is being activated. Check back soon (up to two business days)")));
+    }
+
     void setError(TradeItErrorResultParcelable error) {
         this.error = error;
     }
@@ -217,6 +233,10 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         this.accountsLastUpdated = accountsLastUpdated;
     }
 
+    public boolean isAccountLinkDelayedError() {
+        return (this.error != null && this.error.isAccountLinkDelayedError());
+    }
+
     private List<TradeItLinkedBrokerAccountParcelable> mapBrokerAccountsToLinkedBrokerAccounts(List<TradeItBrokerAccount> accounts) {
         List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = new ArrayList<>();
         for (TradeItBrokerAccount account : accounts) {
@@ -233,7 +253,6 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         TradeItLinkedBrokerParcelable that = (TradeItLinkedBrokerParcelable) o;
 
         return linkedLogin.userId.equals(that.linkedLogin.userId);
-
     }
 
     @Override

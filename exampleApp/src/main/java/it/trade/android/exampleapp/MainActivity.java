@@ -17,15 +17,20 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.enums.TradeItOrderExpiration;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
+import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
+import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
+import it.trade.android.sdk.model.TradeItLinkedBrokerData;
+import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
@@ -35,23 +40,6 @@ import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.request.TradeItEnvironment;
-
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.AUTHENTICATE_ALL_LINKED_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.DELETE_ALL_LINKED_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_ALL_FEATURED_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_ALL_NON_FEATURED_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_FEATURED_EQUITY_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_LINKED_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_NON_FEATURED_EQUITY_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_ALL_LINKED_BROKERS;
-import static it.trade.android.exampleapp.MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
@@ -71,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         GET_ALL_FEATURED_BROKERS("Get All Featured Brokers"),
         GET_FEATURED_EQUITY_BROKERS("Get Featured Equity  Brokers"),
         GET_NON_FEATURED_EQUITY_BROKERS("Get Non Featured Equity Brokers"),
+        SYNC_LOCAL_LINKED_BROKERS("Sync Local Linked Brokers"),
         OAUTH_LINKED_A_BROKER("Link a broker via the oAuth flow"),
         GET_LINKED_BROKERS("getLinkedBrokers"),
         DELETE_ALL_LINKED_BROKERS("Delete all linked brokers"),
@@ -128,22 +117,9 @@ public class MainActivity extends AppCompatActivity {
         rowHeader.addView(tv);
         tableLayout.addView(rowHeader);
 
-        addRow(tableLayout, GET_ALL_FEATURED_BROKERS.label, GET_ALL_FEATURED_BROKERS.ordinal());
-        addRow(tableLayout, GET_ALL_NON_FEATURED_BROKERS.label, GET_ALL_NON_FEATURED_BROKERS.ordinal());
-        addRow(tableLayout, GET_FEATURED_EQUITY_BROKERS.label, GET_FEATURED_EQUITY_BROKERS.ordinal());
-        addRow(tableLayout, GET_NON_FEATURED_EQUITY_BROKERS.label, GET_NON_FEATURED_EQUITY_BROKERS.ordinal());
-        addRow(tableLayout, OAUTH_LINKED_A_BROKER.label, OAUTH_LINKED_A_BROKER.ordinal());
-        addRow(tableLayout, GET_LINKED_BROKERS.label, GET_LINKED_BROKERS.ordinal());
-        addRow(tableLayout, DELETE_ALL_LINKED_BROKERS.label, DELETE_ALL_LINKED_BROKERS.ordinal());
-        addRow(tableLayout, AUTHENTICATE_FIRST_LINKED_BROKER.label, AUTHENTICATE_FIRST_LINKED_BROKER.ordinal());
-        addRow(tableLayout, AUTHENTICATE_ALL_LINKED_BROKERS.label, AUTHENTICATE_ALL_LINKED_BROKERS.ordinal());
-        addRow(tableLayout, GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT.label, GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
-        addRow(tableLayout, REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.label, REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.ordinal());
-        addRow(tableLayout, REFRESH_ALL_BALANCES_ALL_LINKED_BROKERS.label, REFRESH_ALL_BALANCES_ALL_LINKED_BROKERS.ordinal());
-        addRow(tableLayout, GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.label, GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
-        addRow(tableLayout, PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.label, PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.ordinal());
-        addRow(tableLayout, AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.label, AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.ordinal());
-        addRow(tableLayout, AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.label, AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.ordinal());
+        for (MainActivityActions action: MainActivityActions.values()) {
+            addRow(tableLayout, action.label, action.ordinal());
+        }
     }
 
     private void addRow(TableLayout tableLayout, String label, int id) {
@@ -219,6 +195,10 @@ public class MainActivity extends AppCompatActivity {
                 case PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT:
                     Log.d(TAG, "preview trade first linked broker account was tapped!");
                     previewTradeFirstLinkedBroker();
+                    break;
+                case SYNC_LOCAL_LINKED_BROKERS:
+                    Log.d(TAG, "synch local linked brokers was tapped!");
+                    syncLocalLinkedBrokers();
                     break;
                 default:
                     Log.e(TAG, "ERROR: no action found for id " + view.getId());
@@ -534,5 +514,29 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this.getApplicationContext(), BrokersListActivity.class);
         intent.putExtra(GET_BROKERS_LIST_PARAMETER, action);
         startActivity(intent);
+    }
+
+    private void syncLocalLinkedBrokers() {
+        TradeItLinkedBrokerData linkedBrokerData1 = new TradeItLinkedBrokerData(
+                "dummy",
+                "8fa14999720337719675",
+                "XZZt9cfIz9APLljOPeKhFjOuz5mSa1E9Q5Un%2Fc1ARlaD4wQixu6S%2BUIQ6rOhiUDV1RJM0stg7EqVslOH5oxGYHBvdLrKqNoi%2BdRzGscDF3nNbzBR3QJMV5SxsgyEkaLrmFETBZUiaRcfKSR6kvLznA%3D%3D"
+        ).withLinkActivationPending(true);
+        linkedBrokerData1.injectAccount(new TradeItLinkedBrokerAccountData("MyAccountName", "MyAccountNumber", "USD"));
+
+        TradeItLinkedBrokerData linkedBrokerData2 = new TradeItLinkedBrokerData(
+                "dummyFx",
+                "3741499971984583d2f1",
+                "ecwzVqxPiTtgalvlgPQOofmaxc%2BVj1JWnl8UfTwnXlMS8lQgNJ8zevAWAR1hcflBkyJ0V%2FWCuxvQdCe1vowLOcX7Hj9vpADuQfuBppFo1faGCV7q9UEjr0J4F8OhlFhgL2SwRLRz0uD411DokfX86g%3D%3D"
+        );
+
+        try {
+            linkedBrokerManager.syncLocalLinkedBrokers(Arrays.asList(linkedBrokerData1, linkedBrokerData2));
+            goToLinkedBrokersActivity();
+        } catch (TradeItSaveLinkedLoginException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (TradeItDeleteLinkedLoginException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
     }
 }
