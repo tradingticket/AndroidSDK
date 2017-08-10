@@ -64,27 +64,23 @@ public class TradeItLinkedBrokerManager {
     public synchronized void syncLocalLinkedBrokers(List<TradeItLinkedBrokerData> linkedBrokerDataList) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
         List<TradeItLinkedBrokerParcelable> linkedBrokers = this.linkedBrokers;
 
-        // Add missing linkedBrokers
-        for (TradeItLinkedBrokerData linkedBrokerData: linkedBrokerDataList) {
-            TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedBrokerData);
-            TradeItLinkedLoginParcelable linkedLoginParcelable  = linkedBrokerParcelable.getLinkedLogin();
-            if (!linkedBrokers.contains(linkedBrokerParcelable)) {
-                if (linkedBrokerData.isLinkActivationPending){
-                    linkedBrokerParcelable.setAccountLinkDelayedError();
-                }
-                linkedBrokerCache.cache(linkedBrokerParcelable);
-                linkedBrokers.add(linkedBrokerParcelable);
-                keystoreService.saveLinkedLogin(linkedLoginParcelable, linkedLoginParcelable.label);
-            }
-        }
-
-        // Remove non existing linkedBrokers
+        // Remove existing linkedBrokers
         for (TradeItLinkedBrokerParcelable linkedBroker: new ArrayList<>(linkedBrokers)) {
-            if (!linkedBrokerDataList.contains(new TradeItLinkedBrokerData(linkedBroker.getLinkedLogin()))) {
                 linkedBrokerCache.removeFromCache(linkedBroker);
                 linkedBrokers.remove(linkedBroker);
                 keystoreService.deleteLinkedLogin(linkedBroker.getLinkedLogin());
+        }
+
+        // Add new linkedBrokers from linkedBrokerDataList
+        for (TradeItLinkedBrokerData linkedBrokerData : linkedBrokerDataList) {
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedBrokerData);
+            TradeItLinkedLoginParcelable linkedLoginParcelable = linkedBrokerParcelable.getLinkedLogin();
+            if (linkedBrokerData.isLinkActivationPending) {
+                linkedBrokerParcelable.setAccountLinkDelayedError();
             }
+            linkedBrokerCache.cache(linkedBrokerParcelable);
+            linkedBrokers.add(linkedBrokerParcelable);
+            keystoreService.saveLinkedLogin(linkedLoginParcelable, linkedLoginParcelable.label);
         }
     }
 

@@ -4,6 +4,7 @@ import it.trade.android.sdk.internal.TradeItKeystoreService
 import it.trade.android.sdk.model.*
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
+import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItErrorCode
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
 import it.trade.model.reponse.TradeItResponse
@@ -721,6 +722,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         and: "The following already existing linkedBrokers"
             TradeItLinkedLoginParcelable linkedLoginParcelable  = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
             TradeItLinkedBrokerParcelable linkedBrokerParcelable = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable, linkedBrokerCache)
+            linkedBrokerParcelable.accounts.add(new TradeItLinkedBrokerAccountParcelable(linkedBrokerParcelable, new TradeItBrokerAccount()))
             TradeItLinkedLoginParcelable linkedLoginParcelable5  = new TradeItLinkedLoginParcelable("", "MyUserId5", "")
             TradeItLinkedBrokerParcelable linkedBrokerParcelable5 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable5, linkedBrokerCache)
 
@@ -748,6 +750,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable1)
             linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable2)
             linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable3)
+            linkedBrokerManager.getLinkedBrokers().get(0).accounts.size() == 0
             linkedBrokerManager.getLinkedBrokers().get(2).accounts.size() == 1
             linkedBrokerManager.getLinkedBrokers().get(2).accounts.get(0).accountNumber == linkedBrokerAccountData.accountNumber
             linkedBrokerManager.getLinkedBrokers().get(2).accounts.get(0).accountName == linkedBrokerAccountData.accountName
