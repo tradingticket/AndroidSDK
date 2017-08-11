@@ -221,12 +221,12 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         return this.accounts;
     }
 
-    public Date getAccountsLastUpdated() {
-        return accountsLastUpdated;
+    public void setAccounts(List<TradeItLinkedBrokerAccountParcelable> accounts) {
+        this.accounts = accounts;
     }
 
-    void setAccounts(List<TradeItLinkedBrokerAccountParcelable> accounts) {
-        this.accounts = accounts;
+    public Date getAccountsLastUpdated() {
+        return accountsLastUpdated;
     }
 
     void setAccountsLastUpdated(Date accountsLastUpdated) {
@@ -253,6 +253,16 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         TradeItLinkedBrokerParcelable that = (TradeItLinkedBrokerParcelable) o;
 
         return linkedLogin.userId.equals(that.linkedLogin.userId);
+    }
+
+    public boolean equalsAccounts(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TradeItLinkedBrokerParcelable that = (TradeItLinkedBrokerParcelable) o;
+
+        return linkedLogin.userId.equals(that.linkedLogin.userId) &&
+                this.accounts.equals(that.accounts);
     }
 
     @Override
