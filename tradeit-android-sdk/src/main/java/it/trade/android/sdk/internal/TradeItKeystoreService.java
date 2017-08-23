@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItKeystoreServiceCreateKeyException;
-import it.trade.android.sdk.exceptions.TradeItKeystoreServiceDecryptException;
 import it.trade.android.sdk.exceptions.TradeItKeystoreServiceDeleteKeyException;
 import it.trade.android.sdk.exceptions.TradeItKeystoreServiceEncryptException;
 import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException;
@@ -50,9 +50,8 @@ public class TradeItKeystoreService {
         this.context = context;
 
         try {
-            this.secretKey = createKeyIfNotExists();
-
             this.sharedPreferences = context.getSharedPreferences(TRADE_IT_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
+            this.secretKey = createKeyIfNotExists();
         } catch (Exception e) {
             throw new TradeItKeystoreServiceCreateKeyException("Error creating key store with TradeItKeystoreService", e);
         }
@@ -206,6 +205,7 @@ public class TradeItKeystoreService {
                 long startTime = System.currentTimeMillis();
                 secretKey = generateKey();
                 storeSecretKeyInPrivateData(secretKey);
+                deleteOldKey();
                 Log.d("TRADEIT", "=====> Elapsed time to generate key: " + (System.currentTimeMillis() - startTime) + "ms");
             }
         } catch (Exception e) {
@@ -223,6 +223,20 @@ public class TradeItKeystoreService {
             this.context.deleteFile(SECRET_KEY_FILE_NAME);
     }
 
+    private void deleteOldKey() throws TradeItKeystoreServiceDeleteKeyException{
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            String alias = "TRADE_IT_LINKED_BROKERS_ALIAS";
+            if (keyStore.containsAlias(alias)) {
+                keyStore.deleteEntry(alias);
+                deleteAllLinkedLogins();
+            }
+        } catch (Exception e) {
+            //ignore it
+        }
+    }
+
     private String encryptString(String stringToEncrypt) throws TradeItKeystoreServiceEncryptException {
         try {
             Cipher cipher = Cipher.getInstance("AES");
@@ -236,14 +250,16 @@ public class TradeItKeystoreService {
         }
     }
 
-    private String decryptString(String encryptedString) throws TradeItKeystoreServiceDecryptException {
+    private String decryptString(String encryptedString) {
         try {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, this.secretKey);
             byte[] original = cipher.doFinal(Base64.decode(encryptedString, Base64.DEFAULT));
             return new String(original, "UTF-8");
         } catch (Exception e) {
-            throw new TradeItKeystoreServiceDecryptException("Error decrypting the string: "+encryptedString, e);
+            //don't throw an exception, to not crash existing app
+            Log.e(TAG, "Error decrypting the string: " + encryptedString, e);
+            return encryptedString;
         }
     }
 
