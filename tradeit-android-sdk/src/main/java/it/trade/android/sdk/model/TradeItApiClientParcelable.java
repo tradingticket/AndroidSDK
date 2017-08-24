@@ -1,5 +1,6 @@
 package it.trade.android.sdk.model;
 
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -16,7 +17,7 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
         this(apiKey, environment, null);
     }
     public TradeItApiClientParcelable(String apiKey, TradeItEnvironment environment, RequestInterceptorParcelable requestInterceptorParcelable) {
-        super(apiKey, environment, requestInterceptorParcelable);
+        super(apiKey, environment, requestInterceptorParcelable, forceTLS12());
         this.requestInterceptorParcelable = requestInterceptorParcelable;
     }
 
@@ -50,7 +51,7 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
         this.environment = tmpEnvironment == -1 ? null : TradeItEnvironment.values()[tmpEnvironment];
         this.apiKey = in.readString();
         TradeItRequestWithKey.API_KEY = apiKey;
-        this.tradeItApi = this.createTradeItApi(environment, requestInterceptorParcelable);
+        this.tradeItApi = this.createTradeItApi(environment, requestInterceptorParcelable, forceTLS12());
     }
 
     public static final Creator<TradeItApiClientParcelable> CREATOR = new Creator<TradeItApiClientParcelable>() {
@@ -64,4 +65,8 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
             return new TradeItApiClientParcelable[size];
         }
     };
+
+    private static boolean forceTLS12() {
+        return (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 22);
+    }
 }
