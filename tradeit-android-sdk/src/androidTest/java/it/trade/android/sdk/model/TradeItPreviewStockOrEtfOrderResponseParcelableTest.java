@@ -32,7 +32,7 @@ public class TradeItPreviewStockOrEtfOrderResponseParcelableTest {
         previewOrderResponse.warningsList = Arrays.asList("MyWarningList");
         previewOrderResponse.orderDetails = new TradeItOrderDetailsParcelable();
         previewOrderResponse.orderDetails.orderSymbol = "GE";
-
+        previewOrderResponse.orderDetails.orderCommissionLabel = "MyOrderCommissionLabel";
         // Write the data.
         Parcel parcel = Parcel.obtain();
         previewOrderResponse.writeToParcel(parcel, previewOrderResponse.describeContents());
@@ -52,5 +52,6 @@ public class TradeItPreviewStockOrEtfOrderResponseParcelableTest {
         assertThat(ackWarningsList, is(previewOrderResponse.ackWarningsList));
         assertThat(warningsList, is(previewOrderResponse.warningsList));
         assertThat(orderDetailsParcelable.orderSymbol, is(previewOrderResponse.orderDetails.orderSymbol));
+        assertThat(orderDetailsParcelable.orderCommissionLabel, is(previewOrderResponse.orderDetails.orderCommissionLabel));
     }
 }
