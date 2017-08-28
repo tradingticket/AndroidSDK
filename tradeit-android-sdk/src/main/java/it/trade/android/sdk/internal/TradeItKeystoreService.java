@@ -160,20 +160,20 @@ public class TradeItKeystoreService {
 
     private SecretKey loadSecretKeyFromPrivateData() throws IOException {
         SecretKey secretKey = null;
-        FileInputStream fis = null;
+        FileInputStream fileInputStream = null;
         try {
-            fis = this.context.openFileInput(SECRET_KEY_FILE_NAME);
-            byte[] keyBuffer = new byte[(int) fis.getChannel().size()];
-            fis.read(keyBuffer);
+            fileInputStream = this.context.openFileInput(SECRET_KEY_FILE_NAME);
+            byte[] keyBuffer = new byte[(int) fileInputStream.getChannel().size()];
+            fileInputStream.read(keyBuffer);
             secretKey = new SecretKeySpec(keyBuffer, 0, keyBuffer.length, "AES");
         } catch(FileNotFoundException e) {
                 return null;
         } finally {
-            if (fis != null) {
+            if (fileInputStream != null) {
                 try {
-                    fis.close();
+                    fileInputStream.close();
                 } catch (IOException ex) {
-                    Log.e(TAG, "loadSecretKeyFromPrivateData - error closing fis", ex);
+                    Log.e(TAG, "loadSecretKeyFromPrivateData - error closing FileInputStream for "+ SECRET_KEY_FILE_NAME, ex);
                 }
             }
         }
@@ -181,17 +181,17 @@ public class TradeItKeystoreService {
     }
 
     private void storeSecretKeyInPrivateData(SecretKey secretKey) throws IOException {
-        FileOutputStream fos = null;
+        FileOutputStream fileOutputStream = null;
         try {
-            fos = this.context.openFileOutput(SECRET_KEY_FILE_NAME, Context.MODE_PRIVATE);
-            fos.write(secretKey.getEncoded());
-            fos.close();
+            fileOutputStream = this.context.openFileOutput(SECRET_KEY_FILE_NAME, Context.MODE_PRIVATE);
+            fileOutputStream.write(secretKey.getEncoded());
+            fileOutputStream.close();
         } finally {
-            if (fos != null) {
+            if (fileOutputStream != null) {
                 try {
-                    fos.close();
+                    fileOutputStream.close();
                 } catch (IOException ex) {
-                    Log.e(TAG, "storeSecretKeyInPrivateData - error closing fos", ex);
+                    Log.e(TAG, "storeSecretKeyInPrivateData - error closing FileOutputStream for " + SECRET_KEY_FILE_NAME, ex);
                 }
             }
         }
