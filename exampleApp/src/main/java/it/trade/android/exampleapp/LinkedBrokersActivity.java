@@ -39,8 +39,7 @@ public class LinkedBrokersActivity extends AppCompatActivity {
 
             Gson gson = new Gson();
             for (TradeItLinkedBrokerParcelable linkedBroker : linkedBrokers) {
-                String json = "LINKED LOGIN: " + gson.toJson(linkedBroker.getLinkedLogin());
-                json += "\nLINKED BROKER: " + gson.toJson(linkedBroker);
+                String json = "\n---\nLINKED BROKER: " + linkedBroker;
                 output += json + "\n\n===\n\n";
                 Log.d("TEST", json);
             }
