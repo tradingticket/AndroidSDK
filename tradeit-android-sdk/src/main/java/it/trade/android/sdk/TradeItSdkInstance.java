@@ -20,7 +20,6 @@ public class TradeItSdkInstance {
     private Context context;
     private TradeItLinkedBrokerCache linkedBrokerCache;
     private TradeItKeystoreService keyStoreService;
-    private static final String TRADE_IT_LINKED_BROKERS_ALIAS = "TRADE_IT_LINKED_BROKERS_ALIAS";
 
     public TradeItSdkInstance(TradeItConfigurationBuilder configurationBuilder) {
         String baseUrl = configurationBuilder.getBaseUrl();
@@ -37,7 +36,7 @@ public class TradeItSdkInstance {
         this.linkedBrokerCache = new TradeItLinkedBrokerCache(context);
 
         try {
-            this.keyStoreService = new TradeItKeystoreService(TRADE_IT_LINKED_BROKERS_ALIAS, context);
+            this.keyStoreService = new TradeItKeystoreService(context);
         } catch (TradeItKeystoreServiceCreateKeyException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItBrokerLinker: ", e);
         }
