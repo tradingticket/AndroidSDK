@@ -39,7 +39,7 @@ public class TradeItSdkInstance {
         try {
             this.keyStoreService = new TradeItKeystoreService(TRADE_IT_LINKED_BROKERS_ALIAS, context);
         } catch (TradeItKeystoreServiceCreateKeyException e) {
-            throw new TradeItSDKConfigurationException("Error initializing TradeItBrokerLinker: ", e);
+            throw new TradeItSDKConfigurationException("Error initializing TradeItKeystoreService: ", e);
         }
 
         try {
