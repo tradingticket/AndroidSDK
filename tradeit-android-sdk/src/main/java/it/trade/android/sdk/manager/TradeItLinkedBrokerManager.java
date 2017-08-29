@@ -579,6 +579,6 @@ public class TradeItLinkedBrokerManager {
     }
 
     public List<TradeItLinkedBrokerParcelable> getLinkedBrokers() {
-        return new ArrayList<>(linkedBrokers);
+        return linkedBrokers;
     }
 }

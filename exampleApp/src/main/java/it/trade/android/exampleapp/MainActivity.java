@@ -29,9 +29,9 @@ import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
-import it.trade.android.sdk.model.TradeItLinkedBrokerData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
 import it.trade.android.sdk.model.TradeItPositionParcelable;
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "# of linkedBrokers before deletion: " + linkedBrokersToDelete.size());
 
-            for (final TradeItLinkedBrokerParcelable linkedBroker : linkedBrokersToDelete) {
+            for (final TradeItLinkedBrokerParcelable linkedBroker : new ArrayList<>(linkedBrokersToDelete)) {
                 linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback() {
                     @Override
                     public void onSuccess(Object type) {
