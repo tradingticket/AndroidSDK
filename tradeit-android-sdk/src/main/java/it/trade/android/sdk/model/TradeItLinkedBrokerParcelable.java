@@ -206,6 +206,10 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         this.setError(new TradeItErrorResultParcelable(TradeItErrorCode.SESSION_EXPIRED, "Authentication required", Arrays.asList("Linked broker was not authenticated after initializing.")));
     }
 
+    public boolean isUnauthenticated() {
+        return this.error != null && this.error.requiresAuthentication();
+    }
+
     public void setAccountLinkDelayedError() {
         this.setError(new TradeItErrorResultParcelable(TradeItErrorCode.BROKER_ACCOUNT_NOT_AVAILABLE, "Activation In Progress", Arrays.asList("Your " + this.getBrokerName() + " account is being activated. Check back soon (up to two business days)")));
     }
