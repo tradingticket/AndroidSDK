@@ -37,6 +37,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -82,6 +83,28 @@ public class TradeItLinkedBrokerManagerTest {
         });
         boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to getAvailableBrokers is not expired", notExpired, is(true));
+    }
+
+    @Test
+    public void testCacheIsCorrect() throws InterruptedException {
+        linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions();
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        List<TradeItLinkedBrokerAccountParcelable> accounts = linkedBrokers.get(0).getAccounts();
+        TradeItLinkedBrokerAccountParcelable account = accounts.get(0);
+
+        //reset to reload from cache
+        createTradeItLinkedBrokerManager();
+
+        List<TradeItLinkedBrokerParcelable> linkedBrokerParcelables = linkedBrokerManager.getLinkedBrokers();
+        assertThat("The number of linked brokers loaded from cache is correct", linkedBrokerParcelables.size() , is(linkedBrokers.size()));
+
+        TradeItLinkedBrokerParcelable linkedBrokerParcelable = linkedBrokerParcelables.get(0);
+        assertTrue("The error is set to session expired", linkedBrokerParcelable.isUnauthenticated());
+        assertThat("There number of linked broker accounts loaded from cache is correct", linkedBrokerParcelable.getAccounts().size() , is(accounts.size()));
+
+        TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable = linkedBrokerParcelable.getAccounts().get(0);
+        assertThat("The balance loaded from cache is correct", linkedBrokerAccountParcelable.getBalance() , is(account.getBalance()));
+        assertThat("The fx balance loaded from cache is correct", linkedBrokerAccountParcelable.getFxBalance() , is(account.getFxBalance()));
     }
 
     @Test
