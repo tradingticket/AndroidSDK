@@ -216,10 +216,16 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
 
     @Override
     public String toString() {
+        String errorText = "NONE";
+        if (this.error != null) {
+            errorText = this.error.toString();
+        }
+
         return "TradeItLinkedBrokerParcelable{" +
                 "TradeItLinkedLogin=" + this.linkedLogin.toString() +
                 ", accounts=" + getAccounts().toString() +
                 ", accountsLastUpdated=" + getAccountsLastUpdated() +
+                ", error=" + errorText +
                 '}';
     }
 

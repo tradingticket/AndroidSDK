@@ -29,9 +29,9 @@ import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
+import it.trade.android.sdk.model.TradeItLinkedBrokerData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
-import it.trade.android.sdk.model.TradeItLinkedBrokerData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
 import it.trade.android.sdk.model.TradeItPositionParcelable;
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case AUTHENTICATE_FIRST_LINKED_BROKER:
                     Log.d(TAG, "Authenticate first linked broker tapped!");
-                    authenticateLinkedBroker(0);
+                    authenticateFirstLinkedBroker(0);
                     break;
                 case AUTHENTICATE_ALL_LINKED_BROKERS:
                     Log.d(TAG, "Authenticate all linked brokers tapped!");
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void authenticateLinkedBroker(int index) {
+    private void authenticateFirstLinkedBroker(int index) {
         List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty() || linkedBrokers.size() < (index + 1)) {
             String message = "No linked broker to authenticate! Index: " + index + ", linked broker count: " + linkedBrokers.size();
@@ -293,10 +293,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(index);
             final MainActivity mainActivity = this;
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
                 @Override
                 public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
-                    goToLinkedBrokerAccountsActivity(accounts);
+                    goToLinkedBrokersActivity();
                 }
 
                 @Override
