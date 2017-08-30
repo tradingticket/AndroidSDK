@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -20,46 +21,58 @@ import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import static it.trade.android.exampleapp.MainActivity.LINKED_BROKERS_PARAMETER;
 
 public class LinkedBrokersActivity extends AppCompatActivity {
+    List<TradeItLinkedBrokerParcelable> linkedBrokers;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_linked_brokers);
-        final TextView textView = (TextView) this.findViewById(R.id.linked_brokers_textview);
-        textView.setMovementMethod(new ScrollingMovementMethod());
-        Intent intent = getIntent();
-        List<TradeItLinkedBrokerParcelable> linkedBrokers = intent.getParcelableArrayListExtra(LINKED_BROKERS_PARAMETER);
+        this.textView = (TextView) this.findViewById(R.id.linked_brokers_textview);
+        this.textView.setMovementMethod(new ScrollingMovementMethod());
 
-        if (linkedBrokers.isEmpty()) {
-            textView.setText("No linked brokers!");
+        Intent intent = getIntent();
+        this.linkedBrokers = intent.getParcelableArrayListExtra(LINKED_BROKERS_PARAMETER);
+
+        logBrokers();
+    }
+
+    public void authenticateFirstBroker(View view) {
+        textView.setText("Authenticating...");
+
+        this.linkedBrokers.get(0).authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+            @Override
+            public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                textView.setText("Security Question:\n" + securityQuestion);
+            }
+
+            @Override
+            public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> type) {
+                textView.setText("Authenticate SUCCESS!");
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                textView.setText("Authenticate ERROR:\n" + error);
+            }
+        });
+    }
+
+    private void logBrokers() {
+        if (this.linkedBrokers.isEmpty()) {
+            this.textView.setText("No linked brokers!");
         } else {
             String output = "";
 
-            output += "=== " + linkedBrokers.size() + " PARCELED LINKED BROKERS ===\n\n";
+            output += "=== " + this.linkedBrokers.size() + " PARCELED LINKED BROKERS ===\n\n";
 
-            Gson gson = new Gson();
-            for (TradeItLinkedBrokerParcelable linkedBroker : linkedBrokers) {
-                String json = "\n---\nLINKED BROKER: " + linkedBroker;
+            for (TradeItLinkedBrokerParcelable linkedBroker : this.linkedBrokers) {
+                String json = "LINKED BROKER: " + linkedBroker;
                 output += json + "\n\n===\n\n";
                 Log.d("TEST", json);
             }
-            linkedBrokers.get(0).authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
-                @Override
-                public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
 
-                }
-
-                @Override
-                public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> type) {
-
-                }
-
-                @Override
-                public void onError(TradeItErrorResult error) {
-
-                }
-            });
-            textView.setText(output);
+            this.textView.setText(output);
             Log.d("TEST", "==========");
         }
     }

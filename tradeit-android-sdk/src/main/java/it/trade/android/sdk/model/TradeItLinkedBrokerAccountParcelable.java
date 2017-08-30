@@ -28,6 +28,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     public transient TradeItLinkedBrokerParcelable linkedBroker;
     private TradeItBalanceParcelable balance;
+
     private TradeItFxBalanceParcelable fxBalance;
     private Date balanceLastUpdated;
     private List<TradeItPositionParcelable> positions;
@@ -73,6 +74,14 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     public void setBalance(TradeItBalanceParcelable balance) {
         this.balance = balance;
+    }
+
+    public TradeItFxBalanceParcelable getFxBalance() {
+        return fxBalance;
+    }
+
+    public void setFxBalance(TradeItFxBalanceParcelable fxBalance) {
+        this.fxBalance = fxBalance;
     }
 
     public Date getBalanceLastUpdated() { return this.balanceLastUpdated; }

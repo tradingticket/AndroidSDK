@@ -162,8 +162,7 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
                     TradeItAuthenticateResponse authResponse = response.body();
                     List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
                     List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
-                    accounts = linkedBrokerAccounts;
-                    accountsLastUpdated = new Date();
+                    linkedBroker.updateLinkedBrokerAccounts(linkedBrokerAccounts);
                     linkedBrokerCache.cache(linkedBroker);
                     callback.onSuccess(linkedBrokerAccounts);
             }
@@ -188,6 +187,21 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         }
     }
 
+    private void updateLinkedBrokerAccounts(List<TradeItLinkedBrokerAccountParcelable> accounts) {
+        for (TradeItLinkedBrokerAccountParcelable account: accounts) {
+            TradeItLinkedBrokerAccountParcelable existingAccount = getLinkedBrokerAccount(account.getAccountNumber());
+            if (existingAccount != null) {
+                account.setBalance(existingAccount.getBalance());
+                account.setFxBalance(existingAccount.getFxBalance());
+                account.setPositions(existingAccount.getPositions());
+                account.setBalanceLastUpdated(existingAccount.getBalanceLastUpdated());
+                account.setLinkedBroker(this);
+            }
+        }
+        this.accounts = accounts;
+        this.accountsLastUpdated = new Date();
+    }
+
     private void setUnauthenticated() {
         this.setError(new TradeItErrorResultParcelable(TradeItErrorCode.SESSION_EXPIRED, "Authentication required", Arrays.asList("Linked broker was not authenticated after initializing.")));
     }
@@ -202,10 +216,16 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
 
     @Override
     public String toString() {
+        String errorText = "NONE";
+        if (this.error != null) {
+            errorText = this.error.toString();
+        }
+
         return "TradeItLinkedBrokerParcelable{" +
                 "TradeItLinkedLogin=" + this.linkedLogin.toString() +
                 ", accounts=" + getAccounts().toString() +
                 ", accountsLastUpdated=" + getAccountsLastUpdated() +
+                ", error=" + errorText +
                 '}';
     }
 
@@ -301,6 +321,11 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         this.accountsLastUpdated = tmpAccountsLastUpdated == -1 ? null : new Date(tmpAccountsLastUpdated);
         this.error = in.readParcelable(TradeItErrorResultParcelable.class.getClassLoader());
         this.linkedBrokerCache = TradeItSDK.getLinkedBrokerCache();
+        int indexLinkedBroker = TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().indexOf(this);
+        if (indexLinkedBroker != -1) { // updating linkedBroker reference on the linkedBrokerManager as we created a new object
+            TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().remove(indexLinkedBroker);
+            TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().add(indexLinkedBroker, this);
+        }
     }
 
     public static final Parcelable.Creator<TradeItLinkedBrokerParcelable> CREATOR = new Parcelable.Creator<TradeItLinkedBrokerParcelable>() {
