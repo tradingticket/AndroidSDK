@@ -58,20 +58,6 @@ public class MainActivityTest {
         editor.commit();
     }
 
-
-    @Rule
-    public ActivityTestRule<WebViewActivity> mActivityRule = new ActivityTestRule<WebViewActivity>(
-            WebViewActivity.class, false, false) {
-        @Override
-        protected void afterActivityLaunched() {
-            // Technically we do not need to do this - WebViewActivity has javascript turned on.
-            // Other WebViews in your app may have javascript turned off, however since the only way
-            // to automate WebViews is through javascript, it must be enabled.
-            onWebView().forceJavascriptEnabled();
-        }
-    };
-
-
     @Test
     public void oAuthFlowToTradeTest() throws InterruptedException {
         testOauthFlow("dummy");
