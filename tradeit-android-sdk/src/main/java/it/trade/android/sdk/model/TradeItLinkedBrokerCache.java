@@ -44,16 +44,18 @@ public class TradeItLinkedBrokerCache {
         SharedPreferences sharedPreferences = context.getSharedPreferences(TRADE_IT_SDK_SHARED_PREFS_KEY, Context.MODE_PRIVATE);
         Set<String> linkedBrokerCache = sharedPreferences.getStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, new HashSet<String>());
 
-        if (linkedBrokerCache.contains(userId)) {
+        if (linkedBrokerCache != null && linkedBrokerCache.contains(userId)) {
             String linkedBrokerSerialized = sharedPreferences.getString(LINKED_BROKER_CACHE_KEY_PREFIX + userId, "");
-            TradeItLinkedBrokerParcelable linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBrokerParcelable.class);
-            linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
-            linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
-            if (linkedBrokerDeserialized.isAccountLinkDelayedError()) {
-                linkedBroker.setError(linkedBrokerDeserialized.getError());
-            }
-            for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount: linkedBroker.getAccounts()) {
-                linkedBrokerAccount.setLinkedBroker(linkedBroker);
+            if (linkedBrokerSerialized != null && linkedBrokerSerialized.length() > 0) {
+                TradeItLinkedBrokerParcelable linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBrokerParcelable.class);
+                linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
+                linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
+                if (linkedBrokerDeserialized.isAccountLinkDelayedError()) {
+                    linkedBroker.setError(linkedBrokerDeserialized.getError());
+                }
+                for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
+                    linkedBrokerAccount.setLinkedBroker(linkedBroker);
+                }
             }
         }
     }

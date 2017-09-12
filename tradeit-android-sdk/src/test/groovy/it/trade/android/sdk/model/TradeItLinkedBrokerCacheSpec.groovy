@@ -171,6 +171,39 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
             linkedBroker.accounts[0].linkedBroker == linkedBroker
     }
 
+    def "SyncFromCache handles a linkedBroker partially cached"() {
+        given: "a linked broker loaded from the keystore"
+        TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
+
+        and: "a linkedBroker cached"
+        sharedPreferences.getStringSet(_, new HashSet<String>()) >> {
+            Set<String> set = new HashSet<>()
+            set.add(userId)
+            return set
+        }
+        sharedPreferences.getString({it.contains("an other userId")}, "") >> {
+            TradeItLinkedBrokerParcelable linkedBrokerCached = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
+            linkedBrokerCached.linkedLogin.userId == "an other userId"
+            TradeItLinkedBrokerAccountParcelable account1 = new TradeItLinkedBrokerAccountParcelable(linkedBrokerCached, Mock(TradeItBrokerAccount));
+            account1.accountName = "My Account Name"
+            account1.accountNumber = "My Account Number"
+            account1.accountBaseCurrency = "My Account base currency"
+            account1.balance = new TradeItBalanceParcelable()
+            account1.balance.availableCash = 20000
+            linkedBrokerCached.accountsLastUpdated = new Date()
+            linkedBrokerCached.accounts = [account1]
+            return new Gson().toJson(linkedBrokerCached)
+        }
+
+        when: "syncFromCache called: "
+        linkedBrokerCache.syncFromCache(linkedBroker)
+
+        then: "expects the linkedBroker to be populated with the cache"
+        linkedBroker.linkedLogin.userId == userId
+        linkedBroker.accountsLastUpdated == null
+        linkedBroker.accounts.size() == 0
+    }
+
     def "SyncFromCache handles a linkedBroker non cached"() {
         given: "a linked broker loaded from the keystore"
             TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClient, linkedLogin, linkedBrokerCache);
