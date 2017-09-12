@@ -198,7 +198,7 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
         when: "syncFromCache called: "
         linkedBrokerCache.syncFromCache(linkedBroker)
 
-        then: "expects the linkedBroker to be populated with the cache"
+        then: "expects the linkedBroker to be populated with the cache without accounts"
         linkedBroker.linkedLogin.userId == userId
         linkedBroker.accountsLastUpdated == null
         linkedBroker.accounts.size() == 0
