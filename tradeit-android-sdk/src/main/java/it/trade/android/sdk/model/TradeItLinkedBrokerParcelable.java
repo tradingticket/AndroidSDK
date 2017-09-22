@@ -325,6 +325,9 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         this.accountsLastUpdated = tmpAccountsLastUpdated == -1 ? null : new Date(tmpAccountsLastUpdated);
         this.error = in.readParcelable(TradeItErrorResultParcelable.class.getClassLoader());
         this.linkedBrokerCache = TradeItSDK.getLinkedBrokerCache();
+        for (TradeItLinkedBrokerAccountParcelable accountParcelable: this.accounts) {
+            accountParcelable.setLinkedBroker(this);
+        }
         int indexLinkedBroker = TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().indexOf(this);
         if (indexLinkedBroker != -1) { // updating linkedBroker reference on the linkedBrokerManager as we created a new object
             TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().remove(indexLinkedBroker);
