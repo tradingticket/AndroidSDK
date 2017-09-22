@@ -27,13 +27,12 @@ public class TradeItSdkInstance {
         if (baseUrl != null && !baseUrl.isEmpty()) {
             configurationBuilder.getEnvironment().setBaseUrl(baseUrl);
         }
-        initializeTradeItSdkInstance(configurationBuilder.getContext(), configurationBuilder.getApiKey(), configurationBuilder.getEnvironment(), configurationBuilder.getRequestInterceptorParcelable());
+        initializeTradeItSdkInstance(configurationBuilder);
     }
 
-    private void initializeTradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, RequestInterceptorParcelable requestInterceptorParcelable) {
-        this.context = context;
-        this.apiKey = apiKey;
-        this.environment = environment;
+    private void initializeTradeItSdkInstance(TradeItConfigurationBuilder configurationBuilder) {
+        this.context = configurationBuilder.getContext();
+        this.environment = configurationBuilder.getEnvironment();
         this.linkedBrokerCache = new TradeItLinkedBrokerCache(context);
 
         try {
@@ -43,7 +42,7 @@ public class TradeItSdkInstance {
         }
 
         try {
-            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(apiKey, environment, requestInterceptorParcelable), linkedBrokerCache, keyStoreService);
+            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(configurationBuilder.getApiKey(), environment, configurationBuilder.getRequestInterceptorParcelable()), linkedBrokerCache, keyStoreService, configurationBuilder.isStartFetchingBrokerList());
         } catch (TradeItRetrieveLinkedLoginException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e);
         }

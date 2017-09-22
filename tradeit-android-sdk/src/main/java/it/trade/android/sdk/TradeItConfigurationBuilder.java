@@ -12,6 +12,7 @@ public class TradeItConfigurationBuilder {
     private TradeItEnvironment environment;
     private String baseUrl;
     private RequestInterceptorParcelable requestInterceptorParcelable;
+    private boolean startFetchingBrokerList = true;
 
     private TradeItConfigurationBuilder() {
     }
@@ -29,6 +30,11 @@ public class TradeItConfigurationBuilder {
 
     public TradeItConfigurationBuilder withRequestInterceptor(RequestInterceptorParcelable requestInterceptorParcelable) {
         this.requestInterceptorParcelable = requestInterceptorParcelable;
+        return this;
+    }
+
+    public TradeItConfigurationBuilder withStartFetchingBrokerList(boolean startFetchingBrokerList) {
+        this.startFetchingBrokerList = startFetchingBrokerList;
         return this;
     }
 
@@ -50,5 +56,9 @@ public class TradeItConfigurationBuilder {
 
     public RequestInterceptorParcelable getRequestInterceptorParcelable() {
         return requestInterceptorParcelable;
+    }
+
+    public boolean isStartFetchingBrokerList() {
+        return startFetchingBrokerList;
     }
 }
