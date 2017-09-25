@@ -36,7 +36,7 @@ public class TradeItSdkInstance {
         }
 
         try {
-            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(configurationBuilder.getApiKey(), environment, configurationBuilder.getRequestInterceptorParcelable()), linkedBrokerCache, keyStoreService, configurationBuilder.isStartFetchingBrokerList());
+            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(configurationBuilder.getApiKey(), environment, configurationBuilder.getRequestInterceptorParcelable()), linkedBrokerCache, keyStoreService, configurationBuilder.isPrefetchBrokerListEnabled());
         } catch (TradeItRetrieveLinkedLoginException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e);
         }

@@ -52,13 +52,13 @@ public class TradeItLinkedBrokerManager {
     private static final String TAG = TradeItLinkedBrokerManager.class.getName();
     private SingleCache<List<Broker>> availableBrokersSingleCache = null;
 
-    public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService, boolean startFetchingBrokerList) throws TradeItRetrieveLinkedLoginException {
+    public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService, boolean prefetchBrokerList) throws TradeItRetrieveLinkedLoginException {
         this.keystoreService = keystoreService;
         this.linkedBrokerCache = linkedBrokerCache;
         this.apiClient = apiClient;
         this.loadLinkedBrokersFromSharedPreferences();
 
-        if (startFetchingBrokerList) {
+        if (prefetchBrokerList) {
             // Start fetching available brokers asap so that it is cached
             this.getAvailableBrokersSingleCache();
         }
