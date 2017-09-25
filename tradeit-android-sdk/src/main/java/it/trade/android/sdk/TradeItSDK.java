@@ -1,7 +1,6 @@
 package it.trade.android.sdk;
 
 
-import android.content.Context;
 import android.util.Log;
 
 import it.trade.android.sdk.exceptions.TradeItSDKConfigurationException;
@@ -40,24 +39,10 @@ public class TradeItSDK {
         return instance.getEnvironment();
     }
 
-    public static String getApiKey() {
-        if (instance == null) {
-            throw new TradeItSDKConfigurationException("ERROR: TradeItSDK.apiKey referenced before calling TradeItSDK.configure()!");
-        }
-        return instance.getApiKey();
-    }
-
     public static TradeItLinkedBrokerCache getLinkedBrokerCache() {
         if (instance == null) {
             throw new TradeItSDKConfigurationException("ERROR: TradeItSDK.linkedBrokerCache referenced before calling TradeItSDK.configure()!");
         }
         return instance.getLinkedBrokerCache();
-    }
-
-    public static Context getContext() {
-        if (instance == null) {
-            throw new TradeItSDKConfigurationException("ERROR: TradeItSDK.context referenced before calling TradeItSDK.configure()!");
-        }
-        return instance.getContext();
     }
 }

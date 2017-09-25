@@ -1,23 +1,18 @@
 package it.trade.android.sdk;
 
-import android.content.Context;
-
 import it.trade.android.sdk.exceptions.TradeItKeystoreServiceCreateKeyException;
 import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSDKConfigurationException;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
-import it.trade.android.sdk.model.RequestInterceptorParcelable;
 import it.trade.android.sdk.model.TradeItApiClientParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
 import it.trade.model.request.TradeItEnvironment;
 
 
 public class TradeItSdkInstance {
-    private String apiKey;
     private TradeItEnvironment environment;
     private TradeItLinkedBrokerManager linkedBrokerManager;
-    private Context context;
     private TradeItLinkedBrokerCache linkedBrokerCache;
     private TradeItKeystoreService keyStoreService;
     private static final String TRADE_IT_LINKED_BROKERS_ALIAS = "TRADE_IT_LINKED_BROKERS_ALIAS";
@@ -27,23 +22,21 @@ public class TradeItSdkInstance {
         if (baseUrl != null && !baseUrl.isEmpty()) {
             configurationBuilder.getEnvironment().setBaseUrl(baseUrl);
         }
-        initializeTradeItSdkInstance(configurationBuilder.getContext(), configurationBuilder.getApiKey(), configurationBuilder.getEnvironment(), configurationBuilder.getRequestInterceptorParcelable());
+        initializeTradeItSdkInstance(configurationBuilder);
     }
 
-    private void initializeTradeItSdkInstance(Context context, String apiKey, TradeItEnvironment environment, RequestInterceptorParcelable requestInterceptorParcelable) {
-        this.context = context;
-        this.apiKey = apiKey;
-        this.environment = environment;
-        this.linkedBrokerCache = new TradeItLinkedBrokerCache(context);
+    private void initializeTradeItSdkInstance(TradeItConfigurationBuilder configurationBuilder) {
+        this.environment = configurationBuilder.getEnvironment();
+        this.linkedBrokerCache = new TradeItLinkedBrokerCache(configurationBuilder.getContext());
 
         try {
-            this.keyStoreService = new TradeItKeystoreService(TRADE_IT_LINKED_BROKERS_ALIAS, context);
+            this.keyStoreService = new TradeItKeystoreService(TRADE_IT_LINKED_BROKERS_ALIAS, configurationBuilder.getContext());
         } catch (TradeItKeystoreServiceCreateKeyException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItKeystoreService: ", e);
         }
 
         try {
-            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(apiKey, environment, requestInterceptorParcelable), linkedBrokerCache, keyStoreService);
+            linkedBrokerManager = new TradeItLinkedBrokerManager(new TradeItApiClientParcelable(configurationBuilder.getApiKey(), environment, configurationBuilder.getRequestInterceptorParcelable()), linkedBrokerCache, keyStoreService, configurationBuilder.isPrefetchBrokerListEnabled());
         } catch (TradeItRetrieveLinkedLoginException e) {
             throw new TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e);
         }
@@ -57,15 +50,7 @@ public class TradeItSdkInstance {
         return environment;
     }
 
-    public String getApiKey() {
-        return apiKey;
-    }
-
     public TradeItLinkedBrokerCache getLinkedBrokerCache() {
         return linkedBrokerCache;
-    }
-
-    public Context getContext() {
-        return context;
     }
 }
