@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.web.webdriver.DriverAtoms;
-import android.support.test.espresso.web.webdriver.Locator;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObjectNotFoundException;
+import android.support.test.uiautomator.UiSelector;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.widget.EditText;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,10 +31,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withContentDesc
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static android.support.test.espresso.web.sugar.Web.onWebView;
-import static android.support.test.espresso.web.webdriver.DriverAtoms.clearElement;
-import static android.support.test.espresso.web.webdriver.DriverAtoms.findElement;
-import static android.support.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -58,22 +57,8 @@ public class MainActivityTest {
         editor.commit();
     }
 
-
-    @Rule
-    public ActivityTestRule<WebViewActivity> mActivityRule = new ActivityTestRule<WebViewActivity>(
-            WebViewActivity.class, false, false) {
-        @Override
-        protected void afterActivityLaunched() {
-            // Technically we do not need to do this - WebViewActivity has javascript turned on.
-            // Other WebViews in your app may have javascript turned off, however since the only way
-            // to automate WebViews is through javascript, it must be enabled.
-            onWebView().forceJavascriptEnabled();
-        }
-    };
-
-
     @Test
-    public void oAuthFlowToTradeTest() throws InterruptedException {
+    public void oAuthFlowToTradeTest() throws InterruptedException, UiObjectNotFoundException {
         testOauthFlow("dummy");
         testGetLinkedBrokers(1);
         testAuthenticateFirstLinkedBroker();
@@ -84,7 +69,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void oAuthFlowMultipleLinkedBrokerTest() throws InterruptedException {
+    public void oAuthFlowMultipleLinkedBrokerTest() throws InterruptedException, UiObjectNotFoundException {
         testOauthFlow("dummyMultiple");
         testOauthFlow("dummy");
         testGetLinkedBrokers(2);
@@ -145,7 +130,7 @@ public class MainActivityTest {
         tapOnText("OK");
     }
 
-    private void testOauthFlow(String dummyLogin) throws InterruptedException {
+    private void testOauthFlow(String dummyLogin) throws InterruptedException, UiObjectNotFoundException {
         tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.getLabel());
 
         Thread.sleep(500l); //TODO there should be a better way for waiting
@@ -156,15 +141,20 @@ public class MainActivityTest {
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
 
-        onWebView()
-                .withElement(findElement(Locator.NAME, "id"))
-                .perform(clearElement())
-                .perform(DriverAtoms.webKeys(dummyLogin))
-                .withElement(findElement(Locator.NAME, "password"))
-                .perform(clearElement())
-                .perform(DriverAtoms.webKeys("dummy"))
-                .withElement(findElement(Locator.TAG_NAME, "button"))
-                .perform(webClick());
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiSelector selector = new UiSelector();
+        UiObject login = device.findObject(selector.descriptionContains("Dummy Broker Username"));
+        login.clearTextField();
+        login.click();
+        login.setText(dummyLogin);
+
+        UiObject password = device.findObject(selector.className(EditText.class).instance(2));
+        password.clearTextField();
+        password.click();
+        password.setText("dummy");
+
+        UiObject button = device.findObject(selector.descriptionContains("Sign In"));
+        button.click();
 
         Thread.sleep(2000l); //TODO there should be a better way for waiting
 
@@ -188,7 +178,7 @@ public class MainActivityTest {
 
         Thread.sleep(1000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.linked_broker_accounts_textview, "# of linkedBroker accounts: 1 : [TradeItLinkedBrokerAccountParcelable{accountBaseCurrency='USD', accountName='Individual Account', accountNumber='SINGLE-ACCT-0001', balance='null'}]");
+        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS");
 
         navigateUp();
     }
@@ -206,9 +196,9 @@ public class MainActivityTest {
     private void testRefreshAllBalanceForAllLinkedBroker() throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.getLabel());
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.linked_broker_accounts_textview, "balance='TradeItBalanceParcelable");
+        checkFieldContainsText(R.id.linked_broker_accounts_textview, "Refreshed first account balance again just to test.\n# of linkedBroker accounts: ");
 
         navigateUp();
     }
@@ -238,7 +228,7 @@ public class MainActivityTest {
 
         Thread.sleep(1000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponseParcelable{orderId='1', ackWarningsList=[], warningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00', orderValueLabel='Estimated Cost', orderMessage='You are about to place a limit order to buy GE', lastPrice='null', bidPrice='null', askPrice='null', timestamp='null', buyingPower=2408.12, availableCash=1204.06, estimatedOrderCommission=3.5, longHoldings=0.0, shortHoldings=1.0, estimatedOrderValue=25.0, estimatedTotalValue=null}");
+        checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponseParcelable{orderId='1', ackWarningsList=[], warningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00', orderValueLabel='Estimated Cost', orderMessage='You are about to place a limit order to buy GE', lastPrice='null', bidPrice='null', askPrice='null'");
 
         //place trade
         tapOnText("Place trade");

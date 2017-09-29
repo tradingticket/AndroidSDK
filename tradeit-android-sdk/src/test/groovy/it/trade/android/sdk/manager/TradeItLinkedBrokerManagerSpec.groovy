@@ -1,12 +1,10 @@
 package it.trade.android.sdk.manager
 
 import it.trade.android.sdk.internal.TradeItKeystoreService
-import it.trade.android.sdk.model.TradeItApiClientParcelable
-import it.trade.android.sdk.model.TradeItLinkedBrokerCache
-import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable
-import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
+import it.trade.android.sdk.model.*
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
+import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItErrorCode
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
 import it.trade.model.reponse.TradeItResponse
@@ -79,7 +77,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         keystoreService.getLinkedLogins() >> []
         apiClient.getEnvironment() >> TradeItEnvironment.QA
         apiClient.getApiKey() >> apiClient
-        linkedBrokerManager = new TradeItLinkedBrokerManager(apiClient, linkedBrokerCache, keystoreService);
+        linkedBrokerManager = new TradeItLinkedBrokerManager(apiClient, linkedBrokerCache, keystoreService, true);
     }
 
 // TODO find how we can run the tests using RxJava
@@ -706,27 +704,39 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
 
     def "syncLinkedBrokers sync correctly"() {
         given: "A list of linkedLoginParcelable to synch from"
-            TradeItLinkedLoginParcelable linkedLoginParcelable1 = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
-            TradeItLinkedBrokerParcelable linkedBrokerParcelable1 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable1, linkedBrokerCache)
+            TradeItLinkedBrokerData linkedBrokerData1 = new TradeItLinkedBrokerData("", "MyUserId1", "")
+            TradeItLinkedBrokerParcelable linkedBrokerParcelable1 = new TradeItLinkedBrokerParcelable(apiClient, new TradeItLinkedLoginParcelable(linkedBrokerData1.broker, linkedBrokerData1.userId, linkedBrokerData1.userToken), linkedBrokerCache)
+            TradeItLinkedBrokerAccountData linkedBrokerAccountData1 = new TradeItLinkedBrokerAccountData("MyAccountName", "MyChangedAccountNumber", "USD")
+            linkedBrokerData1.injectAccount(linkedBrokerAccountData1)
 
-            TradeItLinkedLoginParcelable linkedLoginParcelable2 = new TradeItLinkedLoginParcelable("", "MyUserId2", "")
+            TradeItLinkedBrokerData linkedBrokerData2 = new TradeItLinkedBrokerData("", "MyUserId2", "").withLinkActivationPending(true)
+            TradeItLinkedLoginParcelable linkedLoginParcelable2 = new TradeItLinkedLoginParcelable(linkedBrokerData2.broker, linkedBrokerData2.userId, linkedBrokerData2.userToken)
             TradeItLinkedBrokerParcelable linkedBrokerParcelable2 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable2, linkedBrokerCache)
 
-            TradeItLinkedLoginParcelable linkedLoginParcelable3 = new TradeItLinkedLoginParcelable("", "MyUserId3", "")
+            TradeItLinkedBrokerData linkedBrokerData3 = new TradeItLinkedBrokerData("", "MyUserId3", "")
+            TradeItLinkedLoginParcelable linkedLoginParcelable3 = new TradeItLinkedLoginParcelable(linkedBrokerData3.broker, linkedBrokerData3.userId, linkedBrokerData3.userToken)
             TradeItLinkedBrokerParcelable linkedBrokerParcelable3 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable3, linkedBrokerCache)
+            TradeItLinkedBrokerAccountData linkedBrokerAccountData3 = new TradeItLinkedBrokerAccountData("MyAccountName", "MyAccountNumber", "USD")
+            linkedBrokerData3.injectAccount(linkedBrokerAccountData3)
 
-            List<TradeItLinkedLoginParcelable> listToSynchFrom = [linkedLoginParcelable1, linkedLoginParcelable2, linkedLoginParcelable3]
+            List<TradeItLinkedBrokerData> listToSyncFrom = [linkedBrokerData1, linkedBrokerData2, linkedBrokerData3]
 
         and: "The following already existing linkedBrokers"
             TradeItLinkedLoginParcelable linkedLoginParcelable  = new TradeItLinkedLoginParcelable("", "MyUserId1", "")
             TradeItLinkedBrokerParcelable linkedBrokerParcelable = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable, linkedBrokerCache)
+            TradeItBrokerAccount account1 = new TradeItBrokerAccount()
+            account1.accountNumber = linkedBrokerAccountData1.accountNumber
+            account1.accountBaseCurrency = linkedBrokerAccountData1.accountBaseCurrency
+            account1.accountNumber = "MyAccountNumber"
+            linkedBrokerParcelable.accounts.add(new TradeItLinkedBrokerAccountParcelable(linkedBrokerParcelable, account1))
+
             TradeItLinkedLoginParcelable linkedLoginParcelable5  = new TradeItLinkedLoginParcelable("", "MyUserId5", "")
             TradeItLinkedBrokerParcelable linkedBrokerParcelable5 = new TradeItLinkedBrokerParcelable(apiClient, linkedLoginParcelable5, linkedBrokerCache)
 
             linkedBrokerManager.linkedBrokers = [linkedBrokerParcelable, linkedBrokerParcelable5]
 
-        when: "Calling syncLinkedBrokers"
-            linkedBrokerManager.syncLinkedBrokers(listToSynchFrom)
+        when: "Calling syncLocalLinkedBrokers"
+            linkedBrokerManager.syncLocalLinkedBrokers(listToSyncFrom)
 
         then: "expects these calls to delete the linkedLogin from the keystore"
             1 * keystoreService.deleteLinkedLogin(linkedLoginParcelable5)
@@ -747,5 +757,15 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable1)
             linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable2)
             linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable3)
+
+            linkedBrokerManager.getLinkedBrokers().get(0).accounts.size() == 1
+            linkedBrokerManager.getLinkedBrokers().get(0).accounts.get(0).accountNumber == linkedBrokerAccountData1.accountNumber
+            linkedBrokerManager.getLinkedBrokers().get(0).accounts.get(0).accountName == linkedBrokerAccountData1.accountName
+            linkedBrokerManager.getLinkedBrokers().get(0).accounts.get(0).accountBaseCurrency == linkedBrokerAccountData1.accountBaseCurrency
+
+            linkedBrokerManager.getLinkedBrokers().get(2).accounts.size() == 1
+            linkedBrokerManager.getLinkedBrokers().get(2).accounts.get(0).accountNumber == linkedBrokerAccountData3.accountNumber
+            linkedBrokerManager.getLinkedBrokers().get(2).accounts.get(0).accountName == linkedBrokerAccountData3.accountName
+            linkedBrokerManager.getLinkedBrokers().get(2).accounts.get(0).accountBaseCurrency == linkedBrokerAccountData3.accountBaseCurrency
     }
 }

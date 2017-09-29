@@ -24,6 +24,7 @@ import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItUpdateLinkedLoginException;
+import it.trade.android.sdk.internal.LinkedBrokersParcelableList;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
 import it.trade.android.sdk.model.TradeItApiClientParcelable;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
@@ -31,6 +32,7 @@ import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompleti
 import it.trade.android.sdk.model.TradeItErrorResultParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerCache;
+import it.trade.android.sdk.model.TradeItLinkedBrokerData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItLinkedLoginParcelable;
 import it.trade.model.TradeItErrorResult;
@@ -50,39 +52,56 @@ public class TradeItLinkedBrokerManager {
     private static final String TAG = TradeItLinkedBrokerManager.class.getName();
     private SingleCache<List<Broker>> availableBrokersSingleCache = null;
 
-    public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService) throws TradeItRetrieveLinkedLoginException {
+    public TradeItLinkedBrokerManager(TradeItApiClientParcelable apiClient, TradeItLinkedBrokerCache linkedBrokerCache, TradeItKeystoreService keystoreService, boolean prefetchBrokerList) throws TradeItRetrieveLinkedLoginException {
         this.keystoreService = keystoreService;
         this.linkedBrokerCache = linkedBrokerCache;
         this.apiClient = apiClient;
         this.loadLinkedBrokersFromSharedPreferences();
 
-        // Start fetching available brokers asap so that it is cached
-        this.getAvailableBrokersSingleCache();
+        if (prefetchBrokerList) {
+            // Start fetching available brokers asap so that it is cached
+            this.getAvailableBrokersSingleCache();
+        }
     }
 
-    public synchronized void syncLinkedBrokers(List<TradeItLinkedLoginParcelable> linkedLoginParcelables) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
+    public synchronized void syncLocalLinkedBrokers(List<TradeItLinkedBrokerData> linkedBrokerDataList) throws TradeItSaveLinkedLoginException, TradeItDeleteLinkedLoginException {
         List<TradeItLinkedBrokerParcelable> linkedBrokers = this.linkedBrokers;
 
-        // Add missing linkedBrokers
-        for (TradeItLinkedLoginParcelable linkedLoginParcelable: linkedLoginParcelables) {
-            TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable);
-            if (!linkedBrokers.contains(linkedBrokerParcelable)) {
-                linkedBrokerCache.cache(linkedBrokerParcelable);
-                linkedBrokers.add(linkedBrokerParcelable);
+        for (TradeItLinkedBrokerData linkedBrokerData: linkedBrokerDataList) {
+            TradeItLinkedBrokerParcelable linkedBrokerDataParcelable = createNewLinkedBroker(linkedBrokerData);
+            if (!linkedBrokers.contains(linkedBrokerDataParcelable)) { // Add missing linkedBrokers
+                if (linkedBrokerData.isLinkActivationPending){
+                    linkedBrokerDataParcelable.setAccountLinkDelayedError();
+                }
+                linkedBrokerCache.cache(linkedBrokerDataParcelable);
+                linkedBrokers.add(linkedBrokerDataParcelable);
+                TradeItLinkedLoginParcelable linkedLoginParcelable  = linkedBrokerDataParcelable.getLinkedLogin();
                 keystoreService.saveLinkedLogin(linkedLoginParcelable, linkedLoginParcelable.label);
+            } else if (!new LinkedBrokersParcelableList(linkedBrokers).containsSameAccounts(linkedBrokerDataParcelable)) { // Update linkedBrokers accounts if they changed
+                int index = linkedBrokers.indexOf(linkedBrokerDataParcelable);
+                if (index != -1) {
+                    TradeItLinkedBrokerParcelable linkedBrokerParcelableToUpdate = linkedBrokers.get(index);
+                    if (linkedBrokerData.isLinkActivationPending){
+                        linkedBrokerParcelableToUpdate.setAccountLinkDelayedError();
+                    }
+                    linkedBrokerParcelableToUpdate.setAccounts(linkedBrokerDataParcelable.getAccounts());
+                    linkedBrokerCache.cache(linkedBrokerParcelableToUpdate);
+                } else {
+                    Log.e(TAG, "syncLocalLinkedBrokers error: couldn't find the linkedBroker to update");
+                }
             }
         }
 
         // Remove non existing linkedBrokers
         for (TradeItLinkedBrokerParcelable linkedBroker: new ArrayList<>(linkedBrokers)) {
-            if (!linkedLoginParcelables.contains(linkedBroker.getLinkedLogin())) {
+            if (!linkedBrokerDataList.contains(new TradeItLinkedBrokerData(linkedBroker.getLinkedLogin()))) {
                 linkedBrokerCache.removeFromCache(linkedBroker);
                 linkedBrokers.remove(linkedBroker);
                 keystoreService.deleteLinkedLogin(linkedBroker.getLinkedLogin());
             }
         }
-
     }
+
     private void loadLinkedBrokersFromSharedPreferences() throws TradeItRetrieveLinkedLoginException {
         List<TradeItLinkedLoginParcelable> linkedLoginList = keystoreService.getLinkedLogins();
         for (TradeItLinkedLoginParcelable linkedLogin : linkedLoginList) {
@@ -92,14 +111,23 @@ public class TradeItLinkedBrokerManager {
         }
     }
 
+    private TradeItLinkedBrokerParcelable createNewLinkedBroker(TradeItLinkedBrokerData linkedBrokerData) {
+        TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedBrokerData.broker, linkedBrokerData.userId, linkedBrokerData.userToken);
+        TradeItLinkedBrokerParcelable linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable);
+        linkedBrokerParcelable.injectAccounts(linkedBrokerData.linkedBrokerAccounts);
+        return linkedBrokerParcelable;
+    }
+
     private TradeItLinkedBrokerParcelable createNewLinkedBroker(TradeItLinkedLoginParcelable linkedLoginParcelable) {
-        TradeItApiClientParcelable
-                apiClientParcelable = new TradeItApiClientParcelable(this.apiClient.getApiKey(), this.apiClient.getEnvironment(), this.apiClient.getRequestInterceptorParcelable());
+        TradeItApiClientParcelable apiClientParcelable = new TradeItApiClientParcelable(
+                this.apiClient.getApiKey(),
+                this.apiClient.getEnvironment(),
+                this.apiClient.getRequestInterceptorParcelable()
+        );
         //provides a default token, so if the user doesn't authenticate before an other call, it will pass an expired token in order to get the session expired error
         apiClientParcelable.setSessionToken("invalid-default-token");
 
         return new TradeItLinkedBrokerParcelable(apiClientParcelable, linkedLoginParcelable, linkedBrokerCache);
-
     }
 
     public void authenticateAll(final TradeItCallbackWithSecurityQuestionAndCompletion callback) {
@@ -553,6 +581,6 @@ public class TradeItLinkedBrokerManager {
     }
 
     public List<TradeItLinkedBrokerParcelable> getLinkedBrokers() {
-        return new ArrayList<>(linkedBrokers);
+        return linkedBrokers;
     }
 }

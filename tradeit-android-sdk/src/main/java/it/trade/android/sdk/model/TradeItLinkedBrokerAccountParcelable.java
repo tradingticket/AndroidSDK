@@ -28,6 +28,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     public transient TradeItLinkedBrokerParcelable linkedBroker;
     private TradeItBalanceParcelable balance;
+
     private TradeItFxBalanceParcelable fxBalance;
     private Date balanceLastUpdated;
     private List<TradeItPositionParcelable> positions;
@@ -73,6 +74,14 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     public void setBalance(TradeItBalanceParcelable balance) {
         this.balance = balance;
+    }
+
+    public TradeItFxBalanceParcelable getFxBalance() {
+        return fxBalance;
+    }
+
+    public void setFxBalance(TradeItFxBalanceParcelable fxBalance) {
+        this.fxBalance = fxBalance;
     }
 
     public Date getBalanceLastUpdated() { return this.balanceLastUpdated; }
@@ -195,7 +204,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         dest.writeLong(this.balanceLastUpdated != null ? this.balanceLastUpdated.getTime() : -1);
         dest.writeList(this.positions);
         dest.writeString(this.userId);
-        linkedBrokersMap.put(this.userId, linkedBroker);
+        linkedBrokersMap.put(this.userId, this.linkedBroker);
     }
 
     protected TradeItLinkedBrokerAccountParcelable(Parcel in) {
@@ -209,6 +218,11 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         in.readList(this.positions, TradeItPositionParcelable.class.getClassLoader());
         this.userId = in.readString();
         this.linkedBroker = linkedBrokersMap.get(this.userId);
+        int indexAccount = this.linkedBroker.getAccounts().indexOf(this);
+        if (indexAccount != -1) { // updating account reference on the linkedBroker as we created a new object
+            this.linkedBroker.getAccounts().remove(indexAccount);
+            this.linkedBroker.getAccounts().add(indexAccount, this);
+        }
     }
 
     public static final Parcelable.Creator<TradeItLinkedBrokerAccountParcelable> CREATOR = new Parcelable.Creator<TradeItLinkedBrokerAccountParcelable>() {

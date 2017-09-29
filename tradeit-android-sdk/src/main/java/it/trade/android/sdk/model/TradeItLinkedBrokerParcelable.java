@@ -68,6 +68,18 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         linkedBrokerCache.cache(this);
     }
 
+    public void injectAccounts(List<TradeItLinkedBrokerAccountData> linkedBrokerAccounts) {
+        for (TradeItLinkedBrokerAccountData linkedBrokerAccountData: linkedBrokerAccounts) {
+            TradeItBrokerAccount brokerAccount = new TradeItBrokerAccount();
+            brokerAccount.name = linkedBrokerAccountData.accountName;
+            brokerAccount.accountNumber = linkedBrokerAccountData.accountNumber;
+            brokerAccount.accountBaseCurrency = linkedBrokerAccountData.accountBaseCurrency;
+            this.accounts.add(new TradeItLinkedBrokerAccountParcelable(this, brokerAccount));
+        }
+    }
+    protected TradeItErrorResultParcelable getError() {
+        return this.error;
+    }
     public void refreshAccountBalances(final TradeItCallBackCompletion callback) {
         RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
             @Override
@@ -150,8 +162,7 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
                     TradeItAuthenticateResponse authResponse = response.body();
                     List<TradeItBrokerAccount> accountsResult = authResponse.accounts;
                     List<TradeItLinkedBrokerAccountParcelable> linkedBrokerAccounts = mapBrokerAccountsToLinkedBrokerAccounts(accountsResult);
-                    accounts = linkedBrokerAccounts;
-                    accountsLastUpdated = new Date();
+                    linkedBroker.updateLinkedBrokerAccounts(linkedBrokerAccounts);
                     linkedBrokerCache.cache(linkedBroker);
                     callback.onSuccess(linkedBrokerAccounts);
             }
@@ -176,8 +187,31 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         }
     }
 
+    private void updateLinkedBrokerAccounts(List<TradeItLinkedBrokerAccountParcelable> accounts) {
+        for (TradeItLinkedBrokerAccountParcelable account: accounts) {
+            TradeItLinkedBrokerAccountParcelable existingAccount = getLinkedBrokerAccount(account.getAccountNumber());
+            if (existingAccount != null) {
+                account.setBalance(existingAccount.getBalance());
+                account.setFxBalance(existingAccount.getFxBalance());
+                account.setPositions(existingAccount.getPositions());
+                account.setBalanceLastUpdated(existingAccount.getBalanceLastUpdated());
+                account.setLinkedBroker(this);
+            }
+        }
+        this.accounts = accounts;
+        this.accountsLastUpdated = new Date();
+    }
+
     private void setUnauthenticated() {
         this.setError(new TradeItErrorResultParcelable(TradeItErrorCode.SESSION_EXPIRED, "Authentication required", Arrays.asList("Linked broker was not authenticated after initializing.")));
+    }
+
+    public boolean isUnauthenticated() {
+        return this.error != null && this.error.requiresAuthentication();
+    }
+
+    public void setAccountLinkDelayedError() {
+        this.setError(new TradeItErrorResultParcelable(TradeItErrorCode.BROKER_ACCOUNT_NOT_AVAILABLE, "Activation In Progress", Arrays.asList("Your " + this.getBrokerName() + " account is being activated. Check back soon (up to two business days)")));
     }
 
     void setError(TradeItErrorResultParcelable error) {
@@ -186,10 +220,16 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
 
     @Override
     public String toString() {
+        String errorText = "NONE";
+        if (this.error != null) {
+            errorText = this.error.toString();
+        }
+
         return "TradeItLinkedBrokerParcelable{" +
                 "TradeItLinkedLogin=" + this.linkedLogin.toString() +
                 ", accounts=" + getAccounts().toString() +
                 ", accountsLastUpdated=" + getAccountsLastUpdated() +
+                ", error=" + errorText +
                 '}';
     }
 
@@ -205,16 +245,20 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         return this.accounts;
     }
 
+    public void setAccounts(List<TradeItLinkedBrokerAccountParcelable> accounts) {
+        this.accounts = accounts;
+    }
+
     public Date getAccountsLastUpdated() {
         return accountsLastUpdated;
     }
 
-    void setAccounts(List<TradeItLinkedBrokerAccountParcelable> accounts) {
-        this.accounts = accounts;
-    }
-
     void setAccountsLastUpdated(Date accountsLastUpdated) {
         this.accountsLastUpdated = accountsLastUpdated;
+    }
+
+    public boolean isAccountLinkDelayedError() {
+        return (this.error != null && this.error.isAccountLinkDelayedError());
     }
 
     private List<TradeItLinkedBrokerAccountParcelable> mapBrokerAccountsToLinkedBrokerAccounts(List<TradeItBrokerAccount> accounts) {
@@ -233,7 +277,16 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         TradeItLinkedBrokerParcelable that = (TradeItLinkedBrokerParcelable) o;
 
         return linkedLogin.userId.equals(that.linkedLogin.userId);
+    }
 
+    public boolean equalsAccounts(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TradeItLinkedBrokerParcelable that = (TradeItLinkedBrokerParcelable) o;
+
+        return linkedLogin.userId.equals(that.linkedLogin.userId) &&
+                this.accounts.equals(that.accounts);
     }
 
     @Override
@@ -272,6 +325,11 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
         this.accountsLastUpdated = tmpAccountsLastUpdated == -1 ? null : new Date(tmpAccountsLastUpdated);
         this.error = in.readParcelable(TradeItErrorResultParcelable.class.getClassLoader());
         this.linkedBrokerCache = TradeItSDK.getLinkedBrokerCache();
+        int indexLinkedBroker = TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().indexOf(this);
+        if (indexLinkedBroker != -1) { // updating linkedBroker reference on the linkedBrokerManager as we created a new object
+            TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().remove(indexLinkedBroker);
+            TradeItSDK.getLinkedBrokerManager().getLinkedBrokers().add(indexLinkedBroker, this);
+        }
     }
 
     public static final Parcelable.Creator<TradeItLinkedBrokerParcelable> CREATOR = new Parcelable.Creator<TradeItLinkedBrokerParcelable>() {
