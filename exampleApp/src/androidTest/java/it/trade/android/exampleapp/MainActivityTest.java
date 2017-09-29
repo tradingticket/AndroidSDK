@@ -196,9 +196,9 @@ public class MainActivityTest {
     private void testRefreshAllBalanceForAllLinkedBroker() throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.getLabel());
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.linked_broker_accounts_textview, "balance='TradeItBalanceParcelable");
+        checkFieldContainsText(R.id.linked_broker_accounts_textview, "Refreshed first account balance again just to test.\n# of linkedBroker accounts: ");
 
         navigateUp();
     }
