@@ -48,8 +48,6 @@ public class OauthLinkBrokerActivity extends AppCompatActivity implements Custom
         brokersSpinner = (Spinner) this.findViewById(R.id.brokers_spinner);
         final OauthLinkBrokerActivity oauthLinkBrokerActivity = this;
 
-
-
         linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
             @Override
             public void onSuccess(List<Broker> brokersList) {
