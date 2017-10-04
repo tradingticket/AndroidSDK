@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String GET_BROKERS_LIST_PARAMETER = "it.trade.android.exampleapp.AVAILABLE_BROKERS";
     public final static String LINKED_BROKERS_PARAMETER = "it.trade.android.exampleapp.LINKED_BROKERS";
     public final static String LINKED_BROKER_ACCOUNTS_PARAMETER = "it.trade.android.exampleapp.LINKED_BROKER_ACCOUNTS";
-    public final static String BALANCES_PARAMETER = "it.trade.android.exampleapp.BALANCES";
+    public final static String PARCELED_ACCOUNT_PARAMETER = "it.trade.android.exampleapp.PARCELED_ACCOUNT";
     public final static String POSITIONS_PARAMETER = "it.trade.android.exampleapp.POSITIONS";
     public final static String PREVIEW_ORDER_PARAMETER = "it.trade.android.exampleapp.PREVIEW_ORDER";
 
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS("Security question with options"),
         REFRESH_ALL_BALANCES_ALL_LINKED_BROKERS("Refresh all balances for all linked brokers"),
         REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER("Refresh all balances for first linked broker"),
-        GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT("Get balances for first linked broker account"),
+        PARCEL_FIRST_LINKED_BROKER_ACCOUNT("Parcel first linked broker account"),
         GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT("Get positions for first linked broker account"),
         PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account");
 
@@ -184,9 +184,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "refresh balances for all linked brokers was tapped!");
                     refreshBalancesForAllLinkedBrokers();
                     break;
-                case GET_BALANCES_FIRST_LINKED_BROKER_ACCOUNT:
-                    Log.d(TAG, "get balances for first linked broker was tapped!");
-                    getBalancesForFirstLinkedBrokerAccount();
+                case PARCEL_FIRST_LINKED_BROKER_ACCOUNT:
+                    Log.d(TAG, "parcel first linked broker account was tapped!");
+                    parcelFirstLinkedBrokerAccount();
                     break;
                 case GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT:
                     Log.d(TAG, "get positions first linked broker was tapped!");
@@ -392,35 +392,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getBalancesForFirstLinkedBrokerAccount() {
+    private void parcelFirstLinkedBrokerAccount() {
         final MainActivity mainActivity = this;
         List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+
         if (linkedBrokers.isEmpty()) {
             showAlert("getBalancesFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
             showAlert("getBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
-            TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = linkedBroker.getAccounts().get(0);
-            linkedBrokerAccount.refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
-                @Override
-                public void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) {
-                    Intent intent = new Intent(mainActivity, BalancesActivity.class);
-                    intent.putExtra(BALANCES_PARAMETER, linkedBrokerAccountParcelable.getBalance());
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onError(TradeItErrorResult error) {
-                    showAlert("getBalancesFirstLinkedBroker", "Error refreshing balances: " + error);
-                }
-            });
+            TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable = linkedBroker.getAccounts().get(0);
+            Intent intent = new Intent(mainActivity, ParceledAccountActivity.class);
+            intent.putExtra(PARCELED_ACCOUNT_PARAMETER, linkedBrokerAccountParcelable);
+            startActivity(intent);
         }
     }
 
     private void refreshAllBalancesFirstLinkedBroker() {
-        final MainActivity mainActivity = this;
         List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+
         if (linkedBrokers.isEmpty()) {
             showAlert("refreshAllBalancesFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
@@ -438,12 +429,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshBalancesForAllLinkedBrokers() {
         List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+
         if (linkedBrokers.isEmpty()) {
             showAlert("refreshAllBalancesFirstLinkedBroker", "No linked broker!");
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
             showAlert("refreshAllBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
-            final TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
             linkedBrokerManager.refreshAccountBalances(new TradeItCallBackCompletion() {
                 @Override
                 public void onFinished() {
