@@ -38,7 +38,7 @@
             android:name=".LinkedBrokerAccountsActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".BalancesActivity"
+            android:name=".ParceledAccountActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PositionsActivity"
