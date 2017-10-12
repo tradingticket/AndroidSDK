@@ -43,4 +43,13 @@
         android:onClick="getPortfolioTapped"
         android:text="GET PORTFOLIO"/>
 
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/output_textview"
+        android:layout_toEndOf="@+id/button3"
+        android:onClick="authenticate"
+        android:text="AUTHENTICATE" />
+
 </RelativeLayout>
