@@ -1,5 +1,5 @@
 ---
-title: Special-Cases
+title: Special Cases
 layout: default
 ---
 
