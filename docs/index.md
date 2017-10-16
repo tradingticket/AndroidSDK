@@ -1,6 +1,6 @@
 ---
-title: Android SDK
+title: Introduction
 layout: default
 ---
 
-{% include_relative AndroidSDK.wiki/Home.md %}
+{% include_relative AndroidSDK.wiki/Introduction.md %}
