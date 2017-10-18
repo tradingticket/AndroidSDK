@@ -13,7 +13,9 @@ import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItPositionParcelable;
 import it.trade.model.TradeItErrorResult;
+import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
+import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 
 import static it.trade.android.exampleapp.MainActivity.PARCELED_ACCOUNT_PARAMETER;
 
@@ -92,6 +94,34 @@ public class ParceledAccountActivity extends AppCompatActivity {
             @Override
             public void onError(TradeItErrorResult error) {
                 textView.setText("Error refreshing portfolio: " + error);
+            }
+        });
+    }
+
+    public void authenticate(View view) {
+        linkedBrokerAccount.linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+            @Override
+            public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+
+            }
+
+            @Override
+            public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
+                String message = "Parceled LinkedBrokerAccount(@"
+                        + System.identityHashCode(linkedBrokerAccount)
+                        + "):\n"
+                        + linkedBrokerAccount.toString()
+                        + "\n\n==========\n\n"
+                        + "LinkedBrokerManager->LinkedBrokerAccount(@"
+                        + System.identityHashCode(accounts.get(0))
+                        + "):\n"
+                        + accounts.get(0).toString();
+                textView.setText(message);
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                textView.setText("Error authenticating: " + error);
             }
         });
     }
