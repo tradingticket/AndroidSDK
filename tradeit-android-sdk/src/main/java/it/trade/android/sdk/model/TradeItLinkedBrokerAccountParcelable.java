@@ -22,9 +22,9 @@ import static it.trade.model.reponse.TradeItErrorCode.PARAMETER_ERROR;
 
 public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
     private static Map<String, TradeItLinkedBrokerParcelable> linkedBrokersMap = new HashMap<>(); //used for parcelable
-    private String accountName;
-    private String accountNumber;
-    private String accountBaseCurrency;
+    protected String accountName;
+    protected String accountNumber;
+    protected String accountBaseCurrency;
 
     public transient TradeItLinkedBrokerParcelable linkedBroker;
     private TradeItBalanceParcelable balance;
