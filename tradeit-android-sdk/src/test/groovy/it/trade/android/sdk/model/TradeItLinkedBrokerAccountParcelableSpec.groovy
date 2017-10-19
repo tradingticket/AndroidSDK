@@ -237,7 +237,7 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
 
             tradeItApiClient.getAllOrderStatus(_, _) >> { args ->
-                TradeItCallback<List<TradeItPosition>> callback = args[1]
+                TradeItCallback<List<OrderStatusDetails>> callback = args[1]
                 def orders = [orderStatusDetails1, orderStatusDetails2]
                 callback.onSuccess(orders)
             }
@@ -272,18 +272,105 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
 
     def "RefreshOrders handles an error response from trade it"() {
         given: "an error response from trade it api"
-        int successCallbackCount = 0
-        int errorCallbackCount = 0
-        tradeItApiClient.getAllOrderStatus(_, _) >> { args ->
-            TradeItCallback<TradeItOrderStatusParcelable> callback = args[1]
-            callback.onError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "My short message", ["My long message"]))
-        }
+            int successCallbackCount = 0
+            int errorCallbackCount = 0
+            tradeItApiClient.getAllOrderStatus(_, _) >> { args ->
+                TradeItCallback<List<TradeItOrderStatusParcelable>> callback = args[1]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "My short message", ["My long message"]))
+            }
 
         when: "calling order status on the linked broker account"
             TradeItErrorResult errorResult = null
             linkedBrokerAccount.refreshOrdersStatus(new TradeItCallback<List<TradeItOrderStatusParcelable>>() {
                 @Override
                 void onSuccess(List<TradeItOrderStatusParcelable> orders) {
+                    successCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorResult = error
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the errorCallbackCount called once"
+            successCallbackCount == 0
+            errorCallbackCount == 1
+
+        then: "expects error result correctly populated"
+            errorResult.errorCode == TradeItErrorCode.SESSION_EXPIRED
+            errorResult.shortMessage == "My short message"
+            errorResult.longMessages == ["My long message"]
+
+
+    }
+
+    def "CancelOrder handles a successful response from trade it"() {
+        given: "a successful response from trade it api"
+            int successCallbackCount = 0
+            int errorCallbackCount = 0
+            OrderStatusDetails orderStatusDetails = new OrderStatusDetails()
+            orderStatusDetails.orderExpiration = "GTC"
+            orderStatusDetails.orderType = "EQUITY_OR_ETF"
+            orderStatusDetails.orderStatus = "CANCELED"
+            orderStatusDetails.orderNumber = "1"
+            OrderLeg orderLeg = new OrderLeg()
+            orderLeg.symbol = "GE"
+            orderLeg.filledQuantity = 0
+            orderLeg.orderedQuantity = 10
+            orderLeg.action = "BUY"
+            PriceInfo priceInfo = new PriceInfo()
+            priceInfo.type = "LIMIT"
+            priceInfo.limitPrice = 20.3
+            orderLeg.priceInfo = priceInfo
+            orderStatusDetails.orderLegs = [orderLeg]
+
+
+            tradeItApiClient.cancelOrder(_, _, _) >> { args ->
+                TradeItCallback<OrderStatusDetails> callback = args[2]
+                callback.onSuccess(orderStatusDetails)
+            }
+
+        when: "calling cancel order on the linked broker account"
+            TradeItOrderStatusParcelable orderStatusParcelableResult = null
+            linkedBrokerAccount.cancelOrder("orderNumber", new TradeItCallback<TradeItOrderStatusParcelable>() {
+                @Override
+                void onSuccess(TradeItOrderStatusParcelable orderStatusParcelable) {
+                    orderStatusParcelableResult = orderStatusParcelable
+                    successCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallbackCount == 1
+            errorCallbackCount == 0
+
+        then: "expects orders status to be returned"
+            orderStatusParcelableResult == new TradeItOrderStatusParcelable(orderStatusDetails)
+
+
+    }
+
+    def "CancelOrder handles an error response from trade it"() {
+        given: "an error response from trade it api"
+            int successCallbackCount = 0
+            int errorCallbackCount = 0
+            tradeItApiClient.cancelOrder(_,_, _) >> { args ->
+                TradeItCallback<TradeItOrderStatusParcelable> callback = args[2]
+                callback.onError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "My short message", ["My long message"]))
+            }
+
+        when: "calling cancel order on the linked broker account"
+            TradeItErrorResult errorResult = null
+            linkedBrokerAccount.cancelOrder("orderNumber", new TradeItCallback<TradeItOrderStatusParcelable>() {
+                @Override
+                void onSuccess(TradeItOrderStatusParcelable order) {
                     successCallbackCount++
                 }
 
