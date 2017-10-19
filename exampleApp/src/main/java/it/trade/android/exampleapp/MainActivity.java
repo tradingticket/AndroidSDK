@@ -29,12 +29,13 @@ import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
-import it.trade.android.sdk.model.TradeItLinkedBrokerData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
+import it.trade.android.sdk.model.TradeItLinkedBrokerData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
 import it.trade.android.sdk.model.TradeItPositionParcelable;
+import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String LINKED_BROKER_ACCOUNTS_PARAMETER = "it.trade.android.exampleapp.LINKED_BROKER_ACCOUNTS";
     public final static String PARCELED_ACCOUNT_PARAMETER = "it.trade.android.exampleapp.PARCELED_ACCOUNT";
     public final static String POSITIONS_PARAMETER = "it.trade.android.exampleapp.POSITIONS";
+    public final static String ORDERS_STATUS_PARAMETER = "it.trade.android.exampleapp.ORDERS_STATUS";
     public final static String PREVIEW_ORDER_PARAMETER = "it.trade.android.exampleapp.PREVIEW_ORDER";
 
 
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER("Refresh all balances for first linked broker"),
         PARCEL_FIRST_LINKED_BROKER_ACCOUNT("Parcel first linked broker account"),
         GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT("Get positions for first linked broker account"),
+        REFRESH_ORDERS_STATUS_FIRST_LINKED_BROKER_ACCOUNT("Refresh orders status for first linked broker account"),
         PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account");
 
         private String label;
@@ -189,8 +192,12 @@ public class MainActivity extends AppCompatActivity {
                     parcelFirstLinkedBrokerAccount();
                     break;
                 case GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT:
-                    Log.d(TAG, "get positions first linked broker was tapped!");
                     getPositionsFirstLinkedBroker();
+                    Log.d(TAG, "get positions first linked broker was tapped!");
+                    break;
+                case REFRESH_ORDERS_STATUS_FIRST_LINKED_BROKER_ACCOUNT:
+                    getOrdersStatusFirstLinkedBroker();
+                    Log.d(TAG, "refresh orders status first linked broker was tapped!");
                     break;
                 case PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT:
                     Log.d(TAG, "preview trade first linked broker account was tapped!");
@@ -464,7 +471,34 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(TradeItErrorResult error) {
-                        showAlert("getBalancesFirstLinkedBroker", "Error refreshing balances: " + error);
+                        showAlert("getPositionsFirstLinkedBroker", "Error refreshing positions: " + error);
+                    }
+                });
+            }
+        }
+    }
+
+    private void getOrdersStatusFirstLinkedBroker() {
+        final MainActivity mainActivity = this;
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        if (linkedBrokers.isEmpty()) {
+            showAlert("getOrdersStatusFirstLinkedBroker", "No linked broker!");
+        } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
+            showAlert("getOrdersStatusFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
+        } else {
+            TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
+            for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
+                linkedBrokerAccount.refreshOrdersStatus(new TradeItCallback<List<TradeItOrderStatusParcelable>>() {
+                    @Override
+                    public void onSuccess(List<TradeItOrderStatusParcelable> orderStatusDetailsList) {
+                        Intent intent = new Intent(mainActivity, OrdersStatusActivity.class);
+                        intent.putParcelableArrayListExtra(ORDERS_STATUS_PARAMETER, (ArrayList<? extends Parcelable>) orderStatusDetailsList);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onError(TradeItErrorResult error) {
+                        showAlert("getOrdersStatusFirstLinkedBroker", "Error refreshing orders status: " + error);
                     }
                 });
             }

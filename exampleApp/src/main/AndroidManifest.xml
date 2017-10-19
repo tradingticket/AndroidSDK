@@ -46,7 +46,10 @@
         <activity
             android:name=".PreviewOrderActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".BrokersListActivity"
+        <activity
+            android:name=".BrokersListActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".OrdersStatusActivity"
             android:parentActivityName=".MainActivity" />
     </application>
 
