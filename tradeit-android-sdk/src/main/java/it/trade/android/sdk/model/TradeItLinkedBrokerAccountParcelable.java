@@ -10,9 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
+import it.trade.model.reponse.OrderStatusDetails;
 import it.trade.model.reponse.TradeItAccountOverviewResponse;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItPosition;
@@ -32,6 +34,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
     private TradeItFxBalanceParcelable fxBalance;
     private Date balanceLastUpdated;
     private List<TradeItPositionParcelable> positions;
+    private List<TradeItOrderStatusParcelable> ordersStatus;
     private String userId;
 
     public TradeItLinkedBrokerAccountParcelable(TradeItLinkedBrokerParcelable linkedBroker, TradeItBrokerAccount account) {
@@ -94,6 +97,10 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         return positions;
     }
 
+    public List<TradeItOrderStatusParcelable> getOrdersStatus() {
+        return ordersStatus;
+    }
+
     void setLinkedBroker(TradeItLinkedBrokerParcelable linkedBroker) {
         this.linkedBroker = linkedBroker;
     }
@@ -143,6 +150,25 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
             @Override
             public void onError(TradeItErrorResult errorResult) {
                 TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(errorResult);
+                linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable);
+                callback.onError(errorResultParcelable);
+            }
+        });
+    }
+
+    public void refreshOrdersStatus(final TradeItCallback<List<TradeItOrderStatusParcelable>> callback) {
+        final TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = this;
+        this.getTradeItApiClient().getAllOrderStatus(accountNumber, new TradeItCallback<List<OrderStatusDetails>>() {
+            @Override
+            public void onSuccess(List<OrderStatusDetails> orderStatusDetailsList) {
+                List<TradeItOrderStatusParcelable> orderStatusParcelables = TradeItOrderStatusParcelable.mapOrderStatusDetailsToTradeItOrderStatusParcelable(orderStatusDetailsList);
+                linkedBrokerAccount.ordersStatus = orderStatusParcelables;
+                callback.onSuccess(orderStatusParcelables);
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
                 linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable);
                 callback.onError(errorResultParcelable);
             }

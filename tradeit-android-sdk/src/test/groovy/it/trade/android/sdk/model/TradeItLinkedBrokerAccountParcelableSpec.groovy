@@ -1,5 +1,6 @@
 package it.trade.android.sdk.model
 
+import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
@@ -176,6 +177,113 @@ class TradeItLinkedBrokerAccountParcelableSpec extends Specification {
             linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItPosition>>() {
                 @Override
                 void onSuccess(List<TradeItPosition> positions) {
+                    successCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorResult = error
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the errorCallbackCount called once"
+            successCallbackCount == 0
+            errorCallbackCount == 1
+
+        then: "expects error result correctly populated"
+            errorResult.errorCode == TradeItErrorCode.SESSION_EXPIRED
+            errorResult.shortMessage == "My short message"
+            errorResult.longMessages == ["My long message"]
+
+
+    }
+
+    def "RefreshOrdersStatus handles a successful response from trade it"() {
+        given: "a successful response from trade it api"
+            int successCallbackCount = 0
+            int errorCallbackCount = 0
+            OrderStatusDetails orderStatusDetails1 = new OrderStatusDetails()
+            orderStatusDetails1.orderExpiration = "GTC"
+            orderStatusDetails1.orderType = "EQUITY_OR_ETF"
+            orderStatusDetails1.orderStatus = "OPEN"
+            orderStatusDetails1.orderNumber = "1"
+            OrderLeg orderLeg = new OrderLeg()
+            orderLeg.symbol = "GE"
+            orderLeg.filledQuantity = 0
+            orderLeg.orderedQuantity = 10
+            orderLeg.action = "BUY"
+            PriceInfo priceInfo = new PriceInfo()
+            priceInfo.type = "LIMIT"
+            priceInfo.limitPrice = 20.3
+            orderLeg.priceInfo = priceInfo
+            orderStatusDetails1.orderLegs = [orderLeg]
+
+            OrderStatusDetails orderStatusDetails2 = new OrderStatusDetails()
+            orderStatusDetails2.orderNumber = 2
+            orderStatusDetails2.orderExpiration = "DAY"
+            orderStatusDetails2.orderType = "EQUITY_OR_ETF"
+            orderStatusDetails2.orderStatus = "OPEN"
+            orderStatusDetails2.orderNumber = "1"
+            orderLeg = new OrderLeg()
+            orderLeg.symbol = "AAPL"
+            orderLeg.filledQuantity = 0
+            orderLeg.orderedQuantity = 10
+            orderLeg.action = "BUY"
+            priceInfo = new PriceInfo()
+            priceInfo.type = "MARKET"
+            orderLeg.priceInfo = priceInfo
+            orderStatusDetails2.orderLegs = [orderLeg]
+
+
+            tradeItApiClient.getAllOrderStatus(_, _) >> { args ->
+                TradeItCallback<List<TradeItPosition>> callback = args[1]
+                def orders = [orderStatusDetails1, orderStatusDetails2]
+                callback.onSuccess(orders)
+            }
+
+        when: "calling refresh orders status on the linked broker account"
+            List<TradeItOrderStatusParcelable> orderStatusResult = null
+            linkedBrokerAccount.refreshOrdersStatus(new TradeItCallback<List<TradeItOrderStatusParcelable>>() {
+                @Override
+                void onSuccess(List<TradeItOrderStatusParcelable> orderStatusParcelableList) {
+                    orderStatusResult = orderStatusParcelableList
+                    successCallbackCount++
+                }
+
+                @Override
+                void onError(TradeItErrorResult error) {
+                    errorCallbackCount++
+                }
+            })
+
+        then: "expects the successCallback called once"
+            successCallbackCount == 1
+            errorCallbackCount == 0
+
+        then: "expects orders status to be returned"
+            orderStatusResult == [new TradeItOrderStatusParcelable(orderStatusDetails1), new TradeItOrderStatusParcelable(orderStatusDetails2)]
+
+        and: "the linked broker account should have his orders status property updated"
+            linkedBrokerAccount.getOrdersStatus() == orderStatusResult
+
+
+    }
+
+    def "RefreshOrders handles an error response from trade it"() {
+        given: "an error response from trade it api"
+        int successCallbackCount = 0
+        int errorCallbackCount = 0
+        tradeItApiClient.getAllOrderStatus(_, _) >> { args ->
+            TradeItCallback<TradeItOrderStatusParcelable> callback = args[1]
+            callback.onError(new TradeItErrorResult(TradeItErrorCode.SESSION_EXPIRED, "My short message", ["My long message"]))
+        }
+
+        when: "calling order status on the linked broker account"
+            TradeItErrorResult errorResult = null
+            linkedBrokerAccount.refreshOrdersStatus(new TradeItCallback<List<TradeItOrderStatusParcelable>>() {
+                @Override
+                void onSuccess(List<TradeItOrderStatusParcelable> orders) {
                     successCallbackCount++
                 }
 
