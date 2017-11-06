@@ -175,6 +175,23 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         });
     }
 
+    public void cancelOrder(String orderNumber, final TradeItCallback<TradeItOrderStatusParcelable> callback) {
+        final TradeItLinkedBrokerAccountParcelable linkedBrokerAccount = this;
+        this.getTradeItApiClient().cancelOrder(accountNumber, orderNumber, new TradeItCallback<OrderStatusDetails>() {
+            @Override
+            public void onSuccess(OrderStatusDetails orderStatusDetails) {
+                callback.onSuccess(new TradeItOrderStatusParcelable(orderStatusDetails));
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable);
+                callback.onError(errorResultParcelable);
+            }
+        });
+    }
+
     private List<TradeItPositionParcelable> mapPositionsToPositionsParcelable(List<TradeItPosition> positions) {
         List<TradeItPositionParcelable> positionsParcelable = new ArrayList<>();
         for (TradeItPosition position : positions) {

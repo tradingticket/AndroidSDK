@@ -12,6 +12,7 @@ import android.widget.TextView;
 import it.trade.android.sdk.model.TradeItOrderParcelable;
 import it.trade.android.sdk.model.TradeItPlaceStockOrEtfOrderResponseParcelable;
 import it.trade.android.sdk.model.TradeItPreviewStockOrEtfOrderResponseParcelable;
+import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
 
@@ -22,6 +23,8 @@ public class PreviewOrderActivity extends AppCompatActivity {
     private String orderId;
     private TradeItOrderParcelable order;
     private TextView textView;
+    private Button cancelOrderButton;
+    String orderNumber = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class PreviewOrderActivity extends AppCompatActivity {
         Intent intent = getIntent();
         order = intent.getParcelableExtra(PREVIEW_ORDER_PARAMETER);
         final Button placeOrderButton = (Button) this.findViewById(R.id.place_trade_button);
+        cancelOrderButton = (Button) this.findViewById(R.id.cancel_order_button);
         order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable>() {
             @Override
             public void onSuccess(TradeItPreviewStockOrEtfOrderResponseParcelable response) {
@@ -53,12 +57,29 @@ public class PreviewOrderActivity extends AppCompatActivity {
             @Override
             public void onSuccess(TradeItPlaceStockOrEtfOrderResponseParcelable placeOrderResponse) {
                 textView.append(placeOrderResponse.toString());
+                cancelOrderButton.setEnabled(true);
+                orderNumber = placeOrderResponse.getOrderNumber();
             }
 
             @Override
             public void onError(TradeItErrorResult error) {
                 Log.e(TAG, "ERROR placeOrder: " + error.toString());
                 textView.setText("ERROR placeOrder: " + error);
+            }
+        });
+    }
+
+    public void cancelOrder(View view) {
+        order.getLinkedBrokerAccount().cancelOrder(orderNumber, new TradeItCallback<TradeItOrderStatusParcelable>() {
+            @Override
+            public void onSuccess(TradeItOrderStatusParcelable orderStatusParcelable) {
+                textView.append(orderStatusParcelable.toString());
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                Log.e(TAG, "ERROR cancelOrder: " + error.toString());
+                textView.setText("ERROR cancelOrder: " + error);
             }
         });
     }
