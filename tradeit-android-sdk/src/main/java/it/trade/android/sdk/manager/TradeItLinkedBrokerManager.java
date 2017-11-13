@@ -447,7 +447,7 @@ public class TradeItLinkedBrokerManager {
     }
 
     public void getOAuthLoginPopupForTokenUpdateUrl(TradeItLinkedBrokerParcelable linkedBroker, String deepLinkCallback, final TradeItCallback<String> callback) {
-        apiClient.getOAuthLoginPopupUrlForTokenUpdate(linkedBroker.getBrokerName(), linkedBroker.getLinkedLogin().userId, deepLinkCallback, new TradeItCallback<String>() {
+        apiClient.getOAuthLoginPopupUrlForTokenUpdate(linkedBroker.getBrokerName(), linkedBroker.getLinkedLogin().userId, linkedBroker.getLinkedLogin().userToken, deepLinkCallback, new TradeItCallback<String>() {
             @Override
             public void onSuccess(String oAuthUrl) {
                 callback.onSuccess(oAuthUrl);
