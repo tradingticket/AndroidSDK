@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String POSITIONS_PARAMETER = "it.trade.android.exampleapp.POSITIONS";
     public final static String ORDERS_STATUS_PARAMETER = "it.trade.android.exampleapp.ORDERS_STATUS";
     public final static String PREVIEW_ORDER_PARAMETER = "it.trade.android.exampleapp.PREVIEW_ORDER";
+    public final static String RELINK_OAUTH_PARAMETER = "it.trade.android.exampleapp.RELINK_OAUTH";
 
 
     private TradeItLinkedBrokerManager linkedBrokerManager;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         GET_NON_FEATURED_EQUITY_BROKERS("Get Non Featured Equity Brokers"),
         SYNC_LOCAL_LINKED_BROKERS("Sync Local Linked Brokers"),
         OAUTH_LINKED_A_BROKER("Link a broker via the oAuth flow"),
+        RELINK_FIRST_LINK__BROKER("Relink first link broker via the oAuth flow"),
         GET_LINKED_BROKERS("Get current linked brokers"),
         DELETE_ALL_LINKED_BROKERS("Delete all linked brokers"),
         AUTHENTICATE_FIRST_LINKED_BROKER("Authenticate first linked broker"),
@@ -154,6 +156,10 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Link a broker tapped!");
                     Intent intentOauth = new Intent(view.getContext(), OauthLinkBrokerActivity.class);
                     startActivity(intentOauth);
+                    break;
+                case RELINK_FIRST_LINK__BROKER:
+                    Log.d(TAG, "Relink first linked broker was tapped!");
+                    relinkFirstLinkedBroker();
                     break;
                 case GET_LINKED_BROKERS:
                     Log.d(TAG, "Get linked brokers tapped!");
@@ -489,6 +495,17 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, e.getMessage(), e);
         } catch (TradeItDeleteLinkedLoginException e) {
             Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private void relinkFirstLinkedBroker() {
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        if (linkedBrokers.isEmpty()) {
+            showAlert("relinkFirstLinkedBroker", "No linked broker!");
+        } else {
+            Intent intentRelinkOauth = new Intent(this, OauthLinkBrokerActivity.class);
+            intentRelinkOauth.putExtra(RELINK_OAUTH_PARAMETER, linkedBrokerManager.getLinkedBrokers().get(0).getLinkedLogin().userId);
+            startActivity(intentRelinkOauth);
         }
     }
 }
