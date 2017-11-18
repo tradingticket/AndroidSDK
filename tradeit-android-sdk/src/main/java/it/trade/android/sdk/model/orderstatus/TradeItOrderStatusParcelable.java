@@ -3,6 +3,8 @@ package it.trade.android.sdk.model.orderstatus;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +14,28 @@ import it.trade.model.reponse.OrderStatusDetails;
 
 public class TradeItOrderStatusParcelable implements Parcelable {
 
+    @SerializedName("groupOrderType")
     private String groupOrderType;
+
+    @SerializedName("orderExpiration")
     private String orderExpiration;
+
+    @SerializedName("orderType")
     private String orderType;
+
+    @SerializedName("groupOrderId")
     private String groupOrderId;
+
+    @SerializedName("orderLegs")
     private List<TradeItOrderLegParcelable> orderLegs = new ArrayList<>();
+
+    @SerializedName("orderNumber")
     private String orderNumber;
+
+    @SerializedName("orderStatus")
     private String orderStatus;
+
+    @SerializedName("groupOrders")
     private List<TradeItOrderStatusParcelable> groupOrders = new ArrayList<>();
 
     public TradeItOrderStatusParcelable(OrderStatusDetails orderStatusDetails) {
