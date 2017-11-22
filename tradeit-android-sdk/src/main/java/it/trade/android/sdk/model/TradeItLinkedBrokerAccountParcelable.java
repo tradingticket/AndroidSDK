@@ -4,6 +4,8 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,17 +26,34 @@ import static it.trade.model.reponse.TradeItErrorCode.PARAMETER_ERROR;
 
 public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
     private static Map<String, TradeItLinkedBrokerParcelable> linkedBrokersMap = new HashMap<>(); //used for parcelable
+
+    @SerializedName("accountName")
     protected String accountName;
+
+    @SerializedName("accountNumber")
     protected String accountNumber;
+
+    @SerializedName("accountBaseCurrency")
     protected String accountBaseCurrency;
 
     public transient TradeItLinkedBrokerParcelable linkedBroker;
+
+    @SerializedName("balance")
     private TradeItBalanceParcelable balance;
 
+    @SerializedName("fxBalance")
     private TradeItFxBalanceParcelable fxBalance;
+
+    @SerializedName("balanceLastUpdated")
     private Date balanceLastUpdated;
+
+    @SerializedName("positions")
     private List<TradeItPositionParcelable> positions;
+
+    @SerializedName("ordersStatus")
     private List<TradeItOrderStatusParcelable> ordersStatus;
+
+    @SerializedName("userId")
     private String userId;
 
     public TradeItLinkedBrokerAccountParcelable(TradeItLinkedBrokerParcelable linkedBroker, TradeItBrokerAccount account) {

@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -11,7 +13,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import it.trade.android.sdk.TradeItSDK;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
@@ -24,6 +25,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
+import it.trade.android.sdk.TradeItSDK;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.AuthenticationCallback;
@@ -39,9 +41,16 @@ import retrofit2.Response;
 public class TradeItLinkedBrokerParcelable implements Parcelable {
     private transient TradeItApiClientParcelable apiClient;
     private transient TradeItLinkedLoginParcelable linkedLogin;
+
+    @SerializedName("accounts")
     private List<TradeItLinkedBrokerAccountParcelable> accounts = new ArrayList<>();
+
+    @SerializedName("accountsLastUpdated")
     private Date accountsLastUpdated;
+
+    @SerializedName("error")
     private TradeItErrorResultParcelable error;
+
     private transient TradeItLinkedBrokerCache linkedBrokerCache;
 
     private static final String TAG = TradeItLinkedBrokerParcelable.class.getName();

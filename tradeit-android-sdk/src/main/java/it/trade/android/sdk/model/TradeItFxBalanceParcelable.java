@@ -3,20 +3,28 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import it.trade.model.reponse.TradeItFxAccountOverview;
 
 public class TradeItFxBalanceParcelable implements Parcelable {
 
+    @SerializedName("buyingPowerBaseCurrency")
     public Double buyingPowerBaseCurrency;
 
+    @SerializedName("marginBalanceBaseCurrency")
     public Double marginBalanceBaseCurrency;
 
+    @SerializedName("realizedProfitAndLossBaseCurrency")
     public Double realizedProfitAndLossBaseCurrency;
 
+    @SerializedName("totalValueBaseCurrency")
     public Double totalValueBaseCurrency;
 
+    @SerializedName("totalValueUSD")
     public Double totalValueUSD;
 
+    @SerializedName("unrealizedProfitAndLossBaseCurrency")
     public Double unrealizedProfitAndLossBaseCurrency;
 
     TradeItFxBalanceParcelable() {}

@@ -3,13 +3,22 @@ package it.trade.android.sdk.model.orderstatus;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import it.trade.model.reponse.Fill;
 
 public class TradeItFillParcelable implements Parcelable {
 
+    @SerializedName("timestampFormat")
     private String timestampFormat;
+
+    @SerializedName("price")
     private Double price;
+
+    @SerializedName("timestamp")
     private String timestamp;
+
+    @SerializedName("quantity")
     private Integer quantity;
 
     TradeItFillParcelable(Fill fill) {

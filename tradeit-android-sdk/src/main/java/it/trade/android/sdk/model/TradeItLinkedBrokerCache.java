@@ -3,9 +3,11 @@ package it.trade.android.sdk.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +16,7 @@ public class TradeItLinkedBrokerCache {
     public static final String TRADE_IT_SDK_SHARED_PREFS_KEY = "TRADE_IT_SDK_SHARED_PREFS_KEY";
     Gson gson = new Gson();
     private Context context;
+    private static final String TAG = TradeItLinkedBrokerCache.class.getName();
 
     public TradeItLinkedBrokerCache(Context context) {
         this.context = context;
@@ -46,16 +49,26 @@ public class TradeItLinkedBrokerCache {
 
         if (linkedBrokerCache.contains(userId)) {
             String linkedBrokerSerialized = sharedPreferences.getString(LINKED_BROKER_CACHE_KEY_PREFIX + userId, "");
-            TradeItLinkedBrokerParcelable linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBrokerParcelable.class);
-            linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
-            linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
+            try {
+                TradeItLinkedBrokerParcelable linkedBrokerDeserialized = gson.fromJson(linkedBrokerSerialized, TradeItLinkedBrokerParcelable.class);
+                linkedBroker.setAccounts(linkedBrokerDeserialized.getAccounts());
+                linkedBroker.setAccountsLastUpdated(linkedBrokerDeserialized.getAccountsLastUpdated());
 
-            if (linkedBrokerDeserialized.isAccountLinkDelayedError()) {
-                linkedBroker.setError(linkedBrokerDeserialized.getError());
-            }
+                if (linkedBrokerDeserialized.isAccountLinkDelayedError()) {
+                    linkedBroker.setError(linkedBrokerDeserialized.getError());
+                }
 
-            for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount: linkedBroker.getAccounts()) {
-                linkedBrokerAccount.setLinkedBroker(linkedBroker);
+                for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount: linkedBroker.getAccounts()) {
+                    linkedBrokerAccount.setLinkedBroker(linkedBroker);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Fails to deserialize to TradeItLinkedBrokerParcelable", e);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(LINKED_BROKER_CACHE_KEY_PREFIX + userId);
+                linkedBrokerCache.remove(userId);
+                editor.putStringSet(LINKED_BROKER_CACHE_KEY_PREFIX, linkedBrokerCache);
+                editor.apply();
+                linkedBroker.setAccounts(new ArrayList<TradeItLinkedBrokerAccountParcelable>());
             }
         }
     }

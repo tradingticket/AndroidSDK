@@ -3,20 +3,43 @@ package it.trade.android.sdk.model.orderstatus;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import it.trade.model.reponse.PriceInfo;
 
 public class TradeItPriceInfoParcelable implements Parcelable {
 
+    @SerializedName("conditionType")
     private String conditionType;
+
+    @SerializedName("initialStopPrice")
     private Double initialStopPrice;
+
+    @SerializedName("conditionSymbol")
     private String conditionSymbol;
+
+    @SerializedName("trailPrice")
     private Double trailPrice;
+
+    @SerializedName("conditionFollowPrice")
     private Double conditionFollowPrice;
+
+    @SerializedName("limitPrice")
     private Double limitPrice;
+
+    @SerializedName("triggerPrice")
     private Double triggerPrice;
+
+    @SerializedName("conditionPrice")
     private Double conditionPrice;
+
+    @SerializedName("bracketLimitPrice")
     private Double bracketLimitPrice;
+
+    @SerializedName("type")
     private String type;
+
+    @SerializedName("stopPrice")
     private Double stopPrice;
 
     TradeItPriceInfoParcelable(PriceInfo priceInfo) {
