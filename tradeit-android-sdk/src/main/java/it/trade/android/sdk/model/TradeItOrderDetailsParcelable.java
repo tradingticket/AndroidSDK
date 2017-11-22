@@ -23,6 +23,7 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
         this.orderQuantity = orderDetails.orderQuantity;
         this.orderMessage = orderDetails.orderMessage;
         this.orderValueLabel = orderDetails.orderValueLabel;
+        this.orderCommissionLabel = orderDetails.orderCommissionLabel;
         this.timestamp = orderDetails.timestamp;
         this.longHoldings = orderDetails.longHoldings;
         this.shortHoldings = orderDetails.shortHoldings;
@@ -41,6 +42,7 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
         dest.writeString(this.orderExpiration);
         dest.writeString(this.orderPrice);
         dest.writeString(this.orderValueLabel);
+        dest.writeString(this.orderCommissionLabel);
         dest.writeString(this.orderMessage);
         dest.writeString(this.lastPrice);
         dest.writeString(this.bidPrice);
@@ -65,6 +67,7 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
         this.orderExpiration = in.readString();
         this.orderPrice = in.readString();
         this.orderValueLabel = in.readString();
+        this.orderCommissionLabel = in.readString();
         this.orderMessage = in.readString();
         this.lastPrice = in.readString();
         this.bidPrice = in.readString();

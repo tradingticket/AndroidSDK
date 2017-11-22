@@ -39,7 +39,7 @@ class TradeItOrderParcelableSpec extends Specification {
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderQuantity = 1
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderPrice = "market"
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.estimatedTotalValue = 25.0
-
+                tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderCommissionLabel = "MyOrderCommissionLabel"
                 callback.onSuccess(tradeItPreviewStockOrEtfOrderResponse);
             }
 
@@ -70,6 +70,7 @@ class TradeItOrderParcelableSpec extends Specification {
             previewResponse.orderDetails.orderQuantity == 1.0
             previewResponse.orderDetails.orderPrice == "market"
             previewResponse.orderDetails.estimatedTotalValue == 25.0
+            previewResponse.orderDetails.orderCommissionLabel == "MyOrderCommissionLabel"
     }
 
     def "previewOrder handles an error response from trade it"() {
