@@ -4,22 +4,30 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import it.trade.model.reponse.TradeItAccountOverview;
 
 public class TradeItBalanceParcelable implements Parcelable {
-
+    @SerializedName("availableCash")
     public Double availableCash;
 
+    @SerializedName("buyingPower")
     public Double buyingPower;
 
+    @SerializedName("dayAbsoluteReturn")
     public Double dayAbsoluteReturn;
 
+    @SerializedName("dayPercentReturn")
     public Double dayPercentReturn;
 
+    @SerializedName("totalAbsoluteReturn")
     public Double totalAbsoluteReturn;
 
+    @SerializedName("totalPercentReturn")
     public Double totalPercentReturn;
 
+    @SerializedName("totalValue")
     public Double totalValue;
 
     TradeItBalanceParcelable() {}

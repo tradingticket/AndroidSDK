@@ -77,7 +77,7 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
         keystoreService.getLinkedLogins() >> []
         apiClient.getEnvironment() >> TradeItEnvironment.QA
         apiClient.getApiKey() >> apiClient
-        linkedBrokerManager = new TradeItLinkedBrokerManager(apiClient, linkedBrokerCache, keystoreService);
+        linkedBrokerManager = new TradeItLinkedBrokerManager(apiClient, linkedBrokerCache, keystoreService, true);
     }
 
 // TODO find how we can run the tests using RxJava

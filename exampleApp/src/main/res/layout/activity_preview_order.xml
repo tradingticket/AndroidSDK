@@ -35,4 +35,16 @@
         android:onClick="placeTrade"
         />
 
+    <Button
+        android:text="Cancel order"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancel_order_button"
+        android:enabled="false"
+        android:layout_marginStart="43dp"
+        android:onClick="cancelOrder"
+        android:layout_alignBaseline="@+id/place_trade_button"
+        android:layout_alignBottom="@+id/place_trade_button"
+        android:layout_toEndOf="@+id/place_trade_button" />
+
 </RelativeLayout>

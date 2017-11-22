@@ -18,9 +18,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".WebViewActivity"
-            android:parentActivityName=".OauthLinkBrokerActivity" />
-        <activity
             android:name=".LinkedBrokersActivity"
             android:parentActivityName=".MainActivity" />
         <activity
@@ -41,7 +38,7 @@
             android:name=".LinkedBrokerAccountsActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".BalancesActivity"
+            android:name=".ParceledAccountActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PositionsActivity"
@@ -49,7 +46,10 @@
         <activity
             android:name=".PreviewOrderActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".BrokersListActivity"
+        <activity
+            android:name=".BrokersListActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".OrdersStatusActivity"
             android:parentActivityName=".MainActivity" />
     </application>
 
