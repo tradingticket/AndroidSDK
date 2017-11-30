@@ -24,6 +24,7 @@ public class TradeItOrderParcelable implements Parcelable {
     private TradeItOrderAction action = TradeItOrderAction.BUY;
     private TradeItOrderPriceType priceType = TradeItOrderPriceType.MARKET;
     private TradeItOrderExpiration expiration = TradeItOrderExpiration.GOOD_FOR_DAY;
+    private boolean userDisabledMargin = false;
 
     public TradeItOrderParcelable(TradeItLinkedBrokerAccountParcelable linkedBrokerAccount, String symbol) {
         this.linkedBrokerAccount = linkedBrokerAccount;
@@ -38,7 +39,9 @@ public class TradeItOrderParcelable implements Parcelable {
                 this.priceType.getPriceTypeValue(),
                 (this.limitPrice != null ? this.limitPrice.toString() : null),
                 (this.stopPrice != null ? this.stopPrice.toString() : null),
-                this.expiration.getExpirationValue());
+                this.expiration.getExpirationValue(),
+                this.userDisabledMargin
+        );
         final TradeItOrderParcelable order = this;
         this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
             @Override
@@ -138,6 +141,14 @@ public class TradeItOrderParcelable implements Parcelable {
         return linkedBrokerAccount;
     }
 
+    public boolean isUserDisabledMargin() {
+        return userDisabledMargin;
+    }
+
+    public void setUserDisabledMargin(boolean userDisabledMargin) {
+        this.userDisabledMargin = userDisabledMargin;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -154,6 +165,7 @@ public class TradeItOrderParcelable implements Parcelable {
         dest.writeInt(this.action == null ? -1 : this.action.ordinal());
         dest.writeInt(this.priceType == null ? -1 : this.priceType.ordinal());
         dest.writeInt(this.expiration == null ? -1 : this.expiration.ordinal());
+        dest.writeByte((byte) (userDisabledMargin ? 1 : 0));
     }
 
     protected TradeItOrderParcelable(Parcel in) {
@@ -169,6 +181,7 @@ public class TradeItOrderParcelable implements Parcelable {
         this.priceType = tmpPriceType == -1 ? null : TradeItOrderPriceType.values()[tmpPriceType];
         int tmpExpiration = in.readInt();
         this.expiration = tmpExpiration == -1 ? null : TradeItOrderExpiration.values()[tmpExpiration];
+        this.userDisabledMargin = in.readByte() != 0;
     }
 
     public static final Parcelable.Creator<TradeItOrderParcelable> CREATOR = new Parcelable.Creator<TradeItOrderParcelable>() {
