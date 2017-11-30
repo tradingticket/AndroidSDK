@@ -67,7 +67,7 @@ public class TradeItOrderParcelableTest {
         order.setLimitPrice(20.50);
         order.setQuantity(1);
         order.setQuoteLastPrice(21.50);
-
+        order.setUserDisabledMargin(true);
         // Write the data.
         Parcel parcel = Parcel.obtain();
         order.writeToParcel(parcel, order.describeContents());
@@ -86,7 +86,7 @@ public class TradeItOrderParcelableTest {
         Double stopPrice = createdFromParcel.getStopPrice();
         Double lastPrice = createdFromParcel.getQuoteLastPrice();
         String symbol = createdFromParcel.getSymbol();
-
+        boolean userDisabledMargin = createdFromParcel.isUserDisabledMargin();
 
         // Verify that the received data is correct.
         assertThat(createdLinkedBrokerAccount, is(linkedBrokerAccount));
@@ -101,5 +101,6 @@ public class TradeItOrderParcelableTest {
         assertThat(stopPrice, is(order.getStopPrice()));
         assertThat(lastPrice, is(order.getQuoteLastPrice()));
         assertThat(symbol, is(order.getSymbol()));
+        assertThat(userDisabledMargin, is(order.isUserDisabledMargin()));
     }
 }
