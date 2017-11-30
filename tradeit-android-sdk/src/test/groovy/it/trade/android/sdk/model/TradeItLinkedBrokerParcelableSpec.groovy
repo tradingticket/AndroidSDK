@@ -35,6 +35,7 @@ class TradeItLinkedBrokerParcelableSpec extends Specification {
             TradeItBrokerAccount account2 = new TradeItBrokerAccount();
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
+            account2.userCanDisableMargin = true
             List<TradeItLinkedBrokerAccountParcelable> accountsExpected = [new TradeItLinkedBrokerAccountParcelable(linkedBroker, account1), new TradeItLinkedBrokerAccountParcelable(linkedBroker, account2)]
             1 * apiClient.authenticate(linkedLogin, _) >> { args ->
                 AuthenticationCallback<TradeItAuthenticateResponse, TradeItSecurityQuestion> callback = args[1]
