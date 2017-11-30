@@ -140,6 +140,9 @@ public class MainActivityTest {
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "Brokers available:");
 
+        //select dummy broker in the spinner
+        selectBroker("Dummy Broker");
+
         tapOnText("Link broker");
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
@@ -166,6 +169,19 @@ public class MainActivityTest {
         navigateUp();
     }
 
+    private void selectBroker(String brokerLongName) {
+        ViewInteraction appCompatSpinner = onView(
+                allOf(withId(R.id.brokers_spinner),
+                        withParent(allOf(withId(R.id.activity_oauth_link_broker),
+                                withParent(withId(android.R.id.content)))),
+                        isDisplayed()));
+        appCompatSpinner.perform(click());
+
+        ViewInteraction appCompatCheckedTextView = onView(
+                allOf(withId(android.R.id.text1), withText(brokerLongName), isDisplayed()));
+
+        appCompatCheckedTextView.perform(click());
+    }
     private void testGetLinkedBrokers(int number) throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.GET_LINKED_BROKERS.getLabel());
 
