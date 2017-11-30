@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.web.webdriver.DriverAtoms;
-import android.support.test.espresso.web.webdriver.Locator;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.UiDevice;
@@ -65,7 +63,6 @@ public class MainActivityTest {
         testOauthFlow("dummy");
         testGetLinkedBrokers(1);
         testAuthenticateFirstLinkedBroker();
-        testGetBalancesFirstLinkedBroker();
         testPositionsFirstLinkedBrokerAccount();
         testPreviewAndPlaceTradeFirstLinkedBrokerAccount();
         testDeleteAllLinkedBrokers();
@@ -133,6 +130,7 @@ public class MainActivityTest {
         tapOnText("OK");
     }
 
+    //TODO FIXME - oAuth flow automated test doesn't work anymore
     private void testOauthFlow(String dummyLogin) throws InterruptedException, UiObjectNotFoundException {
         tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.getLabel());
 
@@ -202,16 +200,6 @@ public class MainActivityTest {
         Thread.sleep(2000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_broker_accounts_textview, "Refreshed first account balance again just to test.\n# of linkedBroker accounts: ");
-
-        navigateUp();
-    }
-
-    private void testGetBalancesFirstLinkedBroker() throws InterruptedException {
-        tapOnText("Get balances for first linked broker account");
-
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
-
-        checkFieldContainsText(R.id.account_overview_textview, "TradeItBalanceParcelable{availableCash=1204.06, buyingPower=2408.12, dayAbsoluteReturn=78.42, dayPercentReturn=3.25, totalAbsoluteReturn=14486.67, totalPercentReturn=22.84, totalValue=76489.23}");
 
         navigateUp();
     }

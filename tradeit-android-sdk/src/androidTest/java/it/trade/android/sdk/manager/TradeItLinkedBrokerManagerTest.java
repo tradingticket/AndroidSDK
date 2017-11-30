@@ -18,18 +18,9 @@ import java.util.concurrent.TimeUnit;
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.internal.TradeItKeystoreService;
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
-import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable;
-import it.trade.android.sdk.model.TradeItOrderParcelable;
-import it.trade.android.sdk.model.TradeItPlaceStockOrEtfOrderResponseParcelable;
-import it.trade.android.sdk.model.TradeItPositionParcelable;
-import it.trade.android.sdk.model.TradeItPreviewStockOrEtfOrderResponseParcelable;
 import it.trade.model.TradeItErrorResult;
-import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
-import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
 import it.trade.model.reponse.TradeItAvailableBrokersResponse;
-import it.trade.model.reponse.TradeItResponse;
 import it.trade.model.request.TradeItEnvironment;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
@@ -37,7 +28,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -85,203 +75,27 @@ public class TradeItLinkedBrokerManagerTest {
         assertThat("The call to getAvailableBrokers is not expired", notExpired, is(true));
     }
 
-    @Test
-    public void testCacheIsCorrect() throws InterruptedException {
-        linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions();
-        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
-        List<TradeItLinkedBrokerAccountParcelable> accounts = linkedBrokers.get(0).getAccounts();
-        TradeItLinkedBrokerAccountParcelable account = accounts.get(0);
-
-        //reset to reload from cache
-        createTradeItLinkedBrokerManager();
-
-        List<TradeItLinkedBrokerParcelable> linkedBrokerParcelables = linkedBrokerManager.getLinkedBrokers();
-        assertThat("The number of linked brokers loaded from cache is correct", linkedBrokerParcelables.size() , is(linkedBrokers.size()));
-
-        TradeItLinkedBrokerParcelable linkedBrokerParcelable = linkedBrokerParcelables.get(0);
-        assertTrue("The error is set to session expired", linkedBrokerParcelable.isUnauthenticated());
-        assertThat("There number of linked broker accounts loaded from cache is correct", linkedBrokerParcelable.getAccounts().size() , is(accounts.size()));
-
-        TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable = linkedBrokerParcelable.getAccounts().get(0);
-        assertThat("The balance loaded from cache is correct", linkedBrokerAccountParcelable.getBalance() , is(account.getBalance()));
-        assertThat("The fx balance loaded from cache is correct", linkedBrokerAccountParcelable.getFxBalance() , is(account.getFxBalance()));
-    }
-
-    @Test
-    public void linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
-            @Override
-            public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
-                assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
-                assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
-                linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
-
-                    @Override
-                    public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
-                        assertThat("The authentication is successful", !accounts.isEmpty(), is(true));
-                        accounts.get(0).refreshBalance(new TradeItCallback<TradeItLinkedBrokerAccountParcelable>() {
-                            @Override
-                            public void onSuccess(TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable) {
-                                assertThat("refreshBalance returns available cash", linkedBrokerAccountParcelable.getBalance().availableCash, notNullValue());
-                                accounts.get(0).refreshPositions(new TradeItCallback<List<TradeItPositionParcelable>>() {
-                                    @Override
-                                    public void onSuccess(List<TradeItPositionParcelable> positions) {
-                                        assertThat("refresh positions is successful", !positions.isEmpty(), is(true));
-                                        lock.countDown();
-                                    }
-
-                                    @Override
-                                    public void onError(TradeItErrorResult error) {
-                                        Log.e(this.getClass().getName(), error.toString());
-                                        assertThat("fails to refresh positions", error, nullValue());
-                                        lock.countDown();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onError(TradeItErrorResult error) {
-                                Log.e(this.getClass().getName(), error.toString());
-                                assertThat("fails to refresh balances", error, nullValue());
-                                lock.countDown();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-                        Log.e(this.getClass().getName(), securityQuestion.toString());
-                        assertThat("fails to authenticate",  securityQuestion, nullValue());
-                        lock.countDown();
-                    }
-
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        Log.e(this.getClass().getName(), error.toString());
-                        assertThat("fails to authenticate",  error, nullValue());
-                        lock.countDown();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to link broker", error, nullValue());
-                lock.countDown();
-            }
-        });
-
-        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
-        assertThat("The call to linkBroker is not expired", notExpired, is(true));
-    }
-    @Test
-    public void linkBrokerOldMethodAndAuthenticationAndTrade() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
-            @Override
-            public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
-                assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
-                assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
-                linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
-                    @Override
-                    public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
-                        assertThat("The authentication is successful",  !accounts.isEmpty(), is(true));
-
-                        final TradeItOrderParcelable order = new TradeItOrderParcelable(accounts.get(0), "GE");
-                        order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable>() {
-                            @Override
-                            public void onSuccess(TradeItPreviewStockOrEtfOrderResponseParcelable response) {
-                                assertThat("Preview order is successful",  response.getOrderId(), notNullValue());
-                                order.placeOrder(response.getOrderId(), new TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable>() {
-                                    @Override
-                                    public void onSuccess(TradeItPlaceStockOrEtfOrderResponseParcelable placeOrderResponse) {
-                                        assertThat("Place order is successful",  placeOrderResponse.getConfirmationMessage(), notNullValue());
-                                        lock.countDown();
-                                    }
-
-                                    @Override
-                                    public void onError(TradeItErrorResult error) {
-                                        assertThat("fails to place order", error, nullValue());
-                                        lock.countDown();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onError(TradeItErrorResult error) {
-                                Log.e(this.getClass().getName(), error.toString());
-                                assertThat("fails to call preview order",  error, nullValue());
-                                lock.countDown();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-                        Log.e(this.getClass().getName(), securityQuestion.toString());
-                        assertThat("fails to authenticate",  securityQuestion, nullValue());
-                        lock.countDown();
-                    }
-
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        Log.e(this.getClass().getName(), error.toString());
-                        assertThat("fails to authenticate",  error, nullValue());
-                        lock.countDown();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to link broker", error, nullValue());
-                lock.countDown();
-            }
-        });
-        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
-        assertThat("The call to linkBroker is not expired", notExpired, is(true));
-    }
-
-    @Test
-    public void linkBrokerOldMethodAndSecurityQuestion() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummySecurity", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
-            @Override
-            public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
-                assertThat("The linkedLogin userId is not null", linkedBroker.getLinkedLogin().userId , notNullValue());
-                assertThat("The linkedLogin userToken is not null", linkedBroker.getLinkedLogin().userToken , notNullValue());
-                linkedBroker.authenticateIfNeeded(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
-                    @Override
-                    public void onSuccess(List<TradeItLinkedBrokerAccountParcelable> accounts) {
-                        assertThat("successful authentication after answering security question security question",  accounts, notNullValue());
-                        lock.countDown();
-                    }
-
-                    @Override
-                    public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-                        assertThat("security question is not null",  securityQuestion, notNullValue());
-                        this.submitSecurityAnswer("tradingticket");
-                    }
-
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        assertThat("fails to get security question",  error, nullValue());
-                        lock.countDown();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to linkBroker", error, nullValue());
-                lock.countDown();
-            }
-        });
-
-        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
-        assertThat("The call to linkBrokerOldMethodAndSecurityQuestion is not expired", notExpired, is(true));
-    }
+//    @Test TODO This should be tested in the UI tests if possible
+//    public void testCacheIsCorrect() throws InterruptedException {
+//        linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions();
+//        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+//        List<TradeItLinkedBrokerAccountParcelable> accounts = linkedBrokers.get(0).getAccounts();
+//        TradeItLinkedBrokerAccountParcelable account = accounts.get(0);
+//
+//        //reset to reload from cache
+//        createTradeItLinkedBrokerManager();
+//
+//        List<TradeItLinkedBrokerParcelable> linkedBrokerParcelables = linkedBrokerManager.getLinkedBrokers();
+//        assertThat("The number of linked brokers loaded from cache is correct", linkedBrokerParcelables.size() , is(linkedBrokers.size()));
+//
+//        TradeItLinkedBrokerParcelable linkedBrokerParcelable = linkedBrokerParcelables.get(0);
+//        assertTrue("The error is set to session expired", linkedBrokerParcelable.isUnauthenticated());
+//        assertThat("There number of linked broker accounts loaded from cache is correct", linkedBrokerParcelable.getAccounts().size() , is(accounts.size()));
+//
+//        TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable = linkedBrokerParcelable.getAccounts().get(0);
+//        assertThat("The balance loaded from cache is correct", linkedBrokerAccountParcelable.getBalance() , is(account.getBalance()));
+//        assertThat("The fx balance loaded from cache is correct", linkedBrokerAccountParcelable.getFxBalance() , is(account.getFxBalance()));
+//    }
 
     @Test
     public void getOAuthLoginPopupUrlForMobile() throws InterruptedException {
@@ -303,79 +117,5 @@ public class TradeItLinkedBrokerManagerTest {
 
         boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
         assertThat("The call to getOAuthLoginPopupUrl is not expired", notExpired, is(true));
-    }
-
-    @Test
-    public void linkAndUnlinkBrokers() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
-            @Override
-            public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
-                List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
-                assertThat("we linked one broker", linkedBrokers.size(), is(1));
-
-                linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback<TradeItResponse>() {
-                    @Override
-                    public void onSuccess(TradeItResponse response) {
-                        assertThat("unlink broker successfully", response, notNullValue());
-                        if (linkedBrokerManager.getLinkedBrokers().size() == 0) {
-                            lock.countDown();
-                        }
-                    }
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        Log.e(this.getClass().getName(), error.toString());
-                        assertThat("fails to unlink broker", error, nullValue());
-                        lock.countDown();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to link broker", error, nullValue());
-                lock.countDown();
-            }
-        });
-
-        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
-        assertThat("The call to linkAndUnlinkBrokers is not expired", notExpired, is(true));
-    }
-
-    @Test
-    public void linkBrokerAndGetOAuthLoginPopupForTokenUpdateUrl() throws InterruptedException {
-        linkedBrokerManager.linkBroker("My accountLabel 1", "Dummy", "dummy", "dummy",  new TradeItCallback<TradeItLinkedBrokerParcelable>() {
-            @Override
-            public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
-                String userId = linkedBroker.getLinkedLogin().userId;
-                assertThat("we linked one broker", userId, notNullValue());
-
-                linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrl(linkedBroker, "myinternalappcallback", new TradeItCallback<String>() {
-
-                    @Override
-                    public void onSuccess(String oAuthUrl) {
-                        assertThat("oAuthUrl is not null", oAuthUrl , notNullValue());
-                        lock.countDown();
-                    }
-
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        Log.e(this.getClass().getName(), error.toString());
-                        assertThat("fails to get the Oauth login popup url", error, nullValue());
-                        lock.countDown();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                Log.e(this.getClass().getName(), error.toString());
-                assertThat("fails to link broker", error, nullValue());
-                lock.countDown();
-            }
-        });
-
-        boolean notExpired = lock.await(EXPIRED_TIME, TimeUnit.MILLISECONDS);
-        assertThat("The call to linkBrokerAndGetOAuthLoginPopupForTokenUpdateUrl is not expired", notExpired, is(true));
     }
 }
