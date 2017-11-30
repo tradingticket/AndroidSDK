@@ -36,6 +36,9 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
     @SerializedName("accountBaseCurrency")
     protected String accountBaseCurrency;
 
+    @SerializedName("userCanDisableMargin")
+    protected boolean userCanDisableMargin;
+
     public transient TradeItLinkedBrokerParcelable linkedBroker;
 
     @SerializedName("balance")
@@ -61,6 +64,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         this.accountName = account.name;
         this.accountNumber = account.accountNumber;
         this.accountBaseCurrency = account.accountBaseCurrency;
+        this.userCanDisableMargin = account.userCanDisableMargin;
         this.userId = linkedBroker.getLinkedLogin().userId;
     }
 
@@ -230,6 +234,8 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
             return false;
         if (accountNumber != null ? !accountNumber.equals(that.accountNumber) : that.accountNumber != null)
             return false;
+        if (userCanDisableMargin != that.userCanDisableMargin)
+            return false;
         return accountBaseCurrency != null ? accountBaseCurrency.equals(that.accountBaseCurrency) : that.accountBaseCurrency == null;
 
     }
@@ -248,6 +254,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
                 "accountBaseCurrency='" + accountBaseCurrency + '\'' +
                 ", accountName='" + accountName + '\'' +
                 ", accountNumber='" + accountNumber + '\'' +
+                ", userCanDisableMargin='" + userCanDisableMargin + '\'' +
                 ", balance='" + balance + '\'' +
                 '}';
     }
@@ -262,6 +269,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         dest.writeString(this.accountName);
         dest.writeString(this.accountNumber);
         dest.writeString(this.accountBaseCurrency);
+        dest.writeByte((byte) (userCanDisableMargin ? 1 : 0));
         dest.writeParcelable(this.balance, flags);
         dest.writeLong(this.balanceLastUpdated != null ? this.balanceLastUpdated.getTime() : -1);
         dest.writeList(this.positions);
@@ -273,6 +281,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         this.accountName = in.readString();
         this.accountNumber = in.readString();
         this.accountBaseCurrency = in.readString();
+        this.userCanDisableMargin = in.readByte() != 0;
         this.balance = in.readParcelable(TradeItBalanceParcelable.class.getClassLoader());
         long tmpBalanceLastUpdated = in.readLong();
         this.balanceLastUpdated = tmpBalanceLastUpdated == -1 ? null : new Date(tmpBalanceLastUpdated);
