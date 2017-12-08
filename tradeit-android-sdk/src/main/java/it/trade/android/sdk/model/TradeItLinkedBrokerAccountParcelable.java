@@ -16,6 +16,7 @@ import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
+import it.trade.model.reponse.Instrument;
 import it.trade.model.reponse.OrderStatusDetails;
 import it.trade.model.reponse.TradeItAccountOverviewResponse;
 import it.trade.model.reponse.TradeItBrokerAccount;
@@ -134,6 +135,15 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
 
     void setPositions(List<TradeItPositionParcelable> positions) {
         this.positions = positions;
+    }
+
+    public TradeItOrderCapabilityParcelable getOrderCapabilityForInstrument(Instrument instrument) {
+        for (TradeItOrderCapabilityParcelable orderCapability: orderCapabilities) {
+            if (orderCapability.getInstrument() == instrument) {
+                return orderCapability;
+            }
+        }
+        return null;
     }
 
     public void refreshBalance(final TradeItCallback<TradeItLinkedBrokerAccountParcelable> callback) {
