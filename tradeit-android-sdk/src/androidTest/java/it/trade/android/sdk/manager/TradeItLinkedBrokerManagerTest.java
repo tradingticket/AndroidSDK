@@ -75,28 +75,6 @@ public class TradeItLinkedBrokerManagerTest {
         assertThat("The call to getAvailableBrokers is not expired", notExpired, is(true));
     }
 
-//    @Test TODO This should be tested in the UI tests if possible
-//    public void testCacheIsCorrect() throws InterruptedException {
-//        linkBrokerOldMethodAndAuthenticationAndRefreshBalanceAndPositions();
-//        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
-//        List<TradeItLinkedBrokerAccountParcelable> accounts = linkedBrokers.get(0).getAccounts();
-//        TradeItLinkedBrokerAccountParcelable account = accounts.get(0);
-//
-//        //reset to reload from cache
-//        createTradeItLinkedBrokerManager();
-//
-//        List<TradeItLinkedBrokerParcelable> linkedBrokerParcelables = linkedBrokerManager.getLinkedBrokers();
-//        assertThat("The number of linked brokers loaded from cache is correct", linkedBrokerParcelables.size() , is(linkedBrokers.size()));
-//
-//        TradeItLinkedBrokerParcelable linkedBrokerParcelable = linkedBrokerParcelables.get(0);
-//        assertTrue("The error is set to session expired", linkedBrokerParcelable.isUnauthenticated());
-//        assertThat("There number of linked broker accounts loaded from cache is correct", linkedBrokerParcelable.getAccounts().size() , is(accounts.size()));
-//
-//        TradeItLinkedBrokerAccountParcelable linkedBrokerAccountParcelable = linkedBrokerParcelable.getAccounts().get(0);
-//        assertThat("The balance loaded from cache is correct", linkedBrokerAccountParcelable.getBalance() , is(account.getBalance()));
-//        assertThat("The fx balance loaded from cache is correct", linkedBrokerAccountParcelable.getFxBalance() , is(account.getFxBalance()));
-//    }
-
     @Test
     public void getOAuthLoginPopupUrlForMobile() throws InterruptedException {
         linkedBrokerManager.getOAuthLoginPopupUrl("Dummy", "myinternalappcallback", new TradeItCallback<String>() {
