@@ -39,6 +39,9 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
     @SerializedName("userCanDisableMargin")
     protected boolean userCanDisableMargin;
 
+    @SerializedName("orderCapabilities")
+    protected List<TradeItOrderCapabilityParcelable> orderCapabilities;
+
     public transient TradeItLinkedBrokerParcelable linkedBroker;
 
     @SerializedName("balance")
@@ -65,6 +68,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         this.accountNumber = account.accountNumber;
         this.accountBaseCurrency = account.accountBaseCurrency;
         this.userCanDisableMargin = account.userCanDisableMargin;
+        this.orderCapabilities = TradeItOrderCapabilityParcelable.mapOrderCapabilitiesToTradeItOrderCapabilityParcelables(account.orderCapabilities);
         this.userId = linkedBroker.getLinkedLogin().userId;
     }
 
@@ -256,6 +260,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
                 ", accountNumber='" + accountNumber + '\'' +
                 ", userCanDisableMargin='" + userCanDisableMargin + '\'' +
                 ", balance='" + balance + '\'' +
+                ", orderCapabilities='" + orderCapabilities + '\'' +
                 '}';
     }
 
@@ -270,6 +275,7 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         dest.writeString(this.accountNumber);
         dest.writeString(this.accountBaseCurrency);
         dest.writeByte((byte) (userCanDisableMargin ? 1 : 0));
+        dest.writeList(this.orderCapabilities);
         dest.writeParcelable(this.balance, flags);
         dest.writeLong(this.balanceLastUpdated != null ? this.balanceLastUpdated.getTime() : -1);
         dest.writeList(this.positions);
@@ -282,6 +288,8 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         this.accountNumber = in.readString();
         this.accountBaseCurrency = in.readString();
         this.userCanDisableMargin = in.readByte() != 0;
+        this.orderCapabilities = new ArrayList<>();
+        in.readList(this.orderCapabilities, TradeItOrderCapabilityParcelable.class.getClassLoader());
         this.balance = in.readParcelable(TradeItBalanceParcelable.class.getClassLoader());
         long tmpBalanceLastUpdated = in.readLong();
         this.balanceLastUpdated = tmpBalanceLastUpdated == -1 ? null : new Date(tmpBalanceLastUpdated);
