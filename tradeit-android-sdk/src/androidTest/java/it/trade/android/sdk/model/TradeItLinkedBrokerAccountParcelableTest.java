@@ -11,11 +11,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.api.TradeItApiClient;
+import it.trade.model.reponse.DisplayLabelValue;
+import it.trade.model.reponse.Instrument;
+import it.trade.model.reponse.OrderCapability;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse;
 import it.trade.model.request.TradeItEnvironment;
@@ -54,6 +58,13 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         account.accountBaseCurrency = "MyAccountBaseCurrency";
         account.name = "MyAccountName";
         account.userCanDisableMargin = true;
+
+        OrderCapability orderCapability = new OrderCapability();
+        DisplayLabelValue action = new DisplayLabelValue("Buy", "buy");
+        orderCapability.actions = Arrays.asList(action);
+        orderCapability.setInstrument(Instrument.EQUITIES);
+        account.orderCapabilities = Arrays.asList(orderCapability);
+
         linkedBrokerAccount = new TradeItLinkedBrokerAccountParcelable(linkedBroker, account);
     }
 
@@ -94,6 +105,9 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         boolean userCanDisableMargin = createdFromParcel.userCanDisableMargin;
         TradeItBalanceParcelable createdBalance = createdFromParcel.getBalance();
         List<TradeItPositionParcelable> createdPositions = createdFromParcel.getPositions();
+        List<TradeItOrderCapabilityParcelable> orderCapabilities = createdFromParcel.orderCapabilities;
+
+        DisplayLabelValueParcelable displayLabelValueParcelable = orderCapabilities.get(0).getActions().get(0);
 
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue());
@@ -106,5 +120,8 @@ public class TradeItLinkedBrokerAccountParcelableTest {
 
         assertThat(createdBalance, is(balance));
         assertThat(createdPositions, is(positions));
+        assertThat(orderCapabilities.isEmpty(), is(false));
+        assertThat(displayLabelValueParcelable.getDisplayLabel(), is("Buy"));
+        assertThat(displayLabelValueParcelable.getValue(), is("buy"));
     }
 }

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.trade.model.reponse.Instrument;
-import it.trade.model.reponse.TradeItBrokerAccount;
+import it.trade.model.reponse.OrderCapability;
 
 public class TradeItOrderCapabilityParcelable implements Parcelable {
 
@@ -16,17 +16,19 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
     private List<DisplayLabelValueParcelable> priceTypes;
     private List<DisplayLabelValueParcelable> expirationTypes;
 
-    public TradeItOrderCapabilityParcelable(TradeItBrokerAccount.OrderCapability orderCapability) {
+    public TradeItOrderCapabilityParcelable(OrderCapability orderCapability) {
         this.instrument = orderCapability.getInstrument();
         this.actions = DisplayLabelValueParcelable.mapDisplayLabelValuesToDisplayLabelValueParcelables(orderCapability.actions);
         this.priceTypes = DisplayLabelValueParcelable.mapDisplayLabelValuesToDisplayLabelValueParcelables(orderCapability.priceTypes);
         this.expirationTypes = DisplayLabelValueParcelable.mapDisplayLabelValuesToDisplayLabelValueParcelables(orderCapability.expirationTypes);
     }
 
-    public static List<TradeItOrderCapabilityParcelable> mapOrderCapabilitiesToTradeItOrderCapabilityParcelables(List<TradeItBrokerAccount.OrderCapability> orderCapabilities) {
+    public static List<TradeItOrderCapabilityParcelable> mapOrderCapabilitiesToTradeItOrderCapabilityParcelables(List<OrderCapability> orderCapabilities) {
         List<TradeItOrderCapabilityParcelable> orderCapabilityParcelables = new ArrayList<>();
-        for (TradeItBrokerAccount.OrderCapability orderCapability: orderCapabilities) {
-            orderCapabilityParcelables.add(new TradeItOrderCapabilityParcelable(orderCapability));
+        if (orderCapabilities != null) {
+            for (OrderCapability orderCapability: orderCapabilities) {
+                orderCapabilityParcelables.add(new TradeItOrderCapabilityParcelable(orderCapability));
+            }
         }
         return orderCapabilityParcelables;
     }
@@ -55,6 +57,29 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
                 ", priceTypes=" + priceTypes +
                 ", expirationTypes=" + expirationTypes +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TradeItOrderCapabilityParcelable that = (TradeItOrderCapabilityParcelable) o;
+
+        if (instrument != that.instrument) return false;
+        if (actions != null ? !actions.equals(that.actions) : that.actions != null) return false;
+        if (priceTypes != null ? !priceTypes.equals(that.priceTypes) : that.priceTypes != null)
+            return false;
+        return expirationTypes != null ? expirationTypes.equals(that.expirationTypes) : that.expirationTypes == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = instrument != null ? instrument.hashCode() : 0;
+        result = 31 * result + (actions != null ? actions.hashCode() : 0);
+        result = 31 * result + (priceTypes != null ? priceTypes.hashCode() : 0);
+        result = 31 * result + (expirationTypes != null ? expirationTypes.hashCode() : 0);
+        return result;
     }
 
     @Override

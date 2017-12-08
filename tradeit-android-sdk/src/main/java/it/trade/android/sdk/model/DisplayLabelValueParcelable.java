@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.trade.model.reponse.TradeItBrokerAccount;
+import it.trade.model.reponse.DisplayLabelValue;
 
 public class DisplayLabelValueParcelable implements Parcelable {
 
@@ -14,15 +14,17 @@ public class DisplayLabelValueParcelable implements Parcelable {
     private String value;
 
 
-    public DisplayLabelValueParcelable(TradeItBrokerAccount.OrderCapability.DisplayLabelValue displayLabelValue) {
+    public DisplayLabelValueParcelable(DisplayLabelValue displayLabelValue) {
         this.displayLabel  = displayLabelValue.displayLabel;
         this.value = displayLabelValue.value;
     }
 
-    public static List<DisplayLabelValueParcelable> mapDisplayLabelValuesToDisplayLabelValueParcelables(List<TradeItBrokerAccount.OrderCapability.DisplayLabelValue> displayLabelValues) {
+    public static List<DisplayLabelValueParcelable> mapDisplayLabelValuesToDisplayLabelValueParcelables(List<DisplayLabelValue> displayLabelValues) {
         List<DisplayLabelValueParcelable> displayLabelValueParcelables = new ArrayList<>();
-        for (TradeItBrokerAccount.OrderCapability.DisplayLabelValue displayLabelValue: displayLabelValues) {
-            displayLabelValueParcelables.add(new DisplayLabelValueParcelable(displayLabelValue));
+        if (displayLabelValues != null) {
+            for (DisplayLabelValue displayLabelValue: displayLabelValues) {
+                displayLabelValueParcelables.add(new DisplayLabelValueParcelable(displayLabelValue));
+            }
         }
         return displayLabelValueParcelables;
     }
@@ -33,6 +35,33 @@ public class DisplayLabelValueParcelable implements Parcelable {
                 "displayLabel='" + displayLabel + '\'' +
                 ", value='" + value + '\'' +
                 '}';
+    }
+
+    public String getDisplayLabel() {
+        return displayLabel;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DisplayLabelValueParcelable that = (DisplayLabelValueParcelable) o;
+
+        if (displayLabel != null ? !displayLabel.equals(that.displayLabel) : that.displayLabel != null)
+            return false;
+        return value != null ? value.equals(that.value) : that.value == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = displayLabel != null ? displayLabel.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
     }
 
     @Override
