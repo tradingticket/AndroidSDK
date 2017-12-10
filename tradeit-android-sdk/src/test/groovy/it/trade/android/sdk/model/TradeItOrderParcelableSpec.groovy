@@ -5,6 +5,7 @@ import it.trade.android.sdk.enums.TradeItOrderExpiration
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
+import it.trade.model.request.TradeItPreviewStockOrEtfOrderRequest
 import spock.lang.Specification
 
 class TradeItOrderParcelableSpec extends Specification {
@@ -21,11 +22,15 @@ class TradeItOrderParcelableSpec extends Specification {
         given: "a successful response from trade it"
             int successfulCallbackCount = 0
             int errorCallbackCount = 0
+            boolean userDisabledMarginFlag = true
             order.setAction(TradeItOrderAction.BUY)
             order.setExpiration(TradeItOrderExpiration.GOOD_FOR_DAY)
             order.setQuantity(1)
+            order.setUserDisabledMargin(userDisabledMarginFlag)
 
             linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(_, _) >> { args ->
+                TradeItPreviewStockOrEtfOrderRequest request = args[0]
+                userDisabledMarginFlag = request.userDisabledMargin
                 TradeItCallback<TradeItPreviewStockOrEtfOrderResponse> callback = args[1]
                 TradeItPreviewStockOrEtfOrderResponse tradeItPreviewStockOrEtfOrderResponse = new TradeItPreviewStockOrEtfOrderResponse()
                 tradeItPreviewStockOrEtfOrderResponse.sessionToken = "My session token"
@@ -71,6 +76,9 @@ class TradeItOrderParcelableSpec extends Specification {
             previewResponse.orderDetails.orderPrice == "market"
             previewResponse.orderDetails.estimatedTotalValue == 25.0
             previewResponse.orderDetails.orderCommissionLabel == "MyOrderCommissionLabel"
+
+        and: "The userDisabledMargin flag was set on the request"
+            userDisabledMarginFlag == true
     }
 
     def "previewOrder handles an error response from trade it"() {

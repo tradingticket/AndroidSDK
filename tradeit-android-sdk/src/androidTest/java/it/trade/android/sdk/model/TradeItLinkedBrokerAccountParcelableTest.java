@@ -53,7 +53,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         account.accountNumber = "MyAccountNumber";
         account.accountBaseCurrency = "MyAccountBaseCurrency";
         account.name = "MyAccountName";
-
+        account.userCanDisableMargin = true;
         linkedBrokerAccount = new TradeItLinkedBrokerAccountParcelable(linkedBroker, account);
     }
 
@@ -91,6 +91,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         String accountBaseCurrency = createdFromParcel.getAccountBaseCurrency();
         String accountName = createdFromParcel.getAccountName();
         String accountNumber = createdFromParcel.getAccountNumber();
+        boolean userCanDisableMargin = createdFromParcel.userCanDisableMargin;
         TradeItBalanceParcelable createdBalance = createdFromParcel.getBalance();
         List<TradeItPositionParcelable> createdPositions = createdFromParcel.getPositions();
 
@@ -101,6 +102,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         assertThat(accountBaseCurrency, is("MyAccountBaseCurrency"));
         assertThat(accountName, is("MyAccountName"));
         assertThat(accountNumber, is("MyAccountNumber"));
+        assertThat(userCanDisableMargin, is(linkedBrokerAccount.userCanDisableMargin));
 
         assertThat(createdBalance, is(balance));
         assertThat(createdPositions, is(positions));
