@@ -4,10 +4,7 @@ import it.trade.model.TradeItErrorResult
 import it.trade.model.TradeItSecurityQuestion
 import it.trade.model.callback.AuthenticationCallback
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl
-import it.trade.model.reponse.TradeItAuthenticateResponse
-import it.trade.model.reponse.TradeItBrokerAccount
-import it.trade.model.reponse.TradeItErrorCode
-import it.trade.model.reponse.TradeItResponseStatus
+import it.trade.model.reponse.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,10 +29,20 @@ class TradeItLinkedBrokerParcelableSpec extends Specification {
             TradeItBrokerAccount account1 = new TradeItBrokerAccount();
             account1.accountNumber = "My account number 1"
             account1.name = "My account name 1"
+
+            OrderCapability orderCapability = new OrderCapability()
+            DisplayLabelValue action = new DisplayLabelValue("Buy", "buy")
+            orderCapability.instrument = Instrument.EQUITIES
+            orderCapability.actions = [action]
+            account1.orderCapabilities = [orderCapability]
+
+
             TradeItBrokerAccount account2 = new TradeItBrokerAccount();
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
+            account2.userCanDisableMargin = true
             List<TradeItLinkedBrokerAccountParcelable> accountsExpected = [new TradeItLinkedBrokerAccountParcelable(linkedBroker, account1), new TradeItLinkedBrokerAccountParcelable(linkedBroker, account2)]
+            List<TradeItOrderCapabilityParcelable> orderCapabilitiesExpected = [new TradeItOrderCapabilityParcelable(orderCapability)]
             1 * apiClient.authenticate(linkedLogin, _) >> { args ->
                 AuthenticationCallback<TradeItAuthenticateResponse, TradeItSecurityQuestion> callback = args[1]
                 TradeItAuthenticateResponse tradeItAuthenticateResponse = new TradeItAuthenticateResponse()
@@ -78,6 +85,10 @@ class TradeItLinkedBrokerParcelableSpec extends Specification {
 
         and: "the list is kept in memory"
             linkedBroker.getAccounts() == accountsExpected
+
+        and: "The orderCapabilities is set to empty list if no value"
+            linkedBroker.getAccounts().get(0).orderCapabilities == orderCapabilitiesExpected
+            linkedBroker.getAccounts().get(1).orderCapabilities == []
     }
 
     def "authenticate handles a successful response with a security question from trade it api"() {

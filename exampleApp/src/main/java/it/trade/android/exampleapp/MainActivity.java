@@ -171,14 +171,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Authenticate all linked brokers tapped!");
                     authenticateAllLinkedBrokers();
                     break;
-                case AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE:
-                    Log.d(TAG, "Simple security question was tapped!");
-                    authenticateWithSimpleSecurityQuestion();
-                    break;
-                case AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS:
-                    Log.d(TAG, "Security question with options was tapped!");
-                    authenticateWithSecurityQuestionOptions();
-                    break;
                 case REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER:
                     Log.d(TAG, "Refresh all balances for first linked broker was tapped!");
                     refreshAllBalancesFirstLinkedBroker();
@@ -332,71 +324,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    private void authenticateWithSimpleSecurityQuestion() {
-        authenticateWithSecurityQuestion("dummySecurity");
-    }
-
-    private void authenticateWithSecurityQuestionOptions() {
-        authenticateWithSecurityQuestion("dummyOption");
-    }
-
-    private void authenticateWithSecurityQuestion(String dummySecurityQuestionLogin) {
-        final MainActivity mainActivity = this;
-        final String dummyLogin = dummySecurityQuestionLogin;
-        linkedBrokerManager.linkBroker(dummyLogin, "Dummy", dummyLogin, "dummy", new TradeItCallback<TradeItLinkedBrokerParcelable>() {
-            @Override
-            public void onSuccess(final TradeItLinkedBrokerParcelable linkedBroker) {
-                linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
-                    @Override
-                    public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
-                        showAlert("Dummy security", "Successfully Authenticate " + dummyLogin);
-                        linkedBrokerManager.unlinkBroker(linkedBroker, new TradeItCallback() {
-                            @Override
-                            public void onSuccess(Object type) {
-                                Log.d(TAG, "unlinking successfully " + dummyLogin);
-                            }
-
-                            @Override
-                            public void onError(TradeItErrorResult error) {
-                                Log.e(TAG, "ERROR unlinking " + dummyLogin);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-                        final EditText input = new EditText(mainActivity);
-                        final TradeItCallbackWithSecurityQuestionImpl securityQuestionImpl = this;
-                        showSecurityQuestion(securityQuestion, input,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        securityQuestionImpl.submitSecurityAnswer(input.getText().toString());
-                                    }
-                                },
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        securityQuestionImpl.cancelSecurityQuestion();
-                                    }
-                                }
-                                );
-                    }
-
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        showAlert("authenticate " + dummyLogin, "Error authenticating: " + error);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                showAlert("authenticate " + dummyLogin, "Error linking " + dummyLogin + ": " + error);
-            }
-        });
     }
 
     private void parcelFirstLinkedBrokerAccount() {

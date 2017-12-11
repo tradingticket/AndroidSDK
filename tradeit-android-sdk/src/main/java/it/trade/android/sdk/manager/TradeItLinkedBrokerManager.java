@@ -550,36 +550,6 @@ public class TradeItLinkedBrokerManager {
         }
     }
 
-    /**
-     * @deprecated Use the new OAuth flow and the #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback) method instead
-     */
-    @Deprecated
-    public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
-        apiClient.linkBrokerAccount(username, password, broker, new TradeItCallback<TradeItLinkedLogin>() {
-            @Override
-            public void onSuccess(TradeItLinkedLogin linkedLogin) {
-                TradeItLinkedLoginParcelable linkedLoginParcelable = new TradeItLinkedLoginParcelable(linkedLogin);
-                try {
-                    keystoreService.saveLinkedLogin(linkedLoginParcelable, accountLabel);
-                    TradeItApiClientParcelable
-                            apiClientParcelable = new TradeItApiClientParcelable(apiClient.getApiKey(), apiClient.getEnvironment(), apiClient.getRequestInterceptorParcelable());
-                    TradeItLinkedBrokerParcelable linkedBroker = new TradeItLinkedBrokerParcelable(apiClientParcelable, linkedLoginParcelable, linkedBrokerCache);
-                    linkedBrokers.add(linkedBroker);
-                    callback.onSuccess(linkedBroker);
-                } catch (TradeItSaveLinkedLoginException e) {
-                    Log.e(this.getClass().getName(), e.getMessage(), e);
-                    callback.onError(new TradeItErrorResult("Failed to link broker", e.getMessage()));
-                }
-            }
-
-            @Override
-            public void onError(TradeItErrorResult error) {
-                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
-                callback.onError(errorResultParcelable);
-            }
-        });
-    }
-
     public List<TradeItLinkedBrokerParcelable> getLinkedBrokers() {
         return linkedBrokers;
     }
