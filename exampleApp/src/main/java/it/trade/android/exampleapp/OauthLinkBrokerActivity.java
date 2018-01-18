@@ -27,7 +27,6 @@ import static android.content.Intent.FLAG_ACTIVITY_NO_HISTORY;
 
 public class OauthLinkBrokerActivity extends AppCompatActivity implements CustomTabActivityHelper.ConnectionCallback{
 
-    public static final String OAUTH_URL_PARAMETER = "it.trade.android.exampleapp.OAUTH_URL";
     public static final String APP_DEEP_LINK = "exampleapp://tradeit";
     TradeItLinkedBrokerManager linkedBrokerManager = TradeItSDK.getLinkedBrokerManager();
     TextView oAuthResultTextView;
@@ -48,6 +47,9 @@ public class OauthLinkBrokerActivity extends AppCompatActivity implements Custom
         brokersSpinner = (Spinner) this.findViewById(R.id.brokers_spinner);
         final OauthLinkBrokerActivity oauthLinkBrokerActivity = this;
 
+        Intent intent = getIntent();
+        final String userId = intent.getStringExtra(MainActivity.RELINK_OAUTH_PARAMETER);
+
         linkedBrokerManager.getAvailableBrokers(new TradeItCallback<List<Broker>>() {
             @Override
             public void onSuccess(List<Broker> brokersList) {
@@ -55,6 +57,10 @@ public class OauthLinkBrokerActivity extends AppCompatActivity implements Custom
                 oAuthResultTextView.setText("Brokers available: " + brokersList + "\n");
                 BrokerAdapter adapter = new BrokerAdapter(oauthLinkBrokerActivity, brokersList);
                 brokersSpinner.setAdapter(adapter);
+                if (userId != null) {
+                    relinkOauthFlow(userId);
+                }
+
             }
 
             @Override
@@ -113,6 +119,20 @@ public class OauthLinkBrokerActivity extends AppCompatActivity implements Custom
             @Override
             public void onError(TradeItErrorResult error) {
                 oAuthResultTextView.setText("getOAuthLoginPopupUrl Error: " + error + "\n");
+            }
+        });
+    }
+
+    public void relinkOauthFlow(String userId) {
+        linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrlByUserId(userId, APP_DEEP_LINK, new TradeItCallback<String>() {
+            @Override
+            public void onSuccess(String oAuthUrl) {
+                launchCustomTab(oAuthUrl);
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                oAuthResultTextView.setText("getOAuthLoginPopupForTokenUpdateUrlByUserId Error: " + error + "\n");
             }
         });
     }
