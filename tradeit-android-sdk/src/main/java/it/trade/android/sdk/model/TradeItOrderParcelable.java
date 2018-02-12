@@ -17,7 +17,7 @@ public class TradeItOrderParcelable implements Parcelable {
 
     private TradeItLinkedBrokerAccountParcelable linkedBrokerAccount;
     private String symbol;
-    private int quantity = 1;
+    private Double quantity = 1.0;
     private Double limitPrice;
     private Double stopPrice;
     private Double quoteLastPrice;
@@ -32,30 +32,36 @@ public class TradeItOrderParcelable implements Parcelable {
     }
 
     public void previewOrder(final TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable> callback) {
-        TradeItPreviewStockOrEtfOrderRequest previewRequest = new TradeItPreviewStockOrEtfOrderRequest(this.linkedBrokerAccount.getAccountNumber(),
-                this.action.getActionValue(),
-                String.valueOf(this.quantity),
-                this.symbol,
-                this.priceType.getPriceTypeValue(),
-                (this.limitPrice != null ? this.limitPrice.toString() : null),
-                (this.stopPrice != null ? this.stopPrice.toString() : null),
-                this.expiration.getExpirationValue(),
-                this.userDisabledMargin
+        TradeItPreviewStockOrEtfOrderRequest previewRequest = new TradeItPreviewStockOrEtfOrderRequest(
+            this.linkedBrokerAccount.getAccountNumber(),
+            this.action.getActionValue(),
+            (this.quantity != null ? this.quantity.toString() : "1"),
+            this.symbol,
+            this.priceType.getPriceTypeValue(),
+            (this.limitPrice != null ? this.limitPrice.toString() : null),
+            (this.stopPrice != null ? this.stopPrice.toString() : null),
+            this.expiration.getExpirationValue(),
+            this.userDisabledMargin
         );
-        final TradeItOrderParcelable order = this;
-        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(previewRequest, new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
-            @Override
-            public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
-                callback.onSuccess(new TradeItPreviewStockOrEtfOrderResponseParcelable(response));
-            }
 
-            @Override
-            public void onError(TradeItErrorResult error) {
-                TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
-                order.linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable);
-                callback.onError(errorResultParcelable);
+        final TradeItOrderParcelable order = this;
+
+        this.linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(
+            previewRequest,
+            new TradeItCallback<TradeItPreviewStockOrEtfOrderResponse>() {
+                @Override
+                public void onSuccess(TradeItPreviewStockOrEtfOrderResponse response) {
+                    callback.onSuccess(new TradeItPreviewStockOrEtfOrderResponseParcelable(response));
+                }
+
+                @Override
+                public void onError(TradeItErrorResult error) {
+                    TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable(error);
+                    order.linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable);
+                    callback.onError(errorResultParcelable);
+                }
             }
-        });
+        );
     }
 
     public void placeOrder(String orderId, final TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable> callback) {
@@ -81,11 +87,11 @@ public class TradeItOrderParcelable implements Parcelable {
         this.symbol = symbol;
     }
 
-    public int getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Double quantity) {
         this.quantity = quantity;
     }
 
@@ -158,7 +164,7 @@ public class TradeItOrderParcelable implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.linkedBrokerAccount, flags);
         dest.writeString(this.symbol);
-        dest.writeInt(this.quantity);
+        dest.writeValue(this.quantity);
         dest.writeValue(this.limitPrice);
         dest.writeValue(this.stopPrice);
         dest.writeValue(this.quoteLastPrice);
@@ -171,7 +177,7 @@ public class TradeItOrderParcelable implements Parcelable {
     protected TradeItOrderParcelable(Parcel in) {
         this.linkedBrokerAccount = in.readParcelable(TradeItLinkedBrokerAccountParcelable.class.getClassLoader());
         this.symbol = in.readString();
-        this.quantity = in.readInt();
+        this.quantity = (Double) in.readValue(Double.class.getClassLoader());
         this.limitPrice = (Double) in.readValue(Double.class.getClassLoader());
         this.stopPrice = (Double) in.readValue(Double.class.getClassLoader());
         this.quoteLastPrice = (Double) in.readValue(Double.class.getClassLoader());
