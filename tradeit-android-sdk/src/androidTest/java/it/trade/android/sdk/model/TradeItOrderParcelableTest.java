@@ -65,7 +65,7 @@ public class TradeItOrderParcelableTest {
         order.setExpiration(TradeItOrderExpiration.GOOD_FOR_DAY);
         order.setPriceType(TradeItOrderPriceType.LIMIT);
         order.setLimitPrice(20.50);
-        order.setQuantity(1);
+        order.setQuantity(3.14159);
         order.setQuoteLastPrice(21.50);
         order.setUserDisabledMargin(true);
         // Write the data.
@@ -82,7 +82,7 @@ public class TradeItOrderParcelableTest {
         TradeItOrderExpiration expiration = createdFromParcel.getExpiration();
         Double limitPrice = createdFromParcel.getLimitPrice();
         TradeItOrderPriceType priceType = createdFromParcel.getPriceType();
-        int quantity = createdFromParcel.getQuantity();
+        Double quantity = createdFromParcel.getQuantity();
         Double stopPrice = createdFromParcel.getStopPrice();
         Double lastPrice = createdFromParcel.getQuoteLastPrice();
         String symbol = createdFromParcel.getSymbol();
