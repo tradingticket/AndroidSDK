@@ -13,4 +13,14 @@ public enum TradeItOrderExpiration {
     public String getExpirationValue() {
         return expirationValue;
     }
+
+
+    public static TradeItOrderExpiration getExpirationForValue(String actionValue) {
+        for (TradeItOrderExpiration expiration: TradeItOrderExpiration.values()) {
+            if (expiration.expirationValue.equals(actionValue)) {
+                return expiration;
+            }
+        }
+        return null;
+    }
 }

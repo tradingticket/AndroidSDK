@@ -11,6 +11,9 @@ import org.junit.runner.RunWith;
 import java.util.Arrays;
 import java.util.List;
 
+import it.trade.android.sdk.enums.TradeItOrderAction;
+import it.trade.android.sdk.enums.TradeItOrderExpiration;
+import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.model.reponse.DisplayLabelValue;
 import it.trade.model.reponse.Instrument;
 import it.trade.model.reponse.OrderCapability;
@@ -43,8 +46,6 @@ public class TradeItOrderCapabilityParcelableTest {
 
     @Test
     public void orderCapabilities_ParcelableWriteRead() {
-
-
         // Write the data.
         Parcel parcel = Parcel.obtain();
         orderCapabilityParcelable.writeToParcel(parcel, orderCapabilityParcelable.describeContents());
@@ -55,21 +56,20 @@ public class TradeItOrderCapabilityParcelableTest {
         // Read the data.
         TradeItOrderCapabilityParcelable createdFromParcel = TradeItOrderCapabilityParcelable.CREATOR.createFromParcel(parcel);
         Instrument instrument = createdFromParcel.getInstrument();
-        List<DisplayLabelValueParcelable> actions = createdFromParcel.getActions();
-        List<DisplayLabelValueParcelable> expirationTypes  = createdFromParcel.getExpirationTypes();
-        List<DisplayLabelValueParcelable> priceTypes  = createdFromParcel.getPriceTypes();
+        List<TradeItOrderActionParcelable> actions = createdFromParcel.getActions();
+        List<TradeItOrderExpirationParcelable> expirationTypes = createdFromParcel.getExpirationTypes();
+        List<TradeItOrderPriceTypeParcelable> priceTypes  = createdFromParcel.getPriceTypes();
 
         // Verify that the received data is correct.
         assertThat(instrument, is(Instrument.EQUITIES));
         assertFalse(actions.isEmpty());
-        assertThat(actions.get(0).getValue(), is(action.value));
+        assertThat(actions.get(0).getAction().getActionValue(), is(action.value));
         assertThat(actions.get(0).getDisplayLabel(), is(action.displayLabel));
         assertFalse(expirationTypes.isEmpty());
-        assertThat(expirationTypes.get(0).getValue(), is(expirationType.value));
+        assertThat(expirationTypes.get(0).getExpiration().getExpirationValue(), is(expirationType.value));
         assertThat(expirationTypes.get(0).getDisplayLabel(), is(expirationType.displayLabel));
         assertFalse(priceTypes.isEmpty());
-        assertThat(priceTypes.get(0).getValue(), is(priceType.value));
+        assertThat(priceTypes.get(0).getPriceType().getPriceTypeValue(), is(priceType.value));
         assertThat(priceTypes.get(0).getDisplayLabel(), is(priceType.displayLabel));
-
     }
 }

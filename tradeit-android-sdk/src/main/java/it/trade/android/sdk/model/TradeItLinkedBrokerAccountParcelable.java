@@ -99,6 +99,14 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
         return accountBaseCurrency;
     }
 
+    public boolean getUserCanDisableMargin() {
+        return userCanDisableMargin;
+    }
+
+    public void setUserCanDisableMargin(boolean userCanDisableMargin) {
+        this.userCanDisableMargin = userCanDisableMargin;
+    }
+
     public TradeItBalanceParcelable getBalance() {
         return balance;
     }
