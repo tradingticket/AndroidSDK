@@ -1,12 +1,12 @@
 package it.trade.android.sdk.enums;
 
-public enum TradeItOrderExpiration {
+public enum TradeItOrderExpirationType {
     GOOD_FOR_DAY("day"),
     GOOD_UNTIL_CANCELED("gtc");
 
     private String expirationValue;
 
-    TradeItOrderExpiration(String expirationValue) {
+    TradeItOrderExpirationType(String expirationValue) {
         this.expirationValue = expirationValue;
     }
 
@@ -15,8 +15,8 @@ public enum TradeItOrderExpiration {
     }
 
 
-    public static TradeItOrderExpiration getExpirationForValue(String actionValue) {
-        for (TradeItOrderExpiration expiration: TradeItOrderExpiration.values()) {
+    public static TradeItOrderExpirationType getExpirationForValue(String actionValue) {
+        for (TradeItOrderExpirationType expiration: TradeItOrderExpirationType.values()) {
             if (expiration.expirationValue.equals(actionValue)) {
                 return expiration;
             }

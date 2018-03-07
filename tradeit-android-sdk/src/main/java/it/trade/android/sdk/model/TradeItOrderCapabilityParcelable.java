@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.trade.android.sdk.enums.TradeItOrderAction;
-import it.trade.android.sdk.enums.TradeItOrderExpiration;
+import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.model.reponse.DisplayLabelValue;
 import it.trade.model.reponse.Instrument;
@@ -18,7 +18,7 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
     private Instrument instrument;
     private List<TradeItOrderActionParcelable> actions;
     private List<TradeItOrderPriceTypeParcelable> priceTypes;
-    private List<TradeItOrderExpirationParcelable> expirationTypes;
+    private List<TradeItOrderExpirationTypeParcelable> expirationTypes;
 
     public TradeItOrderCapabilityParcelable(OrderCapability orderCapability) {
         this.instrument = orderCapability.getInstrument();
@@ -49,8 +49,35 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
         return priceTypes;
     }
 
-    public List<TradeItOrderExpirationParcelable> getExpirationTypes() {
+    public List<TradeItOrderExpirationTypeParcelable> getExpirationTypes() {
         return expirationTypes;
+    }
+
+    public TradeItOrderActionParcelable getActionForEnum(TradeItOrderAction actionEnum) {
+        for (TradeItOrderActionParcelable action: actions) {
+            if (action.getAction() == actionEnum) {
+                return action;
+            }
+        }
+        return null;
+    }
+
+    public TradeItOrderPriceTypeParcelable getPriceTypeForEnum(TradeItOrderPriceType priceTypeEnum) {
+        for (TradeItOrderPriceTypeParcelable priceType: priceTypes) {
+            if (priceType.getPriceType() == priceTypeEnum) {
+                return priceType;
+            }
+        }
+        return null;
+    }
+
+    public TradeItOrderExpirationTypeParcelable getExpirationTypeForEnum(TradeItOrderExpirationType expirationEnum) {
+        for (TradeItOrderExpirationTypeParcelable expiration: expirationTypes) {
+            if (expiration.getExpirationType() == expirationEnum) {
+                return expiration;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -107,7 +134,7 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
         this.priceTypes = new ArrayList<>();
         in.readList(this.priceTypes, TradeItOrderPriceTypeParcelable.class.getClassLoader());
         this.expirationTypes = new ArrayList<>();
-        in.readList(this.expirationTypes, TradeItOrderExpirationParcelable.class.getClassLoader());
+        in.readList(this.expirationTypes, TradeItOrderExpirationTypeParcelable.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<TradeItOrderCapabilityParcelable> CREATOR = new Parcelable.Creator<TradeItOrderCapabilityParcelable>() {
@@ -148,13 +175,13 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
         return mappedValues;
     }
 
-    private static List<TradeItOrderExpirationParcelable> mapOrderExpirationTypesToEnum(List<DisplayLabelValue> displayLabelValues) {
-        List<TradeItOrderExpirationParcelable> mappedValues = new ArrayList<>();
+    private static List<TradeItOrderExpirationTypeParcelable> mapOrderExpirationTypesToEnum(List<DisplayLabelValue> displayLabelValues) {
+        List<TradeItOrderExpirationTypeParcelable> mappedValues = new ArrayList<>();
         if (displayLabelValues != null) {
             for (DisplayLabelValue displayLabelValue: displayLabelValues) {
-                TradeItOrderExpiration expiration = TradeItOrderExpiration.getExpirationForValue(displayLabelValue.value);
+                TradeItOrderExpirationType expiration = TradeItOrderExpirationType.getExpirationForValue(displayLabelValue.value);
                 if (expiration != null) {
-                    mappedValues.add(new TradeItOrderExpirationParcelable(expiration, displayLabelValue.displayLabel));
+                    mappedValues.add(new TradeItOrderExpirationTypeParcelable(expiration, displayLabelValue.displayLabel));
                 }
             }
         }

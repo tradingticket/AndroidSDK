@@ -3,22 +3,22 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import it.trade.android.sdk.enums.TradeItOrderExpiration;
+import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 
-public class TradeItOrderExpirationParcelable implements Parcelable {
-    private TradeItOrderExpiration expiration;
+public class TradeItOrderExpirationTypeParcelable implements Parcelable {
+    private TradeItOrderExpirationType expiration;
     private String displayLabel;
 
-    TradeItOrderExpirationParcelable(TradeItOrderExpiration expiration, String displayLabel) {
+    TradeItOrderExpirationTypeParcelable(TradeItOrderExpirationType expiration, String displayLabel) {
         this.expiration = expiration;
         this.displayLabel = displayLabel;
     }
 
-    public TradeItOrderExpiration getExpiration() {
+    public TradeItOrderExpirationType getExpirationType() {
         return expiration;
     }
 
-    public void setExpiration(TradeItOrderExpiration expiration) {
+    public void setExpiration(TradeItOrderExpirationType expiration) {
         this.expiration = expiration;
     }
 
@@ -35,7 +35,7 @@ public class TradeItOrderExpirationParcelable implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TradeItOrderExpirationParcelable that = (TradeItOrderExpirationParcelable) o;
+        TradeItOrderExpirationTypeParcelable that = (TradeItOrderExpirationTypeParcelable) o;
 
         if (expiration != that.expiration) return false;
         return displayLabel != null ? displayLabel.equals(that.displayLabel) : that.displayLabel == null;
@@ -59,21 +59,21 @@ public class TradeItOrderExpirationParcelable implements Parcelable {
         dest.writeString(this.displayLabel);
     }
 
-    protected TradeItOrderExpirationParcelable(Parcel in) {
+    protected TradeItOrderExpirationTypeParcelable(Parcel in) {
         int tmpExpiration = in.readInt();
-        this.expiration = tmpExpiration == -1 ? null : TradeItOrderExpiration.values()[tmpExpiration];
+        this.expiration = tmpExpiration == -1 ? null : TradeItOrderExpirationType.values()[tmpExpiration];
         this.displayLabel = in.readString();
     }
 
-    public static final Parcelable.Creator<TradeItOrderExpirationParcelable> CREATOR = new Parcelable.Creator<TradeItOrderExpirationParcelable>() {
+    public static final Parcelable.Creator<TradeItOrderExpirationTypeParcelable> CREATOR = new Parcelable.Creator<TradeItOrderExpirationTypeParcelable>() {
         @Override
-        public TradeItOrderExpirationParcelable createFromParcel(Parcel source) {
-            return new TradeItOrderExpirationParcelable(source);
+        public TradeItOrderExpirationTypeParcelable createFromParcel(Parcel source) {
+            return new TradeItOrderExpirationTypeParcelable(source);
         }
 
         @Override
-        public TradeItOrderExpirationParcelable[] newArray(int size) {
-            return new TradeItOrderExpirationParcelable[size];
+        public TradeItOrderExpirationTypeParcelable[] newArray(int size) {
+            return new TradeItOrderExpirationTypeParcelable[size];
         }
     };
 }

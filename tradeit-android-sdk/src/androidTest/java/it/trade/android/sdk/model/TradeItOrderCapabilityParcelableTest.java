@@ -12,13 +12,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import it.trade.android.sdk.enums.TradeItOrderAction;
-import it.trade.android.sdk.enums.TradeItOrderExpiration;
+import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.model.reponse.DisplayLabelValue;
 import it.trade.model.reponse.Instrument;
 import it.trade.model.reponse.OrderCapability;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
@@ -57,7 +58,7 @@ public class TradeItOrderCapabilityParcelableTest {
         TradeItOrderCapabilityParcelable createdFromParcel = TradeItOrderCapabilityParcelable.CREATOR.createFromParcel(parcel);
         Instrument instrument = createdFromParcel.getInstrument();
         List<TradeItOrderActionParcelable> actions = createdFromParcel.getActions();
-        List<TradeItOrderExpirationParcelable> expirationTypes = createdFromParcel.getExpirationTypes();
+        List<TradeItOrderExpirationTypeParcelable> expirationTypes = createdFromParcel.getExpirationTypes();
         List<TradeItOrderPriceTypeParcelable> priceTypes  = createdFromParcel.getPriceTypes();
 
         // Verify that the received data is correct.
@@ -66,10 +67,50 @@ public class TradeItOrderCapabilityParcelableTest {
         assertThat(actions.get(0).getAction().getActionValue(), is(action.value));
         assertThat(actions.get(0).getDisplayLabel(), is(action.displayLabel));
         assertFalse(expirationTypes.isEmpty());
-        assertThat(expirationTypes.get(0).getExpiration().getExpirationValue(), is(expirationType.value));
+        assertThat(expirationTypes.get(0).getExpirationType().getExpirationValue(), is(expirationType.value));
         assertThat(expirationTypes.get(0).getDisplayLabel(), is(expirationType.displayLabel));
         assertFalse(priceTypes.isEmpty());
         assertThat(priceTypes.get(0).getPriceType().getPriceTypeValue(), is(priceType.value));
         assertThat(priceTypes.get(0).getDisplayLabel(), is(priceType.displayLabel));
+    }
+
+    @Test
+    public void orderCapabilities_getActionForEnumForBuy() {
+        TradeItOrderActionParcelable actionParcelable = orderCapabilityParcelable.getActionForEnum(TradeItOrderAction.BUY);
+        assertThat(actionParcelable.getDisplayLabel(), is("Buy"));
+        assertThat(actionParcelable.getAction(), is(TradeItOrderAction.BUY));
+    }
+
+    @Test
+    public void orderCapabilities_getActionForEnumForUnknown() {
+        TradeItOrderActionParcelable actionParcelable = orderCapabilityParcelable.getActionForEnum(TradeItOrderAction.SELL_SHORT);
+        assertThat(actionParcelable, nullValue());
+    }
+
+    @Test
+    public void orderCapabilities_getPriceTypeForEnumForMarket() {
+        TradeItOrderPriceTypeParcelable priceTypeParcelable = orderCapabilityParcelable.getPriceTypeForEnum(TradeItOrderPriceType.MARKET);
+        assertThat(priceTypeParcelable.getDisplayLabel(), is("Market"));
+        assertThat(priceTypeParcelable.getPriceType(), is(TradeItOrderPriceType.MARKET));
+    }
+
+    @Test
+    public void orderCapabilities_getPriceTypeForEnumForUnknown() {
+        TradeItOrderPriceTypeParcelable actionParcelable = orderCapabilityParcelable.getPriceTypeForEnum(TradeItOrderPriceType.LIMIT);
+        assertThat(actionParcelable, nullValue());
+    }
+
+
+    @Test
+    public void orderCapabilities_getExpirationTypeForEnumForDay() {
+        TradeItOrderExpirationTypeParcelable expirationTypeParcelable = orderCapabilityParcelable.getExpirationTypeForEnum(TradeItOrderExpirationType.GOOD_FOR_DAY);
+        assertThat(expirationTypeParcelable.getDisplayLabel(), is("Good for day"));
+        assertThat(expirationTypeParcelable.getExpirationType(), is(TradeItOrderExpirationType.GOOD_FOR_DAY));
+    }
+
+    @Test
+    public void orderCapabilities_getExpirationTypeForEnumForUnknown() {
+        TradeItOrderExpirationTypeParcelable expirationTypeParcelable = orderCapabilityParcelable.getExpirationTypeForEnum(TradeItOrderExpirationType.GOOD_UNTIL_CANCELED);
+        assertThat(expirationTypeParcelable, nullValue());
     }
 }

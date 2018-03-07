@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import it.trade.android.sdk.enums.TradeItOrderAction;
-import it.trade.android.sdk.enums.TradeItOrderExpiration;
+import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
@@ -23,7 +23,7 @@ public class TradeItOrderParcelable implements Parcelable {
     private Double quoteLastPrice;
     private TradeItOrderAction action = TradeItOrderAction.BUY;
     private TradeItOrderPriceType priceType = TradeItOrderPriceType.MARKET;
-    private TradeItOrderExpiration expiration = TradeItOrderExpiration.GOOD_FOR_DAY;
+    private TradeItOrderExpirationType expiration = TradeItOrderExpirationType.GOOD_FOR_DAY;
     private boolean userDisabledMargin = false;
 
     public TradeItOrderParcelable(TradeItLinkedBrokerAccountParcelable linkedBrokerAccount, String symbol) {
@@ -135,11 +135,11 @@ public class TradeItOrderParcelable implements Parcelable {
         this.priceType = priceType;
     }
 
-    public TradeItOrderExpiration getExpiration() {
+    public TradeItOrderExpirationType getExpiration() {
         return expiration;
     }
 
-    public void setExpiration(TradeItOrderExpiration expiration) {
+    public void setExpiration(TradeItOrderExpirationType expiration) {
         this.expiration = expiration;
     }
 
@@ -186,7 +186,7 @@ public class TradeItOrderParcelable implements Parcelable {
         int tmpPriceType = in.readInt();
         this.priceType = tmpPriceType == -1 ? null : TradeItOrderPriceType.values()[tmpPriceType];
         int tmpExpiration = in.readInt();
-        this.expiration = tmpExpiration == -1 ? null : TradeItOrderExpiration.values()[tmpExpiration];
+        this.expiration = tmpExpiration == -1 ? null : TradeItOrderExpirationType.values()[tmpExpiration];
         this.userDisabledMargin = in.readByte() != 0;
     }
 
