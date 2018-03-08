@@ -6,21 +6,25 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.trade.android.sdk.enums.TradeItOrderAction;
+import it.trade.android.sdk.enums.TradeItOrderExpirationType;
+import it.trade.android.sdk.enums.TradeItOrderPriceType;
+import it.trade.model.reponse.DisplayLabelValue;
 import it.trade.model.reponse.Instrument;
 import it.trade.model.reponse.OrderCapability;
 
 public class TradeItOrderCapabilityParcelable implements Parcelable {
 
     private Instrument instrument;
-    private List<DisplayLabelValueParcelable> actions;
-    private List<DisplayLabelValueParcelable> priceTypes;
-    private List<DisplayLabelValueParcelable> expirationTypes;
+    private List<TradeItOrderActionParcelable> actions;
+    private List<TradeItOrderPriceTypeParcelable> priceTypes;
+    private List<TradeItOrderExpirationTypeParcelable> expirationTypes;
 
     public TradeItOrderCapabilityParcelable(OrderCapability orderCapability) {
         this.instrument = orderCapability.getInstrument();
-        this.actions = DisplayLabelValueParcelable.mapDisplayLabelValuesToDisplayLabelValueParcelables(orderCapability.actions);
-        this.priceTypes = DisplayLabelValueParcelable.mapDisplayLabelValuesToDisplayLabelValueParcelables(orderCapability.priceTypes);
-        this.expirationTypes = DisplayLabelValueParcelable.mapDisplayLabelValuesToDisplayLabelValueParcelables(orderCapability.expirationTypes);
+        this.actions = mapOrderActionToEnum(orderCapability.actions);
+        this.priceTypes = mapOrderPriceTypesToEnum(orderCapability.priceTypes);
+        this.expirationTypes = mapOrderExpirationTypesToEnum(orderCapability.expirationTypes);
     }
 
     public static List<TradeItOrderCapabilityParcelable> mapOrderCapabilitiesToTradeItOrderCapabilityParcelables(List<OrderCapability> orderCapabilities) {
@@ -37,16 +41,43 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
         return instrument;
     }
 
-    public List<DisplayLabelValueParcelable> getActions() {
+    public List<TradeItOrderActionParcelable> getActions() {
         return actions;
     }
 
-    public List<DisplayLabelValueParcelable> getPriceTypes() {
+    public List<TradeItOrderPriceTypeParcelable> getPriceTypes() {
         return priceTypes;
     }
 
-    public List<DisplayLabelValueParcelable> getExpirationTypes() {
+    public List<TradeItOrderExpirationTypeParcelable> getExpirationTypes() {
         return expirationTypes;
+    }
+
+    public TradeItOrderActionParcelable getActionForEnum(TradeItOrderAction actionEnum) {
+        for (TradeItOrderActionParcelable action: actions) {
+            if (action.getAction() == actionEnum) {
+                return action;
+            }
+        }
+        return null;
+    }
+
+    public TradeItOrderPriceTypeParcelable getPriceTypeForEnum(TradeItOrderPriceType priceTypeEnum) {
+        for (TradeItOrderPriceTypeParcelable priceType: priceTypes) {
+            if (priceType.getPriceType() == priceTypeEnum) {
+                return priceType;
+            }
+        }
+        return null;
+    }
+
+    public TradeItOrderExpirationTypeParcelable getExpirationTypeForEnum(TradeItOrderExpirationType expirationEnum) {
+        for (TradeItOrderExpirationTypeParcelable expiration: expirationTypes) {
+            if (expiration.getExpirationType() == expirationEnum) {
+                return expiration;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -99,11 +130,11 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
         int tmpInstrument = in.readInt();
         this.instrument = tmpInstrument == -1 ? null : Instrument.values()[tmpInstrument];
         this.actions = new ArrayList<>();
-        in.readList(this.actions, DisplayLabelValueParcelable.class.getClassLoader());
+        in.readList(this.actions, TradeItOrderActionParcelable.class.getClassLoader());
         this.priceTypes = new ArrayList<>();
-        in.readList(this.priceTypes, DisplayLabelValueParcelable.class.getClassLoader());
+        in.readList(this.priceTypes, TradeItOrderPriceTypeParcelable.class.getClassLoader());
         this.expirationTypes = new ArrayList<>();
-        in.readList(this.expirationTypes, DisplayLabelValueParcelable.class.getClassLoader());
+        in.readList(this.expirationTypes, TradeItOrderExpirationTypeParcelable.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<TradeItOrderCapabilityParcelable> CREATOR = new Parcelable.Creator<TradeItOrderCapabilityParcelable>() {
@@ -117,4 +148,43 @@ public class TradeItOrderCapabilityParcelable implements Parcelable {
             return new TradeItOrderCapabilityParcelable[size];
         }
     };
+
+    private static List<TradeItOrderActionParcelable> mapOrderActionToEnum(List<DisplayLabelValue> displayLabelValues) {
+        List<TradeItOrderActionParcelable> mappedValues = new ArrayList<>();
+        if (displayLabelValues != null) {
+            for (DisplayLabelValue displayLabelValue: displayLabelValues) {
+                TradeItOrderAction action = TradeItOrderAction.getActionForValue(displayLabelValue.value);
+                if (action != null) {
+                    mappedValues.add(new TradeItOrderActionParcelable(action, displayLabelValue.displayLabel));
+                }
+            }
+        }
+        return mappedValues;
+    }
+
+    private static List<TradeItOrderPriceTypeParcelable> mapOrderPriceTypesToEnum(List<DisplayLabelValue> displayLabelValues) {
+        List<TradeItOrderPriceTypeParcelable> mappedValues = new ArrayList<>();
+        if (displayLabelValues != null) {
+            for (DisplayLabelValue displayLabelValue: displayLabelValues) {
+                TradeItOrderPriceType priceType = TradeItOrderPriceType.getPriceTypeForValue(displayLabelValue.value);
+                if (priceType != null) {
+                    mappedValues.add(new TradeItOrderPriceTypeParcelable(priceType, displayLabelValue.displayLabel));
+                }
+            }
+        }
+        return mappedValues;
+    }
+
+    private static List<TradeItOrderExpirationTypeParcelable> mapOrderExpirationTypesToEnum(List<DisplayLabelValue> displayLabelValues) {
+        List<TradeItOrderExpirationTypeParcelable> mappedValues = new ArrayList<>();
+        if (displayLabelValues != null) {
+            for (DisplayLabelValue displayLabelValue: displayLabelValues) {
+                TradeItOrderExpirationType expiration = TradeItOrderExpirationType.getExpirationForValue(displayLabelValue.value);
+                if (expiration != null) {
+                    mappedValues.add(new TradeItOrderExpirationTypeParcelable(expiration, displayLabelValue.displayLabel));
+                }
+            }
+        }
+        return mappedValues;
+    }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
+import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.reponse.DisplayLabelValue;
 import it.trade.model.reponse.Instrument;
@@ -107,7 +108,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         List<TradeItPositionParcelable> createdPositions = createdFromParcel.getPositions();
         List<TradeItOrderCapabilityParcelable> orderCapabilities = createdFromParcel.orderCapabilities;
 
-        DisplayLabelValueParcelable displayLabelValueParcelable = orderCapabilities.get(0).getActions().get(0);
+        TradeItOrderActionParcelable actionParcelable = orderCapabilities.get(0).getActions().get(0);
 
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue());
@@ -121,7 +122,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         assertThat(createdBalance, is(balance));
         assertThat(createdPositions, is(positions));
         assertThat(orderCapabilities.isEmpty(), is(false));
-        assertThat(displayLabelValueParcelable.getDisplayLabel(), is("Buy"));
-        assertThat(displayLabelValueParcelable.getValue(), is("buy"));
+        assertThat(actionParcelable.getAction().getActionValue(), is("buy"));
+        assertThat(actionParcelable.getDisplayLabel(), is("Buy"));
     }
 }

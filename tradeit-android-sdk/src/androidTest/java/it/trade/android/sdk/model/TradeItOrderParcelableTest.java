@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
 import it.trade.android.sdk.enums.TradeItOrderAction;
-import it.trade.android.sdk.enums.TradeItOrderExpiration;
+import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.model.reponse.TradeItBrokerAccount;
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse;
@@ -62,7 +62,7 @@ public class TradeItOrderParcelableTest {
     public void order_ParcelableWriteRead() {
         // Set up the Parcelable object to send and receive.
         order.setAction(TradeItOrderAction.BUY);
-        order.setExpiration(TradeItOrderExpiration.GOOD_FOR_DAY);
+        order.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
         order.setPriceType(TradeItOrderPriceType.LIMIT);
         order.setLimitPrice(20.50);
         order.setQuantity(3.14159);
@@ -79,7 +79,7 @@ public class TradeItOrderParcelableTest {
         TradeItOrderParcelable createdFromParcel = TradeItOrderParcelable.CREATOR.createFromParcel(parcel);
         TradeItLinkedBrokerAccountParcelable createdLinkedBrokerAccount = createdFromParcel.getLinkedBrokerAccount();
         TradeItOrderAction action = createdFromParcel.getAction();
-        TradeItOrderExpiration expiration = createdFromParcel.getExpiration();
+        TradeItOrderExpirationType expiration = createdFromParcel.getExpiration();
         Double limitPrice = createdFromParcel.getLimitPrice();
         TradeItOrderPriceType priceType = createdFromParcel.getPriceType();
         Double quantity = createdFromParcel.getQuantity();

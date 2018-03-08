@@ -1,7 +1,7 @@
 package it.trade.android.sdk.model
 
 import it.trade.android.sdk.enums.TradeItOrderAction
-import it.trade.android.sdk.enums.TradeItOrderExpiration
+import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
@@ -24,7 +24,7 @@ class TradeItOrderParcelableSpec extends Specification {
             int errorCallbackCount = 0
             boolean userDisabledMarginFlag = true
             order.setAction(TradeItOrderAction.BUY)
-            order.setExpiration(TradeItOrderExpiration.GOOD_FOR_DAY)
+            order.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY)
             order.setQuantity(1)
             order.setUserDisabledMargin(userDisabledMarginFlag)
 
@@ -86,7 +86,7 @@ class TradeItOrderParcelableSpec extends Specification {
             int successfulCallbackCount = 0
             int errorCallbackCount = 0
             order.setAction(TradeItOrderAction.BUY)
-            order.setExpiration(TradeItOrderExpiration.GOOD_FOR_DAY)
+            order.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY)
             order.setQuantity(1)
 
             linkedBrokerAccount.getTradeItApiClient().previewStockOrEtfOrder(_, _) >> { args ->
