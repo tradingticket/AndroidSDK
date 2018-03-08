@@ -22,7 +22,7 @@ import java.util.List;
 
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
-import it.trade.android.sdk.enums.TradeItOrderExpiration;
+import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
 import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
@@ -448,7 +448,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             final TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokers.get(0).getAccounts().get(0), "GE");
             order.setLimitPrice(20.0);
-            order.setExpiration(TradeItOrderExpiration.GOOD_FOR_DAY);
+            order.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
             order.setPriceType(TradeItOrderPriceType.LIMIT);
             Intent intent = new Intent(mainActivity, PreviewOrderActivity.class);
             intent.putExtra(PREVIEW_ORDER_PARAMETER, order);

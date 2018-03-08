@@ -16,4 +16,13 @@ public enum TradeItOrderPriceType {
     public String getPriceTypeValue() {
         return priceTypeValue;
     }
+
+    public static TradeItOrderPriceType getPriceTypeForValue(String actionValue) {
+        for (TradeItOrderPriceType priceType: TradeItOrderPriceType.values()) {
+            if (priceType.priceTypeValue.equals(actionValue)) {
+                return priceType;
+            }
+        }
+        return null;
+    }
 }
