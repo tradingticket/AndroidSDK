@@ -3,10 +3,12 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.trade.model.reponse.OrderDetails;
 import it.trade.model.reponse.TradeItPreviewStockOrEtfOrderResponse;
+import it.trade.model.reponse.Warning;
 
 public class TradeItPreviewStockOrEtfOrderResponseParcelable implements Parcelable {
 
@@ -26,8 +28,6 @@ public class TradeItPreviewStockOrEtfOrderResponseParcelable implements Parcelab
     public String toString() {
         return "TradeItPreviewStockOrEtfOrderResponseParcelable{" +
                 "orderId='" + orderId + '\'' +
-                ", ackWarningsList=" + ackWarningsList +
-                ", warningsList=" + warningsList +
                 ", orderDetails=" + orderDetails +
                 '}';
     }
@@ -36,10 +36,20 @@ public class TradeItPreviewStockOrEtfOrderResponseParcelable implements Parcelab
         return orderId;
     }
 
+    /**
+     *
+     * @deprecated Use orderDetails.warnings
+     */
+    @Deprecated
     public List<String> getAckWarningsList() {
         return ackWarningsList;
     }
 
+    /**
+     *
+     * @deprecated Use orderDetails.warnings
+     */
+    @Deprecated
     public List<String> getWarningsList() {
         return warningsList;
     }

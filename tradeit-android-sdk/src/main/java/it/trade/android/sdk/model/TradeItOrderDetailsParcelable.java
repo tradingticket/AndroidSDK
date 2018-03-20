@@ -3,9 +3,36 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import it.trade.model.reponse.OrderDetails;
+import java.util.ArrayList;
+import java.util.List;
 
-public class TradeItOrderDetailsParcelable extends OrderDetails implements Parcelable {
+import it.trade.model.reponse.OrderDetails;
+import it.trade.model.reponse.Warning;
+
+public class TradeItOrderDetailsParcelable implements Parcelable {
+    protected String orderSymbol;
+    protected String orderAction;
+    protected Double orderQuantity;
+    protected String orderExpiration;
+    protected String orderPrice;
+    protected String orderValueLabel;
+    protected String orderCommissionLabel;
+    protected String orderMessage;
+    protected String lastPrice;
+    protected String bidPrice;
+    protected String askPrice;
+    protected String timestamp;
+    protected Double buyingPower;
+    protected Double availableCash;
+    protected Double estimatedOrderCommission;
+    protected Double longHoldings;
+    protected Double shortHoldings;
+    protected Double estimatedOrderValue;
+    protected Double estimatedTotalValue;
+    protected List<TradeItWarningParcelable> warnings = new ArrayList<>();
+
+    TradeItOrderDetailsParcelable() {
+    }
 
     TradeItOrderDetailsParcelable(OrderDetails orderDetails) {
         this.askPrice = orderDetails.askPrice;
@@ -27,6 +54,17 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
         this.timestamp = orderDetails.timestamp;
         this.longHoldings = orderDetails.longHoldings;
         this.shortHoldings = orderDetails.shortHoldings;
+        this.warnings = mapWarnings(orderDetails.warnings);
+    }
+
+    private static List<TradeItWarningParcelable> mapWarnings(List<Warning> warnings) {
+        List<TradeItWarningParcelable> mappedValues = new ArrayList<>();
+        if (warnings != null) {
+            for (Warning warning: warnings) {
+                mappedValues.add(new TradeItWarningParcelable(warning));
+            }
+        }
+        return mappedValues;
     }
 
     @Override
@@ -55,9 +93,7 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
         dest.writeValue(this.shortHoldings);
         dest.writeValue(this.estimatedOrderValue);
         dest.writeValue(this.estimatedTotalValue);
-    }
-
-    public TradeItOrderDetailsParcelable() {
+        dest.writeTypedList(this.warnings);
     }
 
     protected TradeItOrderDetailsParcelable(Parcel in) {
@@ -80,6 +116,7 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
         this.shortHoldings = (Double) in.readValue(Double.class.getClassLoader());
         this.estimatedOrderValue = (Double) in.readValue(Double.class.getClassLoader());
         this.estimatedTotalValue = (Double) in.readValue(Double.class.getClassLoader());
+        this.warnings = in.createTypedArrayList(TradeItWarningParcelable.CREATOR);
     }
 
     public static final Parcelable.Creator<TradeItOrderDetailsParcelable> CREATOR = new Parcelable.Creator<TradeItOrderDetailsParcelable>() {
@@ -93,4 +130,84 @@ public class TradeItOrderDetailsParcelable extends OrderDetails implements Parce
             return new TradeItOrderDetailsParcelable[size];
         }
     };
+
+    public String getOrderSymbol() {
+        return orderSymbol;
+    }
+
+    public String getOrderAction() {
+        return orderAction;
+    }
+
+    public Double getOrderQuantity() {
+        return orderQuantity;
+    }
+
+    public String getOrderExpiration() {
+        return orderExpiration;
+    }
+
+    public String getOrderPrice() {
+        return orderPrice;
+    }
+
+    public String getOrderValueLabel() {
+        return orderValueLabel;
+    }
+
+    public String getOrderCommissionLabel() {
+        return orderCommissionLabel;
+    }
+
+    public String getOrderMessage() {
+        return orderMessage;
+    }
+
+    public String getLastPrice() {
+        return lastPrice;
+    }
+
+    public String getBidPrice() {
+        return bidPrice;
+    }
+
+    public String getAskPrice() {
+        return askPrice;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public Double getBuyingPower() {
+        return buyingPower;
+    }
+
+    public Double getAvailableCash() {
+        return availableCash;
+    }
+
+    public Double getEstimatedOrderCommission() {
+        return estimatedOrderCommission;
+    }
+
+    public Double getLongHoldings() {
+        return longHoldings;
+    }
+
+    public Double getShortHoldings() {
+        return shortHoldings;
+    }
+
+    public Double getEstimatedOrderValue() {
+        return estimatedOrderValue;
+    }
+
+    public Double getEstimatedTotalValue() {
+        return estimatedTotalValue;
+    }
+
+    public List<TradeItWarningParcelable> getWarnings() {
+        return warnings;
+    }
 }
