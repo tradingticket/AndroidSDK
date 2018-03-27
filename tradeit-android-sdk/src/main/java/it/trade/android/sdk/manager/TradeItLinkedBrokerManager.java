@@ -550,6 +550,15 @@ public class TradeItLinkedBrokerManager {
         }
     }
 
+    /**
+     * @deprecated Use the new OAuth flow and the #linkBrokerWithOauthVerifier(String, String, String, TradeItCallback) method instead
+     */
+    @Deprecated
+    public void linkBroker(final String accountLabel, String broker, String username, String password, final TradeItCallback<TradeItLinkedBrokerParcelable> callback) {
+        TradeItErrorResultParcelable errorResultParcelable = new TradeItErrorResultParcelable("Couldn't complete your request", "Failed to link broker");
+        callback.onError(errorResultParcelable);
+    }
+
     public List<TradeItLinkedBrokerParcelable> getLinkedBrokers() {
         return linkedBrokers;
     }
