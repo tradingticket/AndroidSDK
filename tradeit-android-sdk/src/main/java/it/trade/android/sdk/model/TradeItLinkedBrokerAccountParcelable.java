@@ -256,8 +256,6 @@ public class TradeItLinkedBrokerAccountParcelable implements Parcelable {
             return false;
         if (accountNumber != null ? !accountNumber.equals(that.accountNumber) : that.accountNumber != null)
             return false;
-        if (userCanDisableMargin != that.userCanDisableMargin)
-            return false;
         return accountBaseCurrency != null ? accountBaseCurrency.equals(that.accountBaseCurrency) : that.accountBaseCurrency == null;
 
     }
