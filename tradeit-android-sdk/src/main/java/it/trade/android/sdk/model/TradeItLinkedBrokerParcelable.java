@@ -263,6 +263,7 @@ public class TradeItLinkedBrokerParcelable implements Parcelable {
                 existingAccount.accountName = account.name;
                 existingAccount.accountBaseCurrency = account.accountBaseCurrency;
                 existingAccount.orderCapabilities = TradeItOrderCapabilityParcelable.mapOrderCapabilitiesToTradeItOrderCapabilityParcelables(account.orderCapabilities);
+                existingAccount.userCanDisableMargin = account.userCanDisableMargin;
                 linkedBrokerAccounts.add(existingAccount);
             } else {
                 linkedBrokerAccounts.add(new TradeItLinkedBrokerAccountParcelable(this, account));
