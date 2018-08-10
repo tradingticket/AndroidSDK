@@ -33,7 +33,7 @@ public class PreviewOrderActivity extends AppCompatActivity {
         textView = (TextView) this.findViewById(R.id.preview_order_textview);
         textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        order = intent.getParcelableExtra(PREVIEW_ORDER_PARAMETER);
+        order = intent.getParcelableExtra(MainActivity.PREVIEW_ORDER_PARAMETER);
         final Button placeOrderButton = (Button) this.findViewById(R.id.place_trade_button);
         cancelOrderButton = (Button) this.findViewById(R.id.cancel_order_button);
         order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable>() {

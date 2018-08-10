@@ -31,7 +31,7 @@ public class ParceledAccountActivity extends AppCompatActivity {
         this.textView = (TextView) this.findViewById(R.id.output_textview);
         this.textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        linkedBrokerAccount = intent.getParcelableExtra(PARCELED_ACCOUNT_PARAMETER);
+        linkedBrokerAccount = intent.getParcelableExtra(MainActivity.PARCELED_ACCOUNT_PARAMETER);
         originalLinkedBrokerAccount = TradeItSDK
                 .getLinkedBrokerManager()
                 .getLinkedBrokerByUserId(linkedBrokerAccount.getLinkedBroker().getLinkedLogin().userId)

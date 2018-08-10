@@ -21,7 +21,7 @@ public class OrdersStatusActivity extends AppCompatActivity {
         TextView textView = (TextView) this.findViewById(R.id.orders_status_textview);
         textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        List<TradeItOrderStatusParcelable> ordersStatusDetailsList = intent.getParcelableArrayListExtra(ORDERS_STATUS_PARAMETER);
+        List<TradeItOrderStatusParcelable> ordersStatusDetailsList = intent.getParcelableArrayListExtra(MainActivity.ORDERS_STATUS_PARAMETER);
         textView.setText(ordersStatusDetailsList.toString());
 
     }

@@ -22,7 +22,7 @@ public class PositionsActivity extends AppCompatActivity {
         TextView textView = (TextView) this.findViewById(R.id.positions_textview);
         textView.setMovementMethod(new ScrollingMovementMethod());
         Intent intent = getIntent();
-        List<TradeItPositionParcelable> positions = intent.getParcelableArrayListExtra(POSITIONS_PARAMETER);
+        List<TradeItPositionParcelable> positions = intent.getParcelableArrayListExtra(MainActivity.POSITIONS_PARAMETER);
         textView.setText(positions.toString());
     }
 }
