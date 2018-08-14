@@ -15,7 +15,6 @@ import android.support.test.uiautomator.UiDevice
 import android.support.test.uiautomator.UiObjectNotFoundException
 import android.support.test.uiautomator.UiSelector
 import android.view.View
-import android.widget.EditText
 import it.trade.android.sdk.internal.TradeItKeystoreService
 import org.hamcrest.Matchers.*
 import org.junit.Rule
@@ -117,7 +116,6 @@ class MainActivityTest {
         tapOnText("OK")
     }
 
-    //TODO FIXME - oAuth flow automated test doesn't work anymore
     @Throws(InterruptedException::class, UiObjectNotFoundException::class)
     private fun testOauthFlow(dummyLogin: String) {
         tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.label)
@@ -134,12 +132,12 @@ class MainActivityTest {
         Thread.sleep(1500L) //TODO there should be a better way for waiting
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val login = device.findObject(UiSelector().className(EditText::class.java).instance(0))
+        val login = device.findObject(UiSelector().resourceId("loginUser"))
         login.clearTextField()
         login.click()
         login.text = dummyLogin
 
-        val password = device.findObject(UiSelector().className(EditText::class.java).instance(1))
+        val password = device.findObject(UiSelector().resourceId("loginPwd"))
         password.clearTextField()
         password.click()
         password.text = "dummy"
