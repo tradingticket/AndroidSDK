@@ -3,9 +3,7 @@ package it.trade.android.sdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import it.trade.model.reponse.TradeItLinkLoginResponse;
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse;
-import it.trade.model.request.TradeItLinkLoginRequest;
 import it.trade.model.request.TradeItLinkedLogin;
 import it.trade.model.request.TradeItOAuthAccessTokenRequest;
 
@@ -13,10 +11,6 @@ import it.trade.model.request.TradeItOAuthAccessTokenRequest;
 public class TradeItLinkedLoginParcelable extends TradeItLinkedLogin implements Parcelable {
     public TradeItLinkedLoginParcelable(String broker, String userId, String userToken) {
         super(broker, userId, userToken);
-    }
-
-    public TradeItLinkedLoginParcelable(TradeItLinkLoginRequest linkLoginRequest, TradeItLinkLoginResponse linkLoginResponse) {
-        super(linkLoginRequest, linkLoginResponse);
     }
 
     public TradeItLinkedLoginParcelable(TradeItOAuthAccessTokenRequest oAuthAccessTokenRequest, TradeItOAuthAccessTokenResponse oAuthAccessTokenResponse) {

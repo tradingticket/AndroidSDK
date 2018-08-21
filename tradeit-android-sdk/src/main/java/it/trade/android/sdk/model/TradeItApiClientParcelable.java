@@ -4,10 +4,9 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import it.trade.api.TradeItApi;
+import it.trade.api.StatelessTradeItApiClient;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.request.TradeItEnvironment;
-import it.trade.model.request.TradeItRequestWithKey;
 
 public class TradeItApiClientParcelable extends TradeItApiClient implements Parcelable {
 
@@ -21,8 +20,8 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
         this.requestInterceptorParcelable = requestInterceptorParcelable;
     }
 
-    protected TradeItApiClientParcelable(TradeItApi tradeItApi) {
-        super(tradeItApi);
+    protected TradeItApiClientParcelable(String apiKey, StatelessTradeItApiClient statelessTradeItApiClient) {
+        super(apiKey, statelessTradeItApiClient);
     }
 
     public RequestInterceptorParcelable getRequestInterceptorParcelable() {
@@ -50,8 +49,7 @@ public class TradeItApiClientParcelable extends TradeItApiClient implements Parc
         int tmpEnvironment = in.readInt();
         this.environment = tmpEnvironment == -1 ? null : TradeItEnvironment.values()[tmpEnvironment];
         this.apiKey = in.readString();
-        TradeItRequestWithKey.API_KEY = apiKey;
-        this.tradeItApi = this.createTradeItApi(environment, requestInterceptorParcelable, forceTLS12());
+        this.statelessTradeItApiClient = this.createStatelessTradeItApiClient(environment, requestInterceptorParcelable, forceTLS12());
     }
 
     public static final Creator<TradeItApiClientParcelable> CREATOR = new Creator<TradeItApiClientParcelable>() {

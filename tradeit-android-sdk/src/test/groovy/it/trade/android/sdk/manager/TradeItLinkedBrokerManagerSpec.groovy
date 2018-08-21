@@ -567,11 +567,11 @@ class TradeItLinkedBrokerManagerSpec extends Specification {
             int errorCallBackCount = 0
             String mySpecialUrl = "http://myspecialoauthurl.com?oAuthTempToken=2bae6cc8-8d37-4b4a-ae5e-6bbde9209ac4"
 
-            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable.class)
+            TradeItLinkedLoginParcelable linkedLogin = Mock(TradeItLinkedLoginParcelable)
             linkedLogin.userId = myUserId
             linkedLogin.userToken = myUserToken
 
-            TradeItLinkedBrokerParcelable linkedBroker = Mock(TradeItLinkedBrokerParcelable.class)
+            TradeItLinkedBrokerParcelable linkedBroker = Mock(TradeItLinkedBrokerParcelable)
             1 * linkedBroker.getBrokerName() >> "My broker 1"
             3 * linkedBroker.getLinkedLogin() >> linkedLogin
             1 * apiClient.getOAuthLoginPopupUrlForTokenUpdate("My broker 1", myUserId, myUserToken, "my internal app callback", _) >> { broker, userId, userToken,  deepLinkCallback, TradeItCallback<String> callback ->

@@ -16,7 +16,6 @@ import java.util.List;
 
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
-import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.api.TradeItApiClient;
 import it.trade.model.reponse.DisplayLabelValue;
 import it.trade.model.reponse.Instrument;
@@ -42,8 +41,7 @@ public class TradeItLinkedBrokerAccountParcelableTest {
         TradeItSDK.clearConfig();
         TradeItSDK.configure(new TradeItConfigurationBuilder(instrumentationCtx.getApplicationContext(), "tradeit-test-api-key", TradeItEnvironment.QA));
 
-        TradeItOAuthAccessTokenRequest oAuthAccessTokenRequest = new TradeItOAuthAccessTokenRequest("MyOauthVerifier");
-        oAuthAccessTokenRequest.apiKey = "MyApiKey";
+        TradeItOAuthAccessTokenRequest oAuthAccessTokenRequest = new TradeItOAuthAccessTokenRequest("MyApiKey","MyOauthVerifier");
         TradeItOAuthAccessTokenResponse oAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse();
         oAuthAccessTokenResponse.userId = "MyUserId";
         oAuthAccessTokenResponse.userToken = "MyUserToken";

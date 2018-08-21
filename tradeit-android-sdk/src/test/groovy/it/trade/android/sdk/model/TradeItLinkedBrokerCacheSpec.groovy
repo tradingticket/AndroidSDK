@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import it.trade.model.reponse.TradeItAccountOverview
 import it.trade.model.reponse.TradeItBrokerAccount
-import it.trade.model.reponse.TradeItLinkLoginResponse
-import it.trade.model.request.TradeItLinkLoginRequest
+import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
+import it.trade.model.request.TradeItOAuthAccessTokenRequest
 import spock.lang.Specification
 
 class TradeItLinkedBrokerCacheSpec extends Specification {
@@ -19,11 +19,12 @@ class TradeItLinkedBrokerCacheSpec extends Specification {
     TradeItLinkedLoginParcelable linkedLogin
 
     def setup() {
-        TradeItLinkLoginRequest linkLoginRequest = new TradeItLinkLoginRequest("my id", "my password", "broker")
-        TradeItLinkLoginResponse linkLoginResponse = new TradeItLinkLoginResponse()
-        linkLoginResponse.userId = userId
-        linkLoginResponse.userToken = "My userToken"
-        linkedLogin = new TradeItLinkedLoginParcelable(linkLoginRequest, linkLoginResponse)
+        TradeItOAuthAccessTokenRequest oAuthAccessTokenRequest = new TradeItOAuthAccessTokenRequest("My Api Key", "oauth verifier")
+        TradeItOAuthAccessTokenResponse oAuthAccessTokenResponse = new TradeItOAuthAccessTokenResponse()
+        oAuthAccessTokenResponse.userId = userId
+        oAuthAccessTokenResponse.userToken = "My userToken"
+        oAuthAccessTokenResponse.broker = "My broker"
+        linkedLogin = new TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, oAuthAccessTokenResponse)
 
 
         context.getSharedPreferences(_, Context.MODE_PRIVATE) >> {
