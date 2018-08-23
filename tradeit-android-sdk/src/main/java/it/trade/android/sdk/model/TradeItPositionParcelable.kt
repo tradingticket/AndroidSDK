@@ -71,7 +71,7 @@ class TradeItPositionParcelable : TradeItPosition, Parcelable {
                 return TradeItPositionParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItPositionParcelable> {
+            override fun newArray(size: Int): Array<TradeItPositionParcelable?> {
                 return arrayOfNulls(size)
             }
         }

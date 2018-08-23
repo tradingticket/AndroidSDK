@@ -12,6 +12,7 @@ import it.trade.model.request.TradeItEnvironment
 object TradeItSDK {
     private var instance: TradeItSdkInstance? = null
 
+    @JvmStatic
     val linkedBrokerManager: TradeItLinkedBrokerManager?
         @Throws(TradeItSDKConfigurationException::class)
         get() {
@@ -38,6 +39,7 @@ object TradeItSDK {
         }
 
 
+    @JvmStatic
     fun configure(configurationBuilder: TradeItConfigurationBuilder) {
         if (instance == null) {
             instance = TradeItSdkInstance(configurationBuilder)

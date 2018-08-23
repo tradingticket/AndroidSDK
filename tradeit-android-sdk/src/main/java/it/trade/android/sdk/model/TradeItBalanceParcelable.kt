@@ -119,7 +119,7 @@ class TradeItBalanceParcelable : Parcelable {
                 return TradeItBalanceParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItBalanceParcelable> {
+            override fun newArray(size: Int): Array<TradeItBalanceParcelable?> {
                 return arrayOfNulls(size)
             }
         }

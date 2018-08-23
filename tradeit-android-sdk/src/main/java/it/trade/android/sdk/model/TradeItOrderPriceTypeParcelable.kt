@@ -52,7 +52,7 @@ class TradeItOrderPriceTypeParcelable : Parcelable {
                 return TradeItOrderPriceTypeParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItOrderPriceTypeParcelable> {
+            override fun newArray(size: Int): Array<TradeItOrderPriceTypeParcelable?> {
                 return arrayOfNulls(size)
             }
         }

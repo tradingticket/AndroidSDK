@@ -50,7 +50,7 @@ class TradeItApiClientParcelable : TradeItApiClient, Parcelable {
                 return TradeItApiClientParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItApiClientParcelable> {
+            override fun newArray(size: Int): Array<TradeItApiClientParcelable?> {
                 return arrayOfNulls(size)
             }
         }

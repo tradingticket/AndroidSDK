@@ -4,33 +4,22 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
 import android.util.Log
-
 import com.google.gson.Gson
-
+import it.trade.android.sdk.exceptions.*
+import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.charset.Charset
 import java.security.KeyStore
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
-import java.util.ArrayList
-import java.util.Collections
-import java.util.HashSet
-
+import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
-
-import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException
-import it.trade.android.sdk.exceptions.TradeItKeystoreServiceCreateKeyException
-import it.trade.android.sdk.exceptions.TradeItKeystoreServiceDeleteKeyException
-import it.trade.android.sdk.exceptions.TradeItKeystoreServiceEncryptException
-import it.trade.android.sdk.exceptions.TradeItRetrieveLinkedLoginException
-import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException
-import it.trade.android.sdk.exceptions.TradeItUpdateLinkedLoginException
-import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
 
 
 class TradeItKeystoreService @Throws(TradeItKeystoreServiceCreateKeyException::class)
@@ -261,7 +250,7 @@ constructor(private val context: Context) {
             val cipher = Cipher.getInstance("AES")
             cipher.init(Cipher.DECRYPT_MODE, this.secretKey)
             val original = cipher.doFinal(Base64.decode(encryptedString, Base64.DEFAULT))
-            return String(original, "UTF-8")
+            return String(original, Charset.forName("UTF-8"))
         } catch (e: Exception) {
             //don't throw an exception, to not crash existing app
             Log.e(TAG, "Error decrypting the string: $encryptedString", e)

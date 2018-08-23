@@ -3,19 +3,9 @@ package it.trade.android.sdk.model
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.Log
-
 import com.google.gson.annotations.SerializedName
-
-import java.io.IOException
-import java.net.SocketException
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.Date
-
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.SingleEmitter
-import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
 import io.reactivex.exceptions.UndeliverableException
@@ -35,16 +25,21 @@ import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItErrorCode
 import it.trade.model.request.TradeItLinkedLogin
 import retrofit2.Response
+import java.io.IOException
+import java.net.SocketException
+import java.util.*
 
 
 class TradeItLinkedBrokerParcelable : Parcelable {
     @Transient
-    private var apiClient: TradeItApiClientParcelable? = null
+    var apiClient: TradeItApiClientParcelable? = null
+    private set
+
     @Transient
     var linkedLogin: TradeItLinkedLoginParcelable? = null
 
     @SerializedName("accounts")
-    private var accounts: MutableList<TradeItLinkedBrokerAccountParcelable> = ArrayList()
+    var accounts: MutableList<TradeItLinkedBrokerAccountParcelable> = ArrayList()
 
     @SerializedName("accountsLastUpdated")
     var accountsLastUpdated: Date? = null
@@ -100,7 +95,7 @@ class TradeItLinkedBrokerParcelable : Parcelable {
 
     fun refreshAccountBalances(callback: TradeItCallBackCompletion) {
         RxJavaPlugins.setErrorHandler(Consumer { e ->
-            var e = e
+            var e: Throwable? = e
             if (e is UndeliverableException) {
                 e = e.cause
             }
@@ -143,8 +138,8 @@ class TradeItLinkedBrokerParcelable : Parcelable {
                         })
                     }
                 }, true)
-                .subscribe(object : DisposableObserver() {
-                    override fun onNext(@NonNull linkedBrokerAccountParcelable: Any) {
+                .subscribe(object : DisposableObserver<TradeItLinkedBrokerAccountParcelable>() {
+                    override fun onNext(@NonNull linkedBrokerAccountParcelable: TradeItLinkedBrokerAccountParcelable) {
                         Log.d(TAG, "onNext: $linkedBrokerAccountParcelable")
                     }
 
@@ -205,7 +200,7 @@ class TradeItLinkedBrokerParcelable : Parcelable {
 
         return "TradeItLinkedBrokerParcelable{" +
                 "TradeItLinkedLogin=" + this.linkedLogin!!.toString() +
-                ", accounts=" + getAccounts().toString() +
+                ", accounts=" + this.accounts.toString() +
                 ", accountsLastUpdated=" + accountsLastUpdated +
                 ", error=" + errorText +
                 '}'.toString()
@@ -213,14 +208,6 @@ class TradeItLinkedBrokerParcelable : Parcelable {
 
     internal fun getApiClient(): TradeItApiClient? {
         return this.apiClient
-    }
-
-    fun getAccounts(): List<TradeItLinkedBrokerAccountParcelable> {
-        return this.accounts
-    }
-
-    fun setAccounts(accounts: MutableList<TradeItLinkedBrokerAccountParcelable>) {
-        this.accounts = accounts
     }
 
     private fun mapBrokerAccountsToLinkedBrokerAccounts(accounts: List<TradeItBrokerAccount>): List<TradeItLinkedBrokerAccountParcelable> {
@@ -283,12 +270,12 @@ class TradeItLinkedBrokerParcelable : Parcelable {
         this.linkedLogin = `in`.readParcelable(TradeItLinkedLogin::class.java!!.getClassLoader())
         this.accounts = `in`.createTypedArrayList(TradeItLinkedBrokerAccountParcelable.CREATOR)
         val tmpAccountsLastUpdated = `in`.readLong()
-        this.accountsLastUpdated = if (tmpAccountsLastUpdated == -1) null else Date(tmpAccountsLastUpdated)
+        this.accountsLastUpdated = if (tmpAccountsLastUpdated.equals(-1)) null else Date(tmpAccountsLastUpdated)
         this.error = `in`.readParcelable(TradeItErrorResultParcelable::class.java!!.getClassLoader())
         this.linkedBrokerCache = TradeItSDK.linkedBrokerCache
 
         for (accountParcelable in this.accounts) {
-            accountParcelable.setLinkedBroker(this)
+            accountParcelable.linkedBroker = this
         }
 
         val indexLinkedBroker = TradeItSDK.linkedBrokerManager!!.getLinkedBrokers().indexOf(this)
@@ -308,11 +295,13 @@ class TradeItLinkedBrokerParcelable : Parcelable {
                 return TradeItLinkedBrokerParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItLinkedBrokerParcelable> {
+            override fun newArray(size: Int): Array<TradeItLinkedBrokerParcelable?> {
                 return arrayOfNulls(size)
             }
         }
     }
+
+
 }
 
 

@@ -89,7 +89,7 @@ class TradeItFillParcelable : Parcelable {
                 return TradeItFillParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItFillParcelable> {
+            override fun newArray(size: Int): Array<TradeItFillParcelable?> {
                 return arrayOfNulls(size)
             }
         }

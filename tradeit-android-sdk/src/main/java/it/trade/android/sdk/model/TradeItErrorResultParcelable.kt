@@ -54,7 +54,7 @@ class TradeItErrorResultParcelable : TradeItErrorResult, Parcelable {
                 return TradeItErrorResultParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItErrorResultParcelable> {
+            override fun newArray(size: Int): Array<TradeItErrorResultParcelable?> {
                 return arrayOfNulls(size)
             }
         }

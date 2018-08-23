@@ -7,7 +7,7 @@ import it.trade.model.reponse.Price
 
 class TradeItPriceParcelable : Parcelable {
 
-    var type: String
+    var type: String = ""
         internal set
     var limitPrice: Double? = null
         internal set
@@ -19,7 +19,7 @@ class TradeItPriceParcelable : Parcelable {
         internal set
     var ask: Double? = null
         internal set
-    var timestamp: String
+    var timestamp: String = ""
         internal set
 
     internal constructor(price: Price) {
@@ -77,7 +77,7 @@ class TradeItPriceParcelable : Parcelable {
                 return TradeItPriceParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItPriceParcelable> {
+            override fun newArray(size: Int): Array<TradeItPriceParcelable?> {
                 return arrayOfNulls(size)
             }
         }

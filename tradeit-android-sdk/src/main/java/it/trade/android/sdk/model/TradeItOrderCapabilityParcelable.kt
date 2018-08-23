@@ -2,15 +2,13 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.os.Parcelable
-
-import java.util.ArrayList
-
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
 import it.trade.model.reponse.DisplayLabelValue
 import it.trade.model.reponse.Instrument
 import it.trade.model.reponse.OrderCapability
+import java.util.*
 
 class TradeItOrderCapabilityParcelable : Parcelable {
 
@@ -126,7 +124,7 @@ class TradeItOrderCapabilityParcelable : Parcelable {
                 return TradeItOrderCapabilityParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItOrderCapabilityParcelable> {
+            override fun newArray(size: Int): Array<TradeItOrderCapabilityParcelable?> {
                 return arrayOfNulls(size)
             }
         }

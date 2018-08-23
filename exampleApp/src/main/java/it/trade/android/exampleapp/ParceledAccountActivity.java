@@ -34,7 +34,7 @@ public class ParceledAccountActivity extends AppCompatActivity {
         linkedBrokerAccount = intent.getParcelableExtra(PARCELED_ACCOUNT_PARAMETER);
         originalLinkedBrokerAccount = TradeItSDK
                 .getLinkedBrokerManager()
-                .getLinkedBrokerByUserId(linkedBrokerAccount.linkedBroker.getLinkedLogin().userId)
+                .getLinkedBrokerByUserId(linkedBrokerAccount.getLinkedBroker().getLinkedLogin().userId)
                 .getLinkedBrokerAccount(linkedBrokerAccount.getAccountNumber());
 
         String message = "Parceled LinkedBrokerAccount(@"
@@ -99,7 +99,7 @@ public class ParceledAccountActivity extends AppCompatActivity {
     }
 
     public void authenticate(View view) {
-        linkedBrokerAccount.linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+        linkedBrokerAccount.getLinkedBroker().authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
             @Override
             public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
 

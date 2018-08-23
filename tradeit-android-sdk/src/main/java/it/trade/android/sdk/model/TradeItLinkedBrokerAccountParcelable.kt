@@ -3,25 +3,17 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.os.Parcelable
-
 import com.google.gson.annotations.SerializedName
-
-import java.util.ArrayList
-import java.util.Date
-import java.util.HashMap
-
 import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable
 import it.trade.api.TradeItApiClient
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
-import it.trade.model.reponse.Instrument
-import it.trade.model.reponse.OrderStatusDetails
-import it.trade.model.reponse.TradeItAccountOverviewResponse
-import it.trade.model.reponse.TradeItBrokerAccount
-import it.trade.model.reponse.TradeItPosition
-
+import it.trade.model.reponse.*
 import it.trade.model.reponse.TradeItErrorCode.BROKER_EXECUTION_ERROR
 import it.trade.model.reponse.TradeItErrorCode.PARAMETER_ERROR
+import java.util.ArrayList
+import java.util.Date
+import kotlin.collections.HashMap
 
 class TradeItLinkedBrokerAccountParcelable : Parcelable {
 
@@ -41,7 +33,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
     var orderCapabilities: List<TradeItOrderCapabilityParcelable>
 
     @Transient
-    var linkedBroker: TradeItLinkedBrokerParcelable
+    var linkedBroker: TradeItLinkedBrokerParcelable?
+        internal set
 
     @SerializedName("balance")
     var balance: TradeItBalanceParcelable? = null
@@ -64,10 +57,10 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
     private var userId: String? = null
 
     val tradeItApiClient: TradeItApiClient?
-        get() = this.linkedBroker.apiClient
+        get() = this.linkedBroker?.apiClient
 
     val brokerName: String
-        get() = this.linkedBroker.brokerName
+        get() = this.linkedBroker?.brokerName ?: ""
 
     constructor(linkedBroker: TradeItLinkedBrokerParcelable, account: TradeItBrokerAccount) {
         this.linkedBroker = linkedBroker
@@ -81,12 +74,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
 
     fun setErrorOnLinkedBroker(errorResult: TradeItErrorResultParcelable) {
         if (errorResult.errorCode != BROKER_EXECUTION_ERROR && errorResult.errorCode != PARAMETER_ERROR) {
-            this.linkedBroker.error = errorResult
+            this.linkedBroker?.error = errorResult
         }
-    }
-
-    internal fun setLinkedBroker(linkedBroker: TradeItLinkedBrokerParcelable) {
-        this.linkedBroker = linkedBroker
     }
 
     fun getOrderCapabilityForInstrument(instrument: Instrument): TradeItOrderCapabilityParcelable? {
@@ -112,7 +101,7 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
                     linkedBrokerAccount.fxBalance = fxBalance
                 }
                 linkedBrokerAccount.balanceLastUpdated = Date()
-                linkedBroker.cache()
+                linkedBroker?.cache()
                 callback.onSuccess(linkedBrokerAccount)
             }
 
@@ -227,7 +216,7 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         dest.writeLong(if (this.balanceLastUpdated != null) this.balanceLastUpdated!!.time else -1)
         dest.writeList(this.positions)
         dest.writeString(this.userId)
-        linkedBrokersMap[this.userId] = this.linkedBroker
+        userId?.let {userId ->  linkedBrokersMap[userId] = this.linkedBroker }
     }
 
     protected constructor(`in`: Parcel) {
@@ -239,27 +228,28 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         `in`.readList(this.orderCapabilities, TradeItOrderCapabilityParcelable::class.java!!.getClassLoader())
         this.balance = `in`.readParcelable(TradeItBalanceParcelable::class.java!!.getClassLoader())
         val tmpBalanceLastUpdated = `in`.readLong()
-        this.balanceLastUpdated = if (tmpBalanceLastUpdated == -1) null else Date(tmpBalanceLastUpdated)
+        this.balanceLastUpdated = if (tmpBalanceLastUpdated.equals(-1)) null else Date(tmpBalanceLastUpdated)
         this.positions = ArrayList()
         `in`.readList(this.positions, TradeItPositionParcelable::class.java!!.getClassLoader())
         this.userId = `in`.readString()
-        this.linkedBroker = linkedBrokersMap[this.userId]
-        val indexAccount = this.linkedBroker.accounts.indexOf(this)
-        if (indexAccount != -1) { // updating account reference on the linkedBroker as we created a new object
-            this.linkedBroker.accounts.removeAt(indexAccount)
-            this.linkedBroker.accounts.add(indexAccount, this)
+        this.linkedBroker = this.userId?.let { userId -> linkedBrokersMap[userId] } ?: null
+        this.linkedBroker?.accounts?.indexOf(this)?.let { indexAccount ->
+            if (indexAccount != -1) { // updating account reference on the linkedBroker as we created a new object
+                this.linkedBroker?.accounts?.removeAt(indexAccount)
+                this.linkedBroker?.accounts?.add(indexAccount, this)
+            }
         }
     }
 
     companion object {
-        private val linkedBrokersMap = HashMap<String, TradeItLinkedBrokerParcelable>() //used for parcelable
+        private val linkedBrokersMap = HashMap<String, TradeItLinkedBrokerParcelable?>() //used for parcelable
 
         val CREATOR: Parcelable.Creator<TradeItLinkedBrokerAccountParcelable> = object : Parcelable.Creator<TradeItLinkedBrokerAccountParcelable> {
             override fun createFromParcel(source: Parcel): TradeItLinkedBrokerAccountParcelable {
                 return TradeItLinkedBrokerAccountParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItLinkedBrokerAccountParcelable> {
+            override fun newArray(size: Int): Array<TradeItLinkedBrokerAccountParcelable?> {
                 return arrayOfNulls(size)
             }
         }

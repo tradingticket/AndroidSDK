@@ -1,14 +1,8 @@
 package it.trade.android.sdk.manager
 
 import android.util.Log
-
-import java.io.IOException
-import java.net.SocketException
-import java.util.ArrayList
-
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.SingleEmitter
 import io.reactivex.SingleOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.annotations.NonNull
@@ -25,15 +19,7 @@ import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException
 import it.trade.android.sdk.exceptions.TradeItUpdateLinkedLoginException
 import it.trade.android.sdk.internal.LinkedBrokersParcelableList
 import it.trade.android.sdk.internal.TradeItKeystoreService
-import it.trade.android.sdk.model.TradeItApiClientParcelable
-import it.trade.android.sdk.model.TradeItCallBackCompletion
-import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion
-import it.trade.android.sdk.model.TradeItErrorResultParcelable
-import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable
-import it.trade.android.sdk.model.TradeItLinkedBrokerCache
-import it.trade.android.sdk.model.TradeItLinkedBrokerData
-import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable
-import it.trade.android.sdk.model.TradeItLinkedLoginParcelable
+import it.trade.android.sdk.model.*
 import it.trade.model.TradeItErrorResult
 import it.trade.model.TradeItSecurityQuestion
 import it.trade.model.callback.TradeItCallback
@@ -42,6 +28,9 @@ import it.trade.model.reponse.Instrument
 import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker
 import it.trade.model.reponse.TradeItResponse
 import it.trade.model.request.TradeItLinkedLogin
+import java.io.IOException
+import java.net.SocketException
+import java.util.*
 
 class TradeItLinkedBrokerManager @Throws(TradeItRetrieveLinkedLoginException::class)
 constructor(
@@ -50,7 +39,7 @@ constructor(
         private val keystoreService: TradeItKeystoreService,
         prefetchBrokerList: Boolean
 ) {
-    private val linkedBrokers = ArrayList<TradeItLinkedBrokerParcelable>()
+    private val linkedBrokers = mutableListOf<TradeItLinkedBrokerParcelable>()
     private var availableBrokersSingleCache: SingleCache<List<Broker>>? = null
 
     init {
@@ -79,8 +68,10 @@ constructor(
 
                 linkedBrokerCache.cache(linkedBrokerDataParcelable)
                 linkedBrokers.add(linkedBrokerDataParcelable)
-                val linkedLoginParcelable = linkedBrokerDataParcelable.linkedLogin
-                keystoreService.saveLinkedLogin(linkedLoginParcelable, linkedLoginParcelable!!.label)
+                linkedBrokerDataParcelable.linkedLogin?.let { linkedLogin ->
+                    keystoreService.saveLinkedLogin(linkedLogin, linkedLogin.label)
+                }
+
             } else if (!LinkedBrokersParcelableList(linkedBrokers).containsSameAccounts(linkedBrokerDataParcelable)) { // Update linkedBrokers accounts if they changed
                 val index = linkedBrokers.indexOf(linkedBrokerDataParcelable)
 
@@ -104,7 +95,9 @@ constructor(
             if (!linkedBrokerDataList.contains(TradeItLinkedBrokerData(linkedBroker.linkedLogin!!))) {
                 linkedBrokerCache.removeFromCache(linkedBroker)
                 linkedBrokers.remove(linkedBroker)
-                keystoreService.deleteLinkedLogin(linkedBroker.linkedLogin)
+                linkedBroker.linkedLogin?.let { linkedLogin ->
+                    keystoreService.deleteLinkedLogin(linkedLogin)
+                }
             }
         }
     }
@@ -123,8 +116,8 @@ constructor(
     private fun createNewLinkedBroker(linkedBrokerData: TradeItLinkedBrokerData): TradeItLinkedBrokerParcelable {
         val linkedLoginParcelable = TradeItLinkedLoginParcelable(
                 linkedBrokerData.broker,
-                linkedBrokerData.userId,
-                linkedBrokerData.userToken
+                linkedBrokerData.userId ?: "",
+                linkedBrokerData.userToken ?: ""
         )
 
         val linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable)
@@ -150,7 +143,7 @@ constructor(
                 Consumer { e ->
                     var e = e
                     if (e is UndeliverableException) {
-                        e = e.cause
+                        e = e.cause!!
                     }
 
                     if (e is IOException || e is SocketException) {
@@ -214,8 +207,8 @@ constructor(
                         },
                         true
                 ).subscribe(
-                        object : DisposableObserver() {
-                            override fun onNext(@NonNull linkedBrokerParcelable: Any) {
+                        object : DisposableObserver<TradeItLinkedBrokerParcelable>() {
+                            override fun onNext(@NonNull linkedBrokerParcelable: TradeItLinkedBrokerParcelable) {
                                 Log.d(TAG, "authenticateAll - onNext: $linkedBrokerParcelable")
                             }
 
@@ -237,11 +230,21 @@ constructor(
                 .observeOn(AndroidSchedulers.mainThread(), true)
                 .subscribeOn(Schedulers.io())
                 .flatMapSingle(
-                        Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>> { linkedBrokerParcelable -> Single.create { emmiter -> linkedBrokerParcelable.refreshAccountBalances { emmiter.onSuccess(linkedBrokerParcelable) } } },
+                        Function<TradeItLinkedBrokerParcelable, Single<TradeItLinkedBrokerParcelable>> { linkedBrokerParcelable ->
+                            Single.create { emmiter ->
+                                linkedBrokerParcelable.refreshAccountBalances(
+                                    object: TradeItCallBackCompletion {
+                                        override fun onFinished() {
+                                            emmiter.onSuccess(linkedBrokerParcelable)
+                                        }
+                                    }
+                                )
+                            }
+                        },
                         true
                 ).subscribe(
-                        object : DisposableObserver() {
-                            override fun onNext(@NonNull linkedBrokerParcelable: Any) {
+                        object : DisposableObserver<TradeItLinkedBrokerParcelable>() {
+                            override fun onNext(@NonNull linkedBrokerParcelable: TradeItLinkedBrokerParcelable) {
                                 Log.d(TAG, "refreshAccountBalances onNext: $linkedBrokerParcelable")
                             }
 
@@ -270,8 +273,9 @@ constructor(
 
     @Synchronized
     private fun getAvailableBrokersSingleCache(): SingleCache<List<Broker>> {
-        if (this.availableBrokersSingleCache != null) {
-            return availableBrokersSingleCache
+        val cache = this.availableBrokersSingleCache
+        if (cache != null) {
+            return cache
         } else {
             val single = Single.create(
                     SingleOnSubscribe<List<Broker>> { emitter ->
@@ -279,7 +283,7 @@ constructor(
                                 Consumer { e ->
                                     var e = e
                                     if (e is UndeliverableException) {
-                                        e = e.cause
+                                        e = e.cause!!
                                     }
 
                                     if (e is IOException || e is SocketException) {
@@ -539,10 +543,10 @@ constructor(
                             callback.onSuccess(linkedBroker)
                         } catch (e: TradeItSaveLinkedLoginException) {
                             Log.e(this.javaClass.getName(), e.message, e)
-                            callback.onError(TradeItErrorResultParcelable("Failed to link broker", e.message))
+                            callback.onError(TradeItErrorResultParcelable("Failed to link broker", e.message ?: ""))
                         } catch (e: TradeItUpdateLinkedLoginException) {
                             Log.e(this.javaClass.getName(), e.message, e)
-                            callback.onError(TradeItErrorResultParcelable("Failed to update link broker", e.message))
+                            callback.onError(TradeItErrorResultParcelable("Failed to update link broker", e.message ?: ""))
                         }
 
                     }
@@ -557,14 +561,17 @@ constructor(
 
     fun unlinkBroker(
             linkedBroker: TradeItLinkedBrokerParcelable,
-            callback: TradeItCallback<*>
+            callback: TradeItCallback<TradeItResponse>
     ) {
         try {
-            keystoreService.deleteLinkedLogin(linkedBroker.linkedLogin)
+            var linkedLogin = linkedBroker.linkedLogin?.let { linkedLogin ->
+                keystoreService.deleteLinkedLogin(linkedLogin)
+                linkedLogin
+            }
             linkedBrokers.remove(linkedBroker)
             linkedBrokerCache.removeFromCache(linkedBroker)
             apiClient.unlinkBrokerAccount(
-                    linkedBroker.linkedLogin!!,
+                    linkedLogin,
                     object : TradeItCallback<TradeItResponse> {
                         override fun onSuccess(response: TradeItResponse) {
                             callback.onSuccess(response)
@@ -600,7 +607,7 @@ constructor(
         return linkedBrokerParcelable
     }
 
-    fun unlinkBrokerByUserId(userId: String, callback: TradeItCallback<*>) {
+    fun unlinkBrokerByUserId(userId: String, callback: TradeItCallback<TradeItResponse>) {
         val linkedBroker = getLinkedBrokerByUserId(userId)
 
         if (linkedBroker == null) {
@@ -631,7 +638,7 @@ constructor(
         callback.onError(errorResultParcelable)
     }
 
-    fun getLinkedBrokers(): List<TradeItLinkedBrokerParcelable> {
+    fun getLinkedBrokers(): MutableList<TradeItLinkedBrokerParcelable> {
         return linkedBrokers
     }
 

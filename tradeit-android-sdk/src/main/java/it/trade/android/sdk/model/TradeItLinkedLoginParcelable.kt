@@ -63,7 +63,7 @@ class TradeItLinkedLoginParcelable : TradeItLinkedLogin, Parcelable {
                 return TradeItLinkedLoginParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItLinkedLoginParcelable> {
+            override fun newArray(size: Int): Array<TradeItLinkedLoginParcelable?> {
                 return arrayOfNulls(size)
             }
         }

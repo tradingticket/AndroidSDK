@@ -53,7 +53,7 @@ class TradeItWarningLinkParcelable : Parcelable {
                 return TradeItWarningLinkParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItWarningLinkParcelable> {
+            override fun newArray(size: Int): Array<TradeItWarningLinkParcelable?> {
                 return arrayOfNulls(size)
             }
         }

@@ -38,7 +38,16 @@ class TradeItSdkInstance(configurationBuilder: TradeItConfigurationBuilder) {
         }
 
         try {
-            linkedBrokerManager = TradeItLinkedBrokerManager(TradeItApiClientParcelable(configurationBuilder.apiKey, environment, configurationBuilder.requestInterceptorParcelable), linkedBrokerCache, keyStoreService, configurationBuilder.isPrefetchBrokerListEnabled)
+            linkedBrokerManager = TradeItLinkedBrokerManager(
+                    TradeItApiClientParcelable(
+                            configurationBuilder.apiKey,
+                            environment!!,
+                            configurationBuilder.requestInterceptorParcelable
+                    ),
+                    linkedBrokerCache!!,
+                    keyStoreService!!,
+                    configurationBuilder.isPrefetchBrokerListEnabled
+            )
         } catch (e: TradeItRetrieveLinkedLoginException) {
             throw TradeItSDKConfigurationException("Error initializing TradeItLinkedBrokerManager: ", e)
         }

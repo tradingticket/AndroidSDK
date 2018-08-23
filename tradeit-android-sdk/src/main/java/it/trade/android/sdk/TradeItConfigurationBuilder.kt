@@ -5,25 +5,22 @@ import android.content.Context
 import it.trade.android.sdk.model.RequestInterceptorParcelable
 import it.trade.model.request.TradeItEnvironment
 
-class TradeItConfigurationBuilder {
+class TradeItConfigurationBuilder (
+        context: Context,
+        apiKey: String,
+        environment: TradeItEnvironment
+    ) {
 
-    val context: Context
-    val apiKey: String
-    val environment: TradeItEnvironment
+    val context = context
+    val apiKey = apiKey
+    val environment = environment
+
     var baseUrl: String? = null
         private set
     var requestInterceptorParcelable: RequestInterceptorParcelable? = null
         private set
     var isPrefetchBrokerListEnabled = true
         private set
-
-    private constructor() {}
-
-    constructor(context: Context, apiKey: String, environment: TradeItEnvironment) {
-        this.context = context
-        this.apiKey = apiKey
-        this.environment = environment
-    }
 
     fun withBaseUrl(baseUrl: String): TradeItConfigurationBuilder {
         this.baseUrl = baseUrl

@@ -2,34 +2,32 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.os.Parcelable
-
-import java.util.ArrayList
-
 import it.trade.model.reponse.OrderDetails
 import it.trade.model.reponse.Warning
+import java.util.*
 
 class TradeItOrderDetailsParcelable : Parcelable {
-    var orderSymbol: String
-    var orderAction: String
+    var orderSymbol: String = ""
+    var orderAction: String = ""
         protected set
     var orderQuantity: Double? = null
         protected set
-    var orderExpiration: String
+    var orderExpiration: String = ""
         protected set
-    var orderPrice: String
+    var orderPrice: String = ""
         protected set
-    var orderValueLabel: String
+    var orderValueLabel: String = ""
         protected set
-    var orderCommissionLabel: String
-    var orderMessage: String
+    var orderCommissionLabel: String = ""
+    var orderMessage: String = ""
         protected set
-    var lastPrice: String
+    var lastPrice: String = ""
         protected set
-    var bidPrice: String
+    var bidPrice: String = ""
         protected set
-    var askPrice: String
+    var askPrice: String = ""
         protected set
-    var timestamp: String
+    var timestamp: String = ""
         protected set
     var buyingPower: Double? = null
         protected set
@@ -139,7 +137,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
                 return TradeItOrderDetailsParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItOrderDetailsParcelable> {
+            override fun newArray(size: Int): Array<TradeItOrderDetailsParcelable?> {
                 return arrayOfNulls(size)
             }
         }

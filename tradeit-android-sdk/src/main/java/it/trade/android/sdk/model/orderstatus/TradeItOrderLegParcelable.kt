@@ -2,13 +2,10 @@ package it.trade.android.sdk.model.orderstatus
 
 import android.os.Parcel
 import android.os.Parcelable
-
 import com.google.gson.annotations.SerializedName
-
-import java.util.ArrayList
-
 import it.trade.model.reponse.Fill
 import it.trade.model.reponse.OrderLeg
+import java.util.*
 
 class TradeItOrderLegParcelable : Parcelable {
 
@@ -122,7 +119,7 @@ class TradeItOrderLegParcelable : Parcelable {
                 return TradeItOrderLegParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItOrderLegParcelable> {
+            override fun newArray(size: Int): Array<TradeItOrderLegParcelable?> {
                 return arrayOfNulls(size)
             }
         }

@@ -2,13 +2,9 @@ package it.trade.android.sdk.model
 
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
-
 import com.google.gson.Gson
-
-import java.util.ArrayList
-import java.util.HashSet
+import java.util.*
 
 class TradeItLinkedBrokerCache(private val context: Context) {
     internal var gson = Gson()
@@ -50,7 +46,7 @@ class TradeItLinkedBrokerCache(private val context: Context) {
                 }
 
                 for (linkedBrokerAccount in linkedBroker.accounts) {
-                    linkedBrokerAccount.setLinkedBroker(linkedBroker)
+                    linkedBrokerAccount.linkedBroker = linkedBroker
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Fails to deserialize to TradeItLinkedBrokerParcelable", e)

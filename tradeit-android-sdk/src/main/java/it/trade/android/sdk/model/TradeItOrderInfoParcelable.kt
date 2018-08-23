@@ -7,15 +7,15 @@ import it.trade.model.reponse.OrderInfo
 import it.trade.model.reponse.Price
 
 class TradeItOrderInfoParcelable : Parcelable {
-    var action: String
+    var action: String = ""
         internal set
     var quantity: Double? = null
         internal set
-    var symbol: String
+    var symbol: String = ""
         internal set
-    var price: TradeItPriceParcelable
+    var price: TradeItPriceParcelable? = null
         internal set
-    var expiration: String
+    var expiration: String = ""
         internal set
 
     internal constructor(orderInfo: OrderInfo) {
@@ -65,7 +65,7 @@ class TradeItOrderInfoParcelable : Parcelable {
                 return TradeItOrderInfoParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItOrderInfoParcelable> {
+            override fun newArray(size: Int): Array<TradeItOrderInfoParcelable?> {
                 return arrayOfNulls(size)
             }
         }

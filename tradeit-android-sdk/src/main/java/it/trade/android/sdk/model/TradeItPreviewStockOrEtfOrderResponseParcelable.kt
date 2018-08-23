@@ -2,23 +2,19 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.os.Parcelable
-
-import java.util.ArrayList
-
 import it.trade.model.reponse.OrderDetails
 import it.trade.model.reponse.TradeItPreviewStockOrEtfOrderResponse
-import it.trade.model.reponse.Warning
 
 class TradeItPreviewStockOrEtfOrderResponseParcelable : Parcelable {
 
-    var orderId: String
+    var orderId: String = ""
 
     @get:Deprecated("Use orderDetails.warnings")
-    var ackWarningsList: List<String>
+    var ackWarningsList: List<String> = arrayListOf()
 
     @get:Deprecated("Use orderDetails.warnings")
-    var warningsList: List<String>
-    var orderDetails: TradeItOrderDetailsParcelable
+    var warningsList: List<String> = arrayListOf()
+    var orderDetails: TradeItOrderDetailsParcelable? = null
 
     internal constructor(response: TradeItPreviewStockOrEtfOrderResponse) {
         this.orderId = response.orderId
@@ -61,7 +57,7 @@ class TradeItPreviewStockOrEtfOrderResponseParcelable : Parcelable {
                 return TradeItPreviewStockOrEtfOrderResponseParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItPreviewStockOrEtfOrderResponseParcelable> {
+            override fun newArray(size: Int): Array<TradeItPreviewStockOrEtfOrderResponseParcelable?> {
                 return arrayOfNulls(size)
             }
         }

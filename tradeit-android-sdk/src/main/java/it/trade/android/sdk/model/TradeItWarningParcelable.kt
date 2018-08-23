@@ -2,11 +2,9 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.os.Parcelable
-
-import java.util.ArrayList
-
 import it.trade.model.reponse.Warning
 import it.trade.model.reponse.WarningLink
+import java.util.*
 
 class TradeItWarningParcelable : Parcelable {
     var message: String? = null
@@ -74,7 +72,7 @@ class TradeItWarningParcelable : Parcelable {
                 return TradeItWarningParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItWarningParcelable> {
+            override fun newArray(size: Int): Array<TradeItWarningParcelable?> {
                 return arrayOfNulls(size)
             }
         }

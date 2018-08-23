@@ -31,7 +31,7 @@ class TradeItSecurityQuestionParcelable : TradeItSecurityQuestion, Parcelable {
                 return TradeItSecurityQuestionParcelable(source)
             }
 
-            override fun newArray(size: Int): Array<TradeItSecurityQuestionParcelable> {
+            override fun newArray(size: Int): Array<TradeItSecurityQuestionParcelable?> {
                 return arrayOfNulls(size)
             }
         }
