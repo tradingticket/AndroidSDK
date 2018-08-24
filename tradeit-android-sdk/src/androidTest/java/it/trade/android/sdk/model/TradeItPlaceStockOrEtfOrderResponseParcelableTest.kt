@@ -3,13 +3,11 @@ package it.trade.android.sdk.model
 import android.os.Parcel
 import android.support.test.runner.AndroidJUnit4
 import android.test.suitebuilder.annotation.SmallTest
-
+import org.hamcrest.Matchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.hamcrest.Matchers.`is`
-import org.junit.Assert.assertThat
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -29,11 +27,11 @@ class TradeItPlaceStockOrEtfOrderResponseParcelableTest {
         placeOrderResponse!!.broker = "MyBroker"
         placeOrderResponse!!.timestamp = "My time stamp"
         placeOrderResponse!!.orderInfo = TradeItOrderInfoParcelable()
-        placeOrderResponse!!.orderInfo.expiration = "MyExpiration"
-        placeOrderResponse!!.orderInfo.symbol = "MySymbol"
-        placeOrderResponse!!.orderInfo.quantity = 4.0
-        placeOrderResponse!!.orderInfo.price = TradeItPriceParcelable()
-        placeOrderResponse!!.orderInfo.price.ask = 20.5
+        placeOrderResponse!!.orderInfo?.expiration = "MyExpiration"
+        placeOrderResponse!!.orderInfo?.symbol = "MySymbol"
+        placeOrderResponse!!.orderInfo?.quantity = 4.0
+        placeOrderResponse!!.orderInfo?.price = TradeItPriceParcelable()
+        placeOrderResponse!!.orderInfo?.price?.ask = 20.5
 
         // Write the data.
         val parcel = Parcel.obtain()
@@ -55,7 +53,7 @@ class TradeItPlaceStockOrEtfOrderResponseParcelableTest {
         assertThat(timestamp, `is`(placeOrderResponse!!.timestamp))
         assertThat(broker, `is`(placeOrderResponse!!.broker))
         assertThat(confirmationMessage, `is`(placeOrderResponse!!.confirmationMessage))
-        assertThat(orderInfoParcelable.action, `is`(placeOrderResponse!!.orderInfo.action))
-        assertThat(orderInfoParcelable.price.ask, `is`(placeOrderResponse!!.orderInfo.price.ask))
+        assertThat(orderInfoParcelable?.action, `is`(placeOrderResponse!!.orderInfo?.action))
+        assertThat(orderInfoParcelable?.price?.ask, `is`(placeOrderResponse!!.orderInfo?.price?.ask))
     }
 }

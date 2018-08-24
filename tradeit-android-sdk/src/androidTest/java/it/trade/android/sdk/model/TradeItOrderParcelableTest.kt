@@ -1,28 +1,25 @@
 package it.trade.android.sdk.model
 
-import android.content.Context
 import android.os.Parcel
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import android.test.suitebuilder.annotation.SmallTest
-
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-
 import it.trade.android.sdk.TradeItConfigurationBuilder
 import it.trade.android.sdk.TradeItSDK
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
+import it.trade.api.TradeItApiClient
 import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
 import it.trade.model.request.TradeItEnvironment
 import it.trade.model.request.TradeItOAuthAccessTokenRequest
-
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.notNullValue
 import org.junit.Assert.assertThat
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -43,10 +40,10 @@ class TradeItOrderParcelableTest {
         oAuthAccessTokenResponse.userToken = "MyUserToken"
         oAuthAccessTokenResponse.broker = "MyBroker"
         val linkedLogin = TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, oAuthAccessTokenResponse)
-        val apiClient = TradeItApiClientParcelable("MyApiKey", TradeItSDK.environment)
+        val apiClient = TradeItApiClientParcelable("MyApiKey", TradeItSDK.environment!!)
 
         apiClient.sessionToken = "MySessionToken"
-        val linkedBroker = TradeItLinkedBrokerParcelable(apiClient, linkedLogin, TradeItSDK.linkedBrokerCache)
+        val linkedBroker = TradeItLinkedBrokerParcelable(apiClient, linkedLogin, TradeItSDK.linkedBrokerCache!!)
 
         val account = TradeItBrokerAccount()
         account.accountNumber = "MyAccountNumber"
@@ -55,7 +52,7 @@ class TradeItOrderParcelableTest {
 
         linkedBrokerAccount = TradeItLinkedBrokerAccountParcelable(linkedBroker, account)
 
-        order = TradeItOrderParcelable(linkedBrokerAccount, "MySymbol")
+        order = TradeItOrderParcelable(linkedBrokerAccount!!, "MySymbol")
     }
 
     @Test

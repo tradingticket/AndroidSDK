@@ -1,25 +1,22 @@
 package it.trade.android.sdk.model
 
-import android.content.Context
 import android.os.Parcel
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import android.test.suitebuilder.annotation.SmallTest
-
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-
 import it.trade.android.sdk.TradeItConfigurationBuilder
 import it.trade.android.sdk.TradeItSDK
+import it.trade.android.sdk.model.orderstatus.TradeItOrderLegParcelable
 import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable
 import it.trade.model.reponse.OrderLeg
 import it.trade.model.reponse.OrderStatusDetails
 import it.trade.model.reponse.PriceInfo
 import it.trade.model.request.TradeItEnvironment
-
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
