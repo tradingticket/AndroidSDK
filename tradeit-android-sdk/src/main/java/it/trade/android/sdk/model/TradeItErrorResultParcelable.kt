@@ -48,7 +48,7 @@ class TradeItErrorResultParcelable : TradeItErrorResult, Parcelable {
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItErrorResultParcelable> = object : Parcelable.Creator<TradeItErrorResultParcelable> {
             override fun createFromParcel(source: Parcel): TradeItErrorResultParcelable {
                 return TradeItErrorResultParcelable(source)

@@ -64,16 +64,16 @@ class TradeItFxBalanceParcelable : Parcelable {
     }
 
     protected constructor(`in`: Parcel) {
-        this.buyingPowerBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.marginBalanceBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.realizedProfitAndLossBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalValueBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalValueUSD = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.unrealizedProfitAndLossBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.buyingPowerBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.marginBalanceBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.realizedProfitAndLossBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalValueBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalValueUSD = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.unrealizedProfitAndLossBaseCurrency = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItFxBalanceParcelable> = object : Parcelable.Creator<TradeItFxBalanceParcelable> {
             override fun createFromParcel(source: Parcel): TradeItFxBalanceParcelable {
                 return TradeItFxBalanceParcelable(source)

@@ -144,7 +144,7 @@ class TradeItOrderStatusParcelable : Parcelable {
             }
             return orderStatusParcelableList
         }
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItOrderStatusParcelable> = object : Parcelable.Creator<TradeItOrderStatusParcelable> {
             override fun createFromParcel(source: Parcel): TradeItOrderStatusParcelable {
                 return TradeItOrderStatusParcelable(source)

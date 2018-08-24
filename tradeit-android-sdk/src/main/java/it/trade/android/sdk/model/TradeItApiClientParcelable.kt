@@ -44,7 +44,7 @@ class TradeItApiClientParcelable : TradeItApiClient, Parcelable {
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItApiClientParcelable> = object : Parcelable.Creator<TradeItApiClientParcelable> {
             override fun createFromParcel(source: Parcel): TradeItApiClientParcelable {
                 return TradeItApiClientParcelable(source)

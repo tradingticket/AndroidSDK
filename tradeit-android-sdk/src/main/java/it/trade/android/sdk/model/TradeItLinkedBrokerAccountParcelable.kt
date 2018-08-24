@@ -243,7 +243,7 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
 
     companion object {
         private val linkedBrokersMap = HashMap<String, TradeItLinkedBrokerParcelable?>() //used for parcelable
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItLinkedBrokerAccountParcelable> = object : Parcelable.Creator<TradeItLinkedBrokerAccountParcelable> {
             override fun createFromParcel(source: Parcel): TradeItLinkedBrokerAccountParcelable {
                 return TradeItLinkedBrokerAccountParcelable(source)

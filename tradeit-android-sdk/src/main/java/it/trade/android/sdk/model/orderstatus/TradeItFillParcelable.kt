@@ -77,13 +77,13 @@ class TradeItFillParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.timestampFormat = `in`.readString()
-        this.price = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.price = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.timestamp = `in`.readString()
-        this.quantity = `in`.readValue(Int::class.java!!.getClassLoader()) as Int
+        this.quantity = `in`.readValue(Int::class.java!!.getClassLoader()) as? Int
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItFillParcelable> = object : Parcelable.Creator<TradeItFillParcelable> {
             override fun createFromParcel(source: Parcel): TradeItFillParcelable {
                 return TradeItFillParcelable(source)

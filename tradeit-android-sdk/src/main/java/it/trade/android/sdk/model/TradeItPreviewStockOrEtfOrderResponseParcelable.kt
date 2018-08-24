@@ -51,7 +51,7 @@ class TradeItPreviewStockOrEtfOrderResponseParcelable : Parcelable {
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItPreviewStockOrEtfOrderResponseParcelable> = object : Parcelable.Creator<TradeItPreviewStockOrEtfOrderResponseParcelable> {
             override fun createFromParcel(source: Parcel): TradeItPreviewStockOrEtfOrderResponseParcelable {
                 return TradeItPreviewStockOrEtfOrderResponseParcelable(source)

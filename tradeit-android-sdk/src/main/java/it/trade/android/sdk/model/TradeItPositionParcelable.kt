@@ -48,24 +48,24 @@ class TradeItPositionParcelable : TradeItPosition, Parcelable {
     }
 
     protected constructor(`in`: Parcel) {
-        this.costbasis = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.costbasis = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.holdingType = `in`.readString()
-        this.lastPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.quantity = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.lastPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.quantity = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.symbol = `in`.readString()
         this.symbolClass = `in`.readString()
-        this.todayGainLossDollar = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.todayGainLossPercentage = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalGainLossDollar = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalGainLossPercentage = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.todayGainLossAbsolute = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalGainLossAbsolute = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.todayGainLossDollar = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.todayGainLossPercentage = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalGainLossDollar = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalGainLossPercentage = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.todayGainLossAbsolute = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalGainLossAbsolute = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.exchange = `in`.readString()
         this.currency = `in`.readString()
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItPositionParcelable> = object : Parcelable.Creator<TradeItPositionParcelable> {
             override fun createFromParcel(source: Parcel): TradeItPositionParcelable {
                 return TradeItPositionParcelable(source)

@@ -66,7 +66,7 @@ class TradeItWarningParcelable : Parcelable {
             }
             return mappedValues
         }
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItWarningParcelable> = object : Parcelable.Creator<TradeItWarningParcelable> {
             override fun createFromParcel(source: Parcel): TradeItWarningParcelable {
                 return TradeItWarningParcelable(source)

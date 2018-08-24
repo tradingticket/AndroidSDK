@@ -107,13 +107,13 @@ class TradeItOrderLegParcelable : Parcelable {
         this.priceInfo = `in`.readParcelable(TradeItPriceInfoParcelable::class.java!!.getClassLoader())
         this.fills = `in`.createTypedArrayList(TradeItFillParcelable.CREATOR)
         this.symbol = `in`.readString()
-        this.orderedQuantity = `in`.readValue(Int::class.java!!.getClassLoader()) as Int
-        this.filledQuantity = `in`.readValue(Int::class.java!!.getClassLoader()) as Int
+        this.orderedQuantity = `in`.readValue(Int::class.java!!.getClassLoader()) as? Int
+        this.filledQuantity = `in`.readValue(Int::class.java!!.getClassLoader()) as? Int
         this.action = `in`.readString()
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItOrderLegParcelable> = object : Parcelable.Creator<TradeItOrderLegParcelable> {
             override fun createFromParcel(source: Parcel): TradeItOrderLegParcelable {
                 return TradeItOrderLegParcelable(source)

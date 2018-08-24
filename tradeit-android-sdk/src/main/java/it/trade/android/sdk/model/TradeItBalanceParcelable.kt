@@ -103,17 +103,17 @@ class TradeItBalanceParcelable : Parcelable {
     }
 
     protected constructor(`in`: Parcel) {
-        this.availableCash = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.buyingPower = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.dayAbsoluteReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.dayPercentReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalAbsoluteReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalPercentReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.totalValue = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.availableCash = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.buyingPower = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.dayAbsoluteReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.dayPercentReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalAbsoluteReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalPercentReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.totalValue = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItBalanceParcelable> = object : Parcelable.Creator<TradeItBalanceParcelable> {
             override fun createFromParcel(source: Parcel): TradeItBalanceParcelable {
                 return TradeItBalanceParcelable(source)

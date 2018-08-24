@@ -19,7 +19,7 @@ class TradeItPriceParcelable : Parcelable {
         internal set
     var ask: Double? = null
         internal set
-    var timestamp: String = ""
+    var timestamp: String? = ""
         internal set
 
     internal constructor(price: Price) {
@@ -62,16 +62,16 @@ class TradeItPriceParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.type = `in`.readString()
-        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.last = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.bid = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.ask = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.last = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.bid = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.ask = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.timestamp = `in`.readString()
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItPriceParcelable> = object : Parcelable.Creator<TradeItPriceParcelable> {
             override fun createFromParcel(source: Parcel): TradeItPriceParcelable {
                 return TradeItPriceParcelable(source)

@@ -290,6 +290,7 @@ class TradeItLinkedBrokerParcelable : Parcelable {
 
         private val TAG = TradeItLinkedBrokerParcelable::class.java!!.getName()
 
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItLinkedBrokerParcelable> = object : Parcelable.Creator<TradeItLinkedBrokerParcelable> {
             override fun createFromParcel(source: Parcel): TradeItLinkedBrokerParcelable {
                 return TradeItLinkedBrokerParcelable(source)

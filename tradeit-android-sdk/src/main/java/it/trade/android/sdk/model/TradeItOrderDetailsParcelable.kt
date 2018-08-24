@@ -14,20 +14,20 @@ class TradeItOrderDetailsParcelable : Parcelable {
         protected set
     var orderExpiration: String = ""
         protected set
-    var orderPrice: String = ""
+    var orderPrice: String? = ""
         protected set
     var orderValueLabel: String = ""
         protected set
     var orderCommissionLabel: String = ""
     var orderMessage: String = ""
         protected set
-    var lastPrice: String = ""
+    var lastPrice: String? = ""
         protected set
-    var bidPrice: String = ""
+    var bidPrice: String? = ""
         protected set
-    var askPrice: String = ""
+    var askPrice: String? = ""
         protected set
-    var timestamp: String = ""
+    var timestamp: String? = ""
         protected set
     var buyingPower: Double? = null
         protected set
@@ -100,7 +100,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
     protected constructor(`in`: Parcel) {
         this.orderSymbol = `in`.readString()
         this.orderAction = `in`.readString()
-        this.orderQuantity = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.orderQuantity = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.orderExpiration = `in`.readString()
         this.orderPrice = `in`.readString()
         this.orderValueLabel = `in`.readString()
@@ -110,13 +110,13 @@ class TradeItOrderDetailsParcelable : Parcelable {
         this.bidPrice = `in`.readString()
         this.askPrice = `in`.readString()
         this.timestamp = `in`.readString()
-        this.buyingPower = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.availableCash = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.estimatedOrderCommission = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.longHoldings = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.shortHoldings = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.estimatedOrderValue = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.estimatedTotalValue = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.buyingPower = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.availableCash = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.estimatedOrderCommission = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.longHoldings = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.shortHoldings = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.estimatedOrderValue = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.estimatedTotalValue = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.warnings = `in`.createTypedArrayList(TradeItWarningParcelable.CREATOR)
     }
 
@@ -131,7 +131,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
             }
             return mappedValues
         }
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItOrderDetailsParcelable> = object : Parcelable.Creator<TradeItOrderDetailsParcelable> {
             override fun createFromParcel(source: Parcel): TradeItOrderDetailsParcelable {
                 return TradeItOrderDetailsParcelable(source)

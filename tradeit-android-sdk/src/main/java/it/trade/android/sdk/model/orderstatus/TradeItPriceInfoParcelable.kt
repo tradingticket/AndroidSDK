@@ -136,20 +136,20 @@ class TradeItPriceInfoParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.conditionType = `in`.readString()
-        this.initialStopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.initialStopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.conditionSymbol = `in`.readString()
-        this.trailPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.conditionFollowPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.triggerPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.conditionPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.bracketLimitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.trailPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.conditionFollowPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.triggerPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.conditionPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.bracketLimitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         this.type = `in`.readString()
-        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItPriceInfoParcelable> = object : Parcelable.Creator<TradeItPriceInfoParcelable> {
             override fun createFromParcel(source: Parcel): TradeItPriceInfoParcelable {
                 return TradeItPriceInfoParcelable(source)

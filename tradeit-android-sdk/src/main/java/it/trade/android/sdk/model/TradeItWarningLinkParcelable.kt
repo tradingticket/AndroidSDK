@@ -47,7 +47,7 @@ class TradeItWarningLinkParcelable : Parcelable {
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItWarningLinkParcelable> = object : Parcelable.Creator<TradeItWarningLinkParcelable> {
             override fun createFromParcel(source: Parcel): TradeItWarningLinkParcelable {
                 return TradeItWarningLinkParcelable(source)

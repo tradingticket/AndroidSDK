@@ -25,7 +25,7 @@ class TradeItSecurityQuestionParcelable : TradeItSecurityQuestion, Parcelable {
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItSecurityQuestionParcelable> = object : Parcelable.Creator<TradeItSecurityQuestionParcelable> {
             override fun createFromParcel(source: Parcel): TradeItSecurityQuestionParcelable {
                 return TradeItSecurityQuestionParcelable(source)

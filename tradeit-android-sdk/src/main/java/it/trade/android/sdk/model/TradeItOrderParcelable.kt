@@ -96,10 +96,10 @@ class TradeItOrderParcelable : Parcelable {
     protected constructor(`in`: Parcel) {
         this.linkedBrokerAccount = `in`.readParcelable(TradeItLinkedBrokerAccountParcelable::class.java!!.getClassLoader())
         this.symbol = `in`.readString()
-        this.quantity = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
-        this.quoteLastPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as Double
+        this.quantity = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.quoteLastPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
         val tmpAction = `in`.readInt()
         this.action = if (tmpAction == -1) null else TradeItOrderAction.values()[tmpAction]
         val tmpPriceType = `in`.readInt()
@@ -110,7 +110,7 @@ class TradeItOrderParcelable : Parcelable {
     }
 
     companion object {
-
+        @JvmField
         val CREATOR: Parcelable.Creator<TradeItOrderParcelable> = object : Parcelable.Creator<TradeItOrderParcelable> {
             override fun createFromParcel(source: Parcel): TradeItOrderParcelable {
                 return TradeItOrderParcelable(source)
