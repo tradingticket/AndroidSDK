@@ -143,24 +143,24 @@ public class MainActivityTest {
 
         tapOnText("Link broker");
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         UiSelector selector = new UiSelector();
-        UiObject login = device.findObject(selector.descriptionContains("Dummy Broker Username"));
+        UiObject login = device.findObject(selector.resourceId("loginUser"));
         login.clearTextField();
         login.click();
         login.setText(dummyLogin);
 
-        UiObject password = device.findObject(selector.className(EditText.class).instance(2));
+        UiObject password = device.findObject(selector.resourceId("loginPwd"));
         password.clearTextField();
         password.click();
         password.setText("dummy");
 
-        UiObject button = device.findObject(selector.descriptionContains("Sign In"));
+        UiObject button = device.findObject(selector.textContains("Sign In"));
         button.click();
 
-        Thread.sleep(2000l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "oAuthFlow Success:");
 
@@ -203,7 +203,7 @@ public class MainActivityTest {
     private void testAuthenticateAllLinkedBroker(int number) throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_ALL_LINKED_BROKERS.getLabel());
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, number + " PARCELED LINKED BROKERS");
 
@@ -213,7 +213,7 @@ public class MainActivityTest {
     private void testRefreshAllBalanceForAllLinkedBroker() throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.getLabel());
 
-        Thread.sleep(2000l); //TODO there should be a better way for waiting
+        Thread.sleep(5000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_broker_accounts_textview, "Refreshed first account balance again just to test.\n# of linkedBroker accounts: ");
 
