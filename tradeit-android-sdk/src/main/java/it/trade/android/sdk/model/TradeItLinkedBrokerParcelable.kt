@@ -33,10 +33,11 @@ import java.util.*
 class TradeItLinkedBrokerParcelable : Parcelable {
     @Transient
     var apiClient: TradeItApiClientParcelable? = null
-    private set
+        private set
 
     @Transient
     var linkedLogin: TradeItLinkedLoginParcelable? = null
+        internal set
 
     @SerializedName("accounts")
     var accounts: MutableList<TradeItLinkedBrokerAccountParcelable> = ArrayList()

@@ -57,7 +57,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
     private var userId: String? = null
 
     val tradeItApiClient: TradeItApiClient?
-        get() = this.linkedBroker?.apiClient
+        get() = this.linkedBroker?.getApiClient()
+
 
     val brokerName: String
         get() = this.linkedBroker?.brokerName ?: ""

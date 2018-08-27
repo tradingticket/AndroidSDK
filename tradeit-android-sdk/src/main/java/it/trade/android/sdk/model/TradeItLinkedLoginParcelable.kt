@@ -24,6 +24,10 @@ class TradeItLinkedLoginParcelable : TradeItLinkedLogin, Parcelable {
         this.label = linkedLogin.label
     }
 
+    fun getUserId(): String {
+        return userId
+    }
+
     override fun equals(o: Any?): Boolean {
         if (this === o) return true
         if (o == null || javaClass != o.javaClass) return false
