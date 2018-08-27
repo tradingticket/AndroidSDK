@@ -129,7 +129,7 @@ class MainActivityTest {
 
         tapOnText("Link broker")
 
-        Thread.sleep(1500L) //TODO there should be a better way for waiting
+        Thread.sleep(3000L) //TODO there should be a better way for waiting
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val login = device.findObject(UiSelector().resourceId("loginUser"))
@@ -181,7 +181,7 @@ class MainActivityTest {
     private fun testAuthenticateFirstLinkedBroker() {
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.label)
 
-        Thread.sleep(1000L) //TODO there should be a better way for waiting
+        Thread.sleep(2000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS")
 
@@ -225,13 +225,13 @@ class MainActivityTest {
     private fun testPreviewAndPlaceTradeFirstLinkedBrokerAccount() {
         scrollAndTapOnText(MainActivity.MainActivityActions.PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.label)
 
-        Thread.sleep(1000L) //TODO there should be a better way for waiting
+        Thread.sleep(2000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponseParcelable{orderId='1', ackWarningsList=[], warningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00', orderValueLabel='Estimated Cost', orderCommissionLabel='Broker fee', orderMessage='You are about to place a limit order to buy GE', lastPrice='null', bidPrice='null', askPrice='null'")
         //place trade
         tapOnText("Place trade")
 
-        Thread.sleep(1500L) //TODO there should be a better way for waiting
+        Thread.sleep(3000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview, "TradeItPlaceStockOrEtfOrderResponseParcelable{broker='Dummy', confirmationMessage='Your order message")
 
