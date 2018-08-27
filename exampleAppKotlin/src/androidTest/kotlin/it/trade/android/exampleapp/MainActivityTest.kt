@@ -203,7 +203,7 @@ class MainActivityTest {
     private fun testRefreshAllBalanceForAllLinkedBroker() {
         tapOnText(MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.label)
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        Thread.sleep(5000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_broker_accounts_textview, "Refreshed first account balance again just to test.\n# of linkedBroker accounts: ")
 
