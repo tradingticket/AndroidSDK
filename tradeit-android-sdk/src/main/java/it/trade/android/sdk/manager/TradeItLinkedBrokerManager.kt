@@ -39,7 +39,8 @@ constructor(
         private val keystoreService: TradeItKeystoreService,
         prefetchBrokerList: Boolean
 ) {
-    private val linkedBrokers = mutableListOf<TradeItLinkedBrokerParcelable>()
+    var linkedBrokers = mutableListOf<TradeItLinkedBrokerParcelable>()
+        internal set
     private var availableBrokersSingleCache: SingleCache<List<Broker>>? = null
 
     init {
@@ -174,7 +175,7 @@ constructor(
                 }
         )
 
-        Observable.fromIterable(this.getLinkedBrokers())
+        Observable.fromIterable(this.linkedBrokers)
                 .observeOn(AndroidSchedulers.mainThread(), true)
                 .subscribeOn(Schedulers.io())
                 .flatMapSingle(
@@ -226,7 +227,7 @@ constructor(
     }
 
     fun refreshAccountBalances(callback: TradeItCallBackCompletion) {
-        Observable.fromIterable(this.getLinkedBrokers())
+        Observable.fromIterable(this.linkedBrokers)
                 .observeOn(AndroidSchedulers.mainThread(), true)
                 .subscribeOn(Schedulers.io())
                 .flatMapSingle(
@@ -597,7 +598,7 @@ constructor(
 
     fun getLinkedBrokerByUserId(userId: String): TradeItLinkedBrokerParcelable? {
         var linkedBrokerParcelable: TradeItLinkedBrokerParcelable? = null
-        for (linkedBroker in this.getLinkedBrokers()) {
+        for (linkedBroker in this.linkedBrokers) {
             if (linkedBroker.linkedLogin!!.userId == userId) {
                 linkedBrokerParcelable = linkedBroker
                 break
@@ -636,10 +637,6 @@ constructor(
                 "Failed to link broker"
         )
         callback.onError(errorResultParcelable)
-    }
-
-    fun getLinkedBrokers(): MutableList<TradeItLinkedBrokerParcelable> {
-        return linkedBrokers
     }
 
     companion object {
