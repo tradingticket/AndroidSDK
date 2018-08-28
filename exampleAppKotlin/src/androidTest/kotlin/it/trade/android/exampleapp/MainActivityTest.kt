@@ -65,9 +65,11 @@ class MainActivityTest {
     @Test
     @Throws(InterruptedException::class)
     fun testDummySecurity() {
-        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.label)
+        testOauthFlow("dummySecurity")
 
-        Thread.sleep(1600L) //TODO there should be a better way for waiting
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.label)
+
+        Thread.sleep(2000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "What is your mother's maiden name")
 
@@ -80,21 +82,23 @@ class MainActivityTest {
 
         tapOnText("OK")
 
-        Thread.sleep(500L) //TODO there should be a better way for waiting
+        Thread.sleep(3000L) //TODO there should be a better way for waiting
 
-        checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummySecurity")
+        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS")
 
-        tapOnText("OK")
+        navigateUp()
+
+        testDeleteAllLinkedBrokers()
     }
 
     @Test
     @Throws(InterruptedException::class)
     fun testDummyMultiple() {
-        val textView = onView(
-                allOf<View>(withText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.label), isDisplayed()))
-        textView.perform(click())
+        testOauthFlow("dummyOption")
 
-        Thread.sleep(1600L) //TODO there should be a better way for waiting
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.label)
+
+        Thread.sleep(2000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "Select an option from the following")
 
@@ -109,11 +113,13 @@ class MainActivityTest {
 
         tapOnText("OK")
 
-        Thread.sleep(500L) //TODO there should be a better way for waiting
+        Thread.sleep(3000L) //TODO there should be a better way for waiting
 
-        checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummyOption")
+        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS")
 
-        tapOnText("OK")
+        navigateUp()
+
+        testDeleteAllLinkedBrokers()
     }
 
     @Throws(InterruptedException::class, UiObjectNotFoundException::class)
@@ -146,6 +152,19 @@ class MainActivityTest {
         button.click()
 
         Thread.sleep(3000L) //TODO there should be a better way for waiting
+
+        if (dummyLogin in arrayOf("dummySecurity", "dummyOption")) {
+            device.findObject(UiSelector().resourceId("securityAnswer")).run {
+                clearTextField()
+                click()
+                text = if (dummyLogin == "dummySecurity") "tradingticket" else "option 1"
+            }
+
+            val submit = device.findObject(UiSelector().text("Submit"))
+            submit.click()
+
+            Thread.sleep(3000L) //TODO there should be a better way for waiting
+        }
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "oAuthFlow Success:")
 

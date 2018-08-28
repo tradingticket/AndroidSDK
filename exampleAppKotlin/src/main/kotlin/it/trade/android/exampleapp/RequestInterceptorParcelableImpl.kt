@@ -36,6 +36,7 @@ class RequestInterceptorParcelableImpl : RequestInterceptorParcelable {
 
     companion object {
 
+        @JvmField
         val CREATOR: Parcelable.Creator<RequestInterceptorParcelableImpl?> = object : Parcelable.Creator<RequestInterceptorParcelableImpl?> {
             override fun createFromParcel(source: Parcel): RequestInterceptorParcelableImpl {
                 return RequestInterceptorParcelableImpl(source)

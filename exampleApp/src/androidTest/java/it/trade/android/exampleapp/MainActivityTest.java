@@ -79,10 +79,12 @@ public class MainActivityTest {
     }
 
     @Test
-    public void testDummySecurity() throws InterruptedException {
-        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.getLabel());
+    public void testDummySecurity() throws InterruptedException, UiObjectNotFoundException {
+        testOauthFlow("dummySecurity");
 
-        Thread.sleep(1600l); //TODO there should be a better way for waiting
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.getLabel());
+
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "What is your mother's maiden name");
 
@@ -95,20 +97,22 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(500l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummySecurity");
+        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS");
 
-        tapOnText("OK");
+        navigateUp();
+
+        testDeleteAllLinkedBrokers();
     }
 
     @Test
-    public void testDummyMultiple() throws InterruptedException {
-        ViewInteraction textView = onView(
-                allOf(withText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.getLabel()), isDisplayed()));
-        textView.perform(click());
+    public void testDummyMultiple() throws InterruptedException, UiObjectNotFoundException {
+        testOauthFlow("dummyOption");
 
-        Thread.sleep(1600l); //TODO there should be a better way for waiting
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.getLabel());
+
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "Select an option from the following");
 
@@ -123,11 +127,13 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(500l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummyOption");
+        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS");
 
-        tapOnText("OK");
+        navigateUp();
+
+        testDeleteAllLinkedBrokers();
     }
 
     //TODO FIXME - oAuth flow automated test doesn't work anymore
@@ -161,6 +167,19 @@ public class MainActivityTest {
         button.click();
 
         Thread.sleep(3000l); //TODO there should be a better way for waiting
+
+        if ("dummySecurity".equals(dummyLogin) || "dummyOption".equals(dummyLogin)) {
+            UiObject answer = device.findObject(selector.resourceId("securityAnswer"));
+            answer.clearTextField();
+            answer.click();
+            answer.setText("dummySecurity".equals(dummyLogin) ? "tradingticket" : "option 1");
+
+            UiObject submit = device.findObject(selector.textContains("Submit"));
+            submit.click();
+
+            Thread.sleep(3000l); //TODO there should be a better way for waiting
+        }
+
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "oAuthFlow Success:");
 
