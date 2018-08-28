@@ -7,13 +7,13 @@ import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse
 
 class TradeItPlaceStockOrEtfOrderResponseParcelable : Parcelable {
 
-    var broker: String = ""
+    var broker: String? = ""
         internal set
-    var confirmationMessage: String = ""
+    var confirmationMessage: String? = ""
         internal set
     var orderNumber: String = ""
         internal set
-    var timestamp: String = ""
+    var timestamp: String? = ""
         internal set
     var orderInfo: TradeItOrderInfoParcelable? = null
         internal set
