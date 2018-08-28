@@ -120,7 +120,7 @@ class MainActivityTest {
     private fun testOauthFlow(dummyLogin: String) {
         tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.label)
 
-        Thread.sleep(500L) //TODO there should be a better way for waiting
+        Thread.sleep(3000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "Brokers available:")
 
@@ -192,7 +192,7 @@ class MainActivityTest {
     private fun testAuthenticateAllLinkedBroker(number: Int) {
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_ALL_LINKED_BROKERS.label)
 
-        Thread.sleep(1000L) //TODO there should be a better way for waiting
+        Thread.sleep(3000L) //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, number.toString() + " PARCELED LINKED BROKERS")
 
