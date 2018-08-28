@@ -23,7 +23,6 @@ class RequestInterceptorParcelableImpl : RequestInterceptorParcelable {
         return chain.proceed(transformedRequest)
     }
 
-
     override fun describeContents(): Int {
         return 0
     }
