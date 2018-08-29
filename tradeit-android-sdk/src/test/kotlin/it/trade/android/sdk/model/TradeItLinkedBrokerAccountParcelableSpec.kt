@@ -7,11 +7,7 @@ import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
-import org.junit.Assert
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TradeItLinkedBrokerAccountParcelableSpec {
@@ -74,20 +70,20 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallbackCount, 1)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successCallbackCount, 1)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // and expects balance correctly populated
-            Assert.assertEquals(balance?.availableCash, 1200.54)
-            Assert.assertEquals(balance?.buyingPower, 2604.45)
-            Assert.assertEquals(balance?.dayAbsoluteReturn, 100.0)
-            Assert.assertEquals(balance?.dayPercentReturn, 0.45)
-            Assert.assertEquals(balance?.totalAbsoluteReturn, -234.98)
-            Assert.assertEquals(balance?.totalPercentReturn, -2.34)
-            Assert.assertEquals(balance?.totalValue, 12983.34)
+            Assertions.assertEquals(balance?.availableCash, 1200.54)
+            Assertions.assertEquals(balance?.buyingPower, 2604.45)
+            Assertions.assertEquals(balance?.dayAbsoluteReturn, 100.0)
+            Assertions.assertEquals(balance?.dayPercentReturn, 0.45)
+            Assertions.assertEquals(balance?.totalAbsoluteReturn, -234.98)
+            Assertions.assertEquals(balance?.totalPercentReturn, -2.34)
+            Assertions.assertEquals(balance?.totalValue, 12983.34)
 
             // and the linked broker account should have his balance property updated
-            Assert.assertEquals(linkedBrokerAccount?.balance, balance)
+            Assertions.assertEquals(linkedBrokerAccount?.balance, balance)
         }
 
         @Test
@@ -120,13 +116,13 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             })
 
             // then expects the errorCallbackCount called once
-            Assert.assertEquals(successCallbackCount,  0)
-            Assert.assertEquals(errorCallbackCount, 1)
+            Assertions.assertEquals(successCallbackCount,  0)
+            Assertions.assertEquals(errorCallbackCount, 1)
 
             // and expects error result correctly populated
-            Assert.assertEquals(errorResult?.errorCode, TradeItErrorCode.SESSION_EXPIRED)
-            Assert.assertEquals(errorResult?.shortMessage, "My short message")
-            Assert.assertEquals(errorResult?.longMessages, arrayListOf("My long message"))
+            Assertions.assertEquals(errorResult?.errorCode, TradeItErrorCode.SESSION_EXPIRED)
+            Assertions.assertEquals(errorResult?.shortMessage, "My short message")
+            Assertions.assertEquals(errorResult?.longMessages, arrayListOf("My long message"))
         }
     }
 
@@ -166,14 +162,14 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallbackCount, 1)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successCallbackCount, 1)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // and "expects positions to be returned"
-            Assert.assertEquals(positionsResult, arrayListOf(position1, position2))
+            Assertions.assertEquals(positionsResult, arrayListOf(position1, position2))
 
             // and the linked broker account should have his positions property updated
-            Assert.assertEquals(linkedBrokerAccount?.positions, positionsResult)
+            Assertions.assertEquals(linkedBrokerAccount?.positions, positionsResult)
         }
     }
 
@@ -237,11 +233,11 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallbackCount, 1)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successCallbackCount, 1)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // and expects orders status to be returned
-            Assert.assertEquals(
+            Assertions.assertEquals(
                 orderStatusResult,
                 arrayListOf(
                     TradeItOrderStatusParcelable(orderStatusDetails1),
@@ -250,7 +246,7 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             )
 
             // and the linked broker account should have his orders status property updated
-            Assert.assertEquals(linkedBrokerAccount?.ordersStatus, orderStatusResult)
+            Assertions.assertEquals(linkedBrokerAccount?.ordersStatus, orderStatusResult)
         }
 
         @Test
@@ -283,13 +279,13 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             })
 
             // then expects the errorCallbackCount called once
-            Assert.assertEquals(successCallbackCount, 0)
-            Assert.assertEquals(errorCallbackCount, 1)
+            Assertions.assertEquals(successCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 1)
 
             // and expects error result correctly populated
-            Assert.assertEquals(errorResult?.errorCode, TradeItErrorCode.SESSION_EXPIRED)
-            Assert.assertEquals(errorResult?.shortMessage, "My short message")
-            Assert.assertEquals(errorResult?.longMessages, arrayListOf("My long message"))
+            Assertions.assertEquals(errorResult?.errorCode, TradeItErrorCode.SESSION_EXPIRED)
+            Assertions.assertEquals(errorResult?.shortMessage, "My short message")
+            Assertions.assertEquals(errorResult?.longMessages, arrayListOf("My long message"))
         }
     }
 
@@ -336,11 +332,11 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallbackCount, 1)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successCallbackCount, 1)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // then expects orders status to be returned
-            Assert.assertEquals(orderStatusParcelableResult, TradeItOrderStatusParcelable(orderStatusDetails))
+            Assertions.assertEquals(orderStatusParcelableResult, TradeItOrderStatusParcelable(orderStatusDetails))
         }
 
         @Test
@@ -376,13 +372,13 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             )
 
             // then expects the errorCallbackCount called once
-            Assert.assertEquals(successCallbackCount, 0)
-            Assert.assertEquals(errorCallbackCount, 1)
+            Assertions.assertEquals(successCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 1)
 
             // then expects error result correctly populated
-            Assert.assertEquals(errorResult?.errorCode, TradeItErrorCode.SESSION_EXPIRED)
-            Assert.assertEquals(errorResult?.shortMessage, "My short message")
-            Assert.assertEquals(errorResult?.longMessages, arrayListOf("My long message"))
+            Assertions.assertEquals(errorResult?.errorCode, TradeItErrorCode.SESSION_EXPIRED)
+            Assertions.assertEquals(errorResult?.shortMessage, "My short message")
+            Assertions.assertEquals(errorResult?.longMessages, arrayListOf("My long message"))
         }
     }
 

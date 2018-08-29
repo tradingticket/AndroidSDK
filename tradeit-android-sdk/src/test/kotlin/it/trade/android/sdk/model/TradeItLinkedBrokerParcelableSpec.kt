@@ -6,11 +6,7 @@ import it.trade.model.TradeItSecurityQuestion
 import it.trade.model.callback.AuthenticationCallback
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl
 import it.trade.model.reponse.*
-import junit.framework.Assert
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import retrofit2.Callback
 import retrofit2.Response
 
@@ -89,19 +85,19 @@ class TradeItLinkedBrokerParcelableSpec {
             )
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(securityQuestionCallbackCount, 0)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(securityQuestionCallbackCount, 0)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and expects a list of TradeItLinkedBrokerAccountParcelable
-            Assert.assertEquals(accountsResult, accountsExpected)
+            Assertions.assertEquals(accountsResult, accountsExpected)
 
             // and the list is kept in memory"
-            Assert.assertEquals(linkedBroker.accounts, accountsExpected)
+            Assertions.assertEquals(linkedBroker.accounts, accountsExpected)
 
             // and The orderCapabilities is set to empty list if no value
-            Assert.assertEquals(linkedBroker.accounts[0].orderCapabilities, orderCapabilitiesExpected)
-            Assert.assertEquals(
+            Assertions.assertEquals(linkedBroker.accounts[0].orderCapabilities, orderCapabilitiesExpected)
+            Assertions.assertEquals(
                 linkedBroker.accounts[1].orderCapabilities,
                 emptyList<TradeItOrderCapabilityParcelable>()
             )
@@ -143,12 +139,12 @@ class TradeItLinkedBrokerParcelableSpec {
             })
 
             // then expects the securityQuestionCallbackCount called once
-            Assert.assertEquals(successCallBackCount, 0)
-            Assert.assertEquals(securityQuestionCallbackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 0)
+            Assertions.assertEquals(securityQuestionCallbackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and expects a security question
-            Assert.assertEquals(tradeItSecurityQuestion!!.securityQuestion, "My security question")
+            Assertions.assertEquals(tradeItSecurityQuestion!!.securityQuestion, "My security question")
         }
 
         @Test
@@ -190,15 +186,15 @@ class TradeItLinkedBrokerParcelableSpec {
             })
 
             // then expects the errorCallbackCount called once
-            Assert.assertEquals(successCallBackCount, 0)
-            Assert.assertEquals(securityQuestionCallbackCount, 0)
-            Assert.assertEquals(errorCallBackCount, 1)
+            Assertions.assertEquals(successCallBackCount, 0)
+            Assertions.assertEquals(securityQuestionCallbackCount, 0)
+            Assertions.assertEquals(errorCallBackCount, 1)
 
             // and expects a trade it error result
-            Assert.assertEquals(tradeItErrorResult!!.shortMessage, "My short error message")
-            Assert.assertEquals(tradeItErrorResult!!.longMessages, arrayListOf("My long error message"))
-            Assert.assertEquals(tradeItErrorResult!!.errorCode, TradeItErrorCode.BROKER_AUTHENTICATION_ERROR)
-            Assert.assertEquals(tradeItErrorResult!!.httpCode, 200)
+            Assertions.assertEquals(tradeItErrorResult!!.shortMessage, "My short error message")
+            Assertions.assertEquals(tradeItErrorResult!!.longMessages, arrayListOf("My long error message"))
+            Assertions.assertEquals(tradeItErrorResult!!.errorCode, TradeItErrorCode.BROKER_AUTHENTICATION_ERROR)
+            Assertions.assertEquals(tradeItErrorResult!!.httpCode, 200)
         }
     }
 
@@ -256,18 +252,18 @@ class TradeItLinkedBrokerParcelableSpec {
             })
 
             // then expects the successCallBackCount called once
-            Assert.assertEquals(successCallbackCount, 1)
-            Assert.assertEquals(securityQuestionCallbackCount, 0)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successCallbackCount, 1)
+            Assertions.assertEquals(securityQuestionCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // and expects a list of TradeItLinkedBrokerAccountParcelable
-            Assert.assertEquals(accountsResult, accountsExpected)
+            Assertions.assertEquals(accountsResult, accountsExpected)
 
             // and the list is kept in memory
-            Assert.assertEquals(linkedBroker.accounts, accountsExpected)
+            Assertions.assertEquals(linkedBroker.accounts, accountsExpected)
 
             // and the error is set to null
-            Assert.assertEquals(linkedBroker.error, null)
+            Assertions.assertEquals(linkedBroker.error, null)
 
         }
 
@@ -299,15 +295,15 @@ class TradeItLinkedBrokerParcelableSpec {
             })
 
             // then expects the successCallBackCount called once
-            Assert.assertEquals(successCallbackCount, 0)
-            Assert.assertEquals(securityQuestionCallbackCount, 0)
-            Assert.assertEquals(errorCallbackCount, 1)
+            Assertions.assertEquals(successCallbackCount, 0)
+            Assertions.assertEquals(securityQuestionCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 1)
 
             // and expects a relink error
-            Assert.assertEquals(expectedError, errorResult)
+            Assertions.assertEquals(expectedError, errorResult)
 
             // and the error is still set to relink error
-            Assert.assertEquals(linkedBroker.error, errorResult)
+            Assertions.assertEquals(linkedBroker.error, errorResult)
 
         }
 
@@ -339,15 +335,15 @@ class TradeItLinkedBrokerParcelableSpec {
             })
 
             // then expects the successCallBackCount called once
-            Assert.assertEquals(successCallbackCount, 1)
-            Assert.assertEquals(securityQuestionCallbackCount, 0)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successCallbackCount, 1)
+            Assertions.assertEquals(securityQuestionCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // and authenticate has not been called
             verify(apiClient, never()).authenticate(any(), any())
 
             // and the error is still set
-            Assert.assertEquals(linkedBroker.error, errorResult)
+            Assertions.assertEquals(linkedBroker.error, errorResult)
 
         }
     }
@@ -373,8 +369,8 @@ class TradeItLinkedBrokerParcelableSpec {
             val accountParcelableResult = linkedBroker.getLinkedBrokerAccount(myAccountNumberInput)
 
             // then
-            Assert.assertNotNull(accountParcelableResult)
-            Assert.assertEquals(accountParcelableResult!!.accountNumber, myAccountNumberInput)
+            Assertions.assertNotNull(accountParcelableResult)
+            Assertions.assertEquals(accountParcelableResult!!.accountNumber, myAccountNumberInput)
         }
 
         @Test
@@ -401,7 +397,7 @@ class TradeItLinkedBrokerParcelableSpec {
             val accountParcelableResult = linkedBroker.getLinkedBrokerAccount(myAccountNumberInput)
 
             // then
-            Assert.assertNull(accountParcelableResult)
+            Assertions.assertNull(accountParcelableResult)
         }
     }
 }

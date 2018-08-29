@@ -9,11 +9,7 @@ import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
 import it.trade.model.request.TradeItPreviewStockOrEtfOrderRequest
-import junit.framework.Assert
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TradeItOrderParcelableSpec {
@@ -76,8 +72,8 @@ class TradeItOrderParcelableSpec {
             })
 
             // then expect the sucess callback called
-            Assert.assertEquals(successfulCallbackCount, 1)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successfulCallbackCount, 1)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // and the preview response is correctly filled
             previewResponse!!.orderId == "My Order Id"
@@ -92,7 +88,7 @@ class TradeItOrderParcelableSpec {
             previewResponse!!.orderDetails!!.orderValueLabel == "MyOrderValueLabel"
 
             // and The userDisabledMargin flag was set on the request
-            Assert.assertTrue(userDisabledMarginFlag)
+            Assertions.assertTrue(userDisabledMarginFlag)
         }
 
         @Test
@@ -129,14 +125,14 @@ class TradeItOrderParcelableSpec {
             })
 
             // then expect the success callback to be called
-            Assert.assertEquals(successfulCallbackCount, 0)
-            Assert.assertEquals(errorCallbackCount, 1)
+            Assertions.assertEquals(successfulCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 1)
 
             // and the error is correctly populated
-            Assert.assertEquals(errorResult!!.errorCode, TradeItErrorCode.BROKER_ACCOUNT_ERROR)
-            Assert.assertEquals(errorResult!!.shortMessage, "My short error message")
-            Assert.assertEquals(errorResult!!.longMessages, arrayListOf("My long error message"))
-            Assert.assertEquals(errorResult!!.httpCode, 200)
+            Assertions.assertEquals(errorResult!!.errorCode, TradeItErrorCode.BROKER_ACCOUNT_ERROR)
+            Assertions.assertEquals(errorResult!!.shortMessage, "My short error message")
+            Assertions.assertEquals(errorResult!!.longMessages, arrayListOf("My long error message"))
+            Assertions.assertEquals(errorResult!!.httpCode, 200)
         }
     }
 
@@ -180,15 +176,15 @@ class TradeItOrderParcelableSpec {
             })
 
             // then expect the sucess callback called
-            Assert.assertEquals(successfulCallbackCount, 1)
-            Assert.assertEquals(errorCallbackCount, 0)
+            Assertions.assertEquals(successfulCallbackCount, 1)
+            Assertions.assertEquals(errorCallbackCount, 0)
 
             // and the place order response is correctly filled
-            Assert.assertEquals(placeOrderResponse!!.orderNumber, "My Order Id")
-            Assert.assertEquals(placeOrderResponse!!.orderInfo!!.action, "buy")
-            Assert.assertEquals(placeOrderResponse!!.orderInfo!!.symbol, "My symbol")
-            Assert.assertEquals(placeOrderResponse!!.orderInfo!!.expiration, "day")
-            Assert.assertEquals(placeOrderResponse!!.orderInfo!!.quantity, 1.0)
+            Assertions.assertEquals(placeOrderResponse!!.orderNumber, "My Order Id")
+            Assertions.assertEquals(placeOrderResponse!!.orderInfo!!.action, "buy")
+            Assertions.assertEquals(placeOrderResponse!!.orderInfo!!.symbol, "My symbol")
+            Assertions.assertEquals(placeOrderResponse!!.orderInfo!!.expiration, "day")
+            Assertions.assertEquals(placeOrderResponse!!.orderInfo!!.quantity, 1.0)
         }
 
         @Test
@@ -221,14 +217,14 @@ class TradeItOrderParcelableSpec {
             })
 
             // then expect the sucess callback called
-            Assert.assertEquals(successfulCallbackCount, 0)
-            Assert.assertEquals(errorCallbackCount, 1)
+            Assertions.assertEquals(successfulCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 1)
 
             // and the error is correctly populated
-            Assert.assertEquals(errorResult!!.errorCode, TradeItErrorCode.PARAMETER_ERROR)
-            Assert.assertEquals(errorResult!!.shortMessage, "My short error message")
-            Assert.assertEquals(errorResult!!.longMessages, arrayListOf("My long error message"))
-            Assert.assertEquals(errorResult!!.httpCode, 200)
+            Assertions.assertEquals(errorResult!!.errorCode, TradeItErrorCode.PARAMETER_ERROR)
+            Assertions.assertEquals(errorResult!!.shortMessage, "My short error message")
+            Assertions.assertEquals(errorResult!!.longMessages, arrayListOf("My long error message"))
+            Assertions.assertEquals(errorResult!!.httpCode, 200)
         }
     }
 }

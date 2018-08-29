@@ -9,11 +9,7 @@ import it.trade.model.reponse.*
 import it.trade.model.request.TradeItEnvironment
 import it.trade.model.request.TradeItLinkedLogin
 import it.trade.model.request.TradeItOAuthAccessTokenRequest
-import junit.framework.Assert
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyString
 
@@ -68,11 +64,11 @@ class TradeItLinkedBrokerManagerSpec {
             )
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and "expects the oAuthUrl to be populated"
-            Assert.assertEquals(oAuthUrlResult, mySpecialUrl)
+            Assertions.assertEquals(oAuthUrlResult, mySpecialUrl)
         }
 
         @Test
@@ -112,12 +108,12 @@ class TradeItLinkedBrokerManagerSpec {
                 })
 
             // then expects the errorCallback called once
-            Assert.assertEquals(successCallBackCount, 0)
-            Assert.assertEquals(errorCallBackCount, 1)
+            Assertions.assertEquals(successCallBackCount, 0)
+            Assertions.assertEquals(errorCallBackCount, 1)
 
             // and expects a populated TradeItErrorResult
-            Assert.assertEquals(errorResult!!.getErrorCode(), errorCode)
-            Assert.assertEquals(errorResult!!.getShortMessage(), shortMessage)
+            Assertions.assertEquals(errorResult!!.getErrorCode(), errorCode)
+            Assertions.assertEquals(errorResult!!.getShortMessage(), shortMessage)
         }
     }
 
@@ -152,16 +148,16 @@ class TradeItLinkedBrokerManagerSpec {
                 })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and saveLinkedLogin method was called
             verify(keystoreService, times(1)).saveLinkedLogin(any(), ArgumentMatchers.anyString())
 
             // and expects a linkedBroker containing userId and userToken
-            Assert.assertEquals(linkedBrokerResult!!.linkedLogin!!.userId, myUserId)
-            Assert.assertEquals(linkedBrokerResult!!.linkedLogin!!.userToken, myUserToken)
-            Assert.assertEquals(linkedBrokerResult!!.linkedLogin!!.broker, "My broker 1")
+            Assertions.assertEquals(linkedBrokerResult!!.linkedLogin!!.userId, myUserId)
+            Assertions.assertEquals(linkedBrokerResult!!.linkedLogin!!.userToken, myUserToken)
+            Assertions.assertEquals(linkedBrokerResult!!.linkedLogin!!.broker, "My broker 1")
         }
 
         @Test
@@ -203,21 +199,21 @@ class TradeItLinkedBrokerManagerSpec {
                 })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and the updateLinkedLogin method was called
             verify(keystoreService, times(1)).updateLinkedLogin(any())
 
             // and expects a linkedBroker containing userId and updated userToken
-            Assert.assertEquals(linkedBrokerResult!!.linkedLogin!!.userId, myUserId)
-            Assert.assertEquals(linkedBrokerResult!!.linkedLogin!!.userToken, myUserToken)
-            Assert.assertEquals(linkedBrokerResult!!.linkedLogin!!.broker, "My broker 1")
+            Assertions.assertEquals(linkedBrokerResult!!.linkedLogin!!.userId, myUserId)
+            Assertions.assertEquals(linkedBrokerResult!!.linkedLogin!!.userToken, myUserToken)
+            Assertions.assertEquals(linkedBrokerResult!!.linkedLogin!!.broker, "My broker 1")
 
             // and expects only one linkedbroker in the list
-            Assert.assertEquals(linkedBrokerManager.linkedBrokers.size, 1)
-            Assert.assertEquals(linkedBrokerManager.linkedBrokers[0].linkedLogin!!.userId, myUserId)
-            Assert.assertEquals(linkedBrokerManager.linkedBrokers[0].linkedLogin!!.userToken, myUserToken)
+            Assertions.assertEquals(linkedBrokerManager.linkedBrokers.size, 1)
+            Assertions.assertEquals(linkedBrokerManager.linkedBrokers[0].linkedLogin!!.userId, myUserId)
+            Assertions.assertEquals(linkedBrokerManager.linkedBrokers[0].linkedLogin!!.userToken, myUserToken)
         }
 
         @Test
@@ -256,12 +252,12 @@ class TradeItLinkedBrokerManagerSpec {
             )
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 0)
-            Assert.assertEquals(errorCallBackCount, 1)
+            Assertions.assertEquals(successCallBackCount, 0)
+            Assertions.assertEquals(errorCallBackCount, 1)
 
             // and expects a populated TradeItErrorResult
-            Assert.assertEquals(errorResult!!.getErrorCode(), errorCode)
-            Assert.assertEquals(errorResult!!.getShortMessage(), shortMessage)
+            Assertions.assertEquals(errorResult!!.getErrorCode(), errorCode)
+            Assertions.assertEquals(errorResult!!.getShortMessage(), shortMessage)
         }
     }
 
@@ -298,8 +294,8 @@ class TradeItLinkedBrokerManagerSpec {
             })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and the deleteLinkedLogin method was called
             verify(keystoreService, times(1)).deleteLinkedLogin(any())
@@ -308,7 +304,7 @@ class TradeItLinkedBrokerManagerSpec {
             verify(linkedBrokerCache, times(1)).removeFromCache(linkedBroker)
 
             // and the linkedbrokers list is empty
-            Assert.assertEquals(linkedBrokerManager.linkedBrokers.size, 0)
+            Assertions.assertEquals(linkedBrokerManager.linkedBrokers.size, 0)
         }
 
         @Test
@@ -348,8 +344,8 @@ class TradeItLinkedBrokerManagerSpec {
             })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and the deleteLinkedLogin method was called
             verify(keystoreService, times(1)).deleteLinkedLogin(linkedLogin)
@@ -358,7 +354,7 @@ class TradeItLinkedBrokerManagerSpec {
             verify(linkedBrokerCache, times(1)).removeFromCache(linkedBroker)
 
             // and the linkedbrokers list is empty
-            Assert.assertEquals(linkedBrokerManager.linkedBrokers.size, 0)
+            Assertions.assertEquals(linkedBrokerManager.linkedBrokers.size, 0)
         }
 
         @Test
@@ -383,8 +379,8 @@ class TradeItLinkedBrokerManagerSpec {
             })
 
             // then expects the errorCallback called once
-            Assert.assertEquals(successCallBackCount, 0)
-            Assert.assertEquals(errorCallBackCount, 1)
+            Assertions.assertEquals(successCallBackCount, 0)
+            Assertions.assertEquals(errorCallBackCount, 1)
 
             // and the method on the api was not called
             verify(apiClient, never()).unlinkBrokerAccount(any(), any())
@@ -439,11 +435,11 @@ class TradeItLinkedBrokerManagerSpec {
                 })
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and expects the oAuthUrl to be populated
-            Assert.assertEquals(oAuthUrlResult, mySpecialUrl)
+            Assertions.assertEquals(oAuthUrlResult, mySpecialUrl)
         }
 
         @Test
@@ -492,11 +488,11 @@ class TradeItLinkedBrokerManagerSpec {
             )
 
             // then expects the successCallback called once
-            Assert.assertEquals(successCallBackCount, 1)
-            Assert.assertEquals(errorCallBackCount, 0)
+            Assertions.assertEquals(successCallBackCount, 1)
+            Assertions.assertEquals(errorCallBackCount, 0)
 
             // and expects the oAuthUrl to be populated
-            Assert.assertEquals(oAuthUrlResult, mySpecialUrl)
+            Assertions.assertEquals(oAuthUrlResult, mySpecialUrl)
         }
 
         @Test
@@ -521,8 +517,8 @@ class TradeItLinkedBrokerManagerSpec {
                 })
 
             // then expects the errorCallBackCount called once
-            Assert.assertEquals(successCallBackCount, 0)
-            Assert.assertEquals(errorCallBackCount, 1)
+            Assertions.assertEquals(successCallBackCount, 0)
+            Assertions.assertEquals(errorCallBackCount, 1)
 
             // and expects the api eas not called
             verify(apiClient, never()).getOAuthLoginPopupUrlForTokenUpdate(anyString(), eq(myUserId), anyString(), anyString(), any())
@@ -630,35 +626,35 @@ class TradeItLinkedBrokerManagerSpec {
         verify(linkedBrokerCache, times(1)).cache(linkedBrokerParcelable3)
 
         // and linkedBrokers contains linkedBrokerParcelable1, linkedBrokerParcelable2, linkedBrokerParcelable3
-        Assert.assertEquals(linkedBrokerManager.linkedBrokers.size, 3)
-        Assert.assertTrue(linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable1))
-        Assert.assertTrue(linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable2))
-        Assert.assertTrue(linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable3))
+        Assertions.assertEquals(linkedBrokerManager.linkedBrokers.size, 3)
+        Assertions.assertTrue(linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable1))
+        Assertions.assertTrue(linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable2))
+        Assertions.assertTrue(linkedBrokerManager.linkedBrokers.contains(linkedBrokerParcelable3))
 
-        Assert.assertEquals(linkedBrokerManager.linkedBrokers[0].accounts.size, 1)
-        Assert.assertEquals(
+        Assertions.assertEquals(linkedBrokerManager.linkedBrokers[0].accounts.size, 1)
+        Assertions.assertEquals(
             linkedBrokerManager.linkedBrokers[0].accounts[0].accountNumber,
             linkedBrokerAccountData1.accountNumber
         )
-        Assert.assertEquals(
+        Assertions.assertEquals(
             linkedBrokerManager.linkedBrokers[0].accounts[0].accountName,
             linkedBrokerAccountData1.accountName
         )
-        Assert.assertEquals(
+        Assertions.assertEquals(
             linkedBrokerManager.linkedBrokers[0].accounts[0].accountBaseCurrency,
             linkedBrokerAccountData1.accountBaseCurrency
         )
 
-        Assert.assertEquals(linkedBrokerManager.linkedBrokers[2].accounts.size, 1)
-        Assert.assertEquals(
+        Assertions.assertEquals(linkedBrokerManager.linkedBrokers[2].accounts.size, 1)
+        Assertions.assertEquals(
             linkedBrokerManager.linkedBrokers[2].accounts[0].accountNumber,
             linkedBrokerAccountData3.accountNumber
         )
-        Assert.assertEquals(
+        Assertions.assertEquals(
             linkedBrokerManager.linkedBrokers[2].accounts[0].accountName,
             linkedBrokerAccountData3.accountName
         )
-        Assert.assertEquals(
+        Assertions.assertEquals(
             linkedBrokerManager.linkedBrokers[2].accounts[0].accountBaseCurrency,
             linkedBrokerAccountData3.accountBaseCurrency
         )

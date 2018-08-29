@@ -8,11 +8,7 @@ import com.nhaarman.mockitokotlin2.*
 import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItLinkLoginResponse
 import it.trade.model.request.TradeItLinkLoginRequest
-import org.junit.Assert
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.mockito.ArgumentMatchers.anySet
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.ArgumentMatchers.contains
@@ -83,19 +79,19 @@ class TradeItLinkedBrokerCacheSpec {
             linkedBrokerCache.cache(linkedBroker)
 
             // then expects the linkedBroker to be serialized and stored
-            Assert.assertEquals(stored, 1)
-            Assert.assertTrue(linkedBrokerCacheJson!!.size == 1)
-            Assert.assertTrue(linkedBrokerCacheJson!!.contains(userId))
-            Assert.assertNotEquals(
+            Assertions.assertEquals(stored, 1)
+            Assertions.assertTrue(linkedBrokerCacheJson!!.size == 1)
+            Assertions.assertTrue(linkedBrokerCacheJson!!.contains(userId))
+            Assertions.assertNotEquals(
                 linkedBrokerAccountCacheJson!!.indexOf("accountsLastUpdated"), -1
             )
-            Assert.assertTrue(
+            Assertions.assertTrue(
                 linkedBrokerAccountCacheJson!!.contains(linkedBroker.accounts[0].accountName!!)
             )
-            Assert.assertTrue(
+            Assertions.assertTrue(
                 linkedBrokerAccountCacheJson!!.contains(linkedBroker.accounts[0].accountNumber!!)
             )
-            Assert.assertTrue(
+            Assertions.assertTrue(
                 linkedBrokerAccountCacheJson!!.contains(
                     linkedBroker.accounts[0].accountBaseCurrency!!
                 )
@@ -143,26 +139,26 @@ class TradeItLinkedBrokerCacheSpec {
             linkedBrokerCache.cache(linkedBroker)
 
             // then expects the linkedBroker to be serialized and stored
-            Assert.assertEquals(stored, 1)
-            Assert.assertTrue(linkedBrokerCacheJson!!.size == 1)
-            Assert.assertTrue(linkedBrokerCacheJson!!.contains(userId))
-            Assert.assertNotEquals(
+            Assertions.assertEquals(stored, 1)
+            Assertions.assertTrue(linkedBrokerCacheJson!!.size == 1)
+            Assertions.assertTrue(linkedBrokerCacheJson!!.contains(userId))
+            Assertions.assertNotEquals(
                 linkedBrokerAccountCacheJson!!.indexOf(linkedBroker.accounts[0].accountName!!),
                 -1
             )
-            Assert.assertNotEquals(
+            Assertions.assertNotEquals(
                 linkedBrokerAccountCacheJson!!.indexOf(linkedBroker.accounts[0].accountNumber!!),
                 -1
             )
-            Assert.assertNotEquals(
+            Assertions.assertNotEquals(
                 linkedBrokerAccountCacheJson!!.indexOf(linkedBroker.accounts[0].accountBaseCurrency!!),
                 -1
             )
-            Assert.assertNotEquals(
+            Assertions.assertNotEquals(
                 linkedBrokerAccountCacheJson!!.indexOf("accountsLastUpdated"),
                 -1
             )
-            Assert.assertNotEquals(
+            Assertions.assertNotEquals(
                 linkedBrokerAccountCacheJson!!.indexOf("availableCash"),
                 -1
             )
@@ -203,13 +199,13 @@ class TradeItLinkedBrokerCacheSpec {
             linkedBrokerCache.syncFromCache(linkedBroker)
 
             // then expects the linkedBroker to be populated with the cache
-            Assert.assertEquals(linkedBroker.linkedLogin!!.userId, userId)
-            Assert.assertNotEquals(linkedBroker.accountsLastUpdated, null)
-            Assert.assertTrue(linkedBroker.accounts.size == 1)
-            Assert.assertEquals(linkedBroker.accounts[0].balance!!.availableCash, 20000.0)
+            Assertions.assertEquals(linkedBroker.linkedLogin!!.userId, userId)
+            Assertions.assertNotEquals(linkedBroker.accountsLastUpdated, null)
+            Assertions.assertTrue(linkedBroker.accounts.size == 1)
+            Assertions.assertEquals(linkedBroker.accounts[0].balance!!.availableCash, 20000.0)
 
             // and the linked broker is set on the linked broker account
-            Assert.assertEquals(linkedBroker.accounts[0].linkedBroker, linkedBroker)
+            Assertions.assertEquals(linkedBroker.accounts[0].linkedBroker, linkedBroker)
         }
 
         @Test
@@ -245,9 +241,9 @@ class TradeItLinkedBrokerCacheSpec {
             linkedBrokerCache.syncFromCache(linkedBroker)
 
             // then expects the linkedBroker to not be populated with the cache
-            Assert.assertEquals(linkedBroker.linkedLogin!!.userId, userId)
-            Assert.assertEquals(linkedBroker.accountsLastUpdated, null)
-            Assert.assertEquals(linkedBroker.accounts.size, 0)
+            Assertions.assertEquals(linkedBroker.linkedLogin!!.userId, userId)
+            Assertions.assertEquals(linkedBroker.accountsLastUpdated, null)
+            Assertions.assertEquals(linkedBroker.accounts.size, 0)
         }
     }
 
@@ -286,7 +282,7 @@ class TradeItLinkedBrokerCacheSpec {
             linkedBrokerCache.removeFromCache(linkedBroker)
 
             // then linkedBroker was removed from the set of string
-            Assert.assertEquals(set.size, 0)
+            Assertions.assertEquals(set.size, 0)
 
             // and expects the following method called
             verify(editor, times(1))
