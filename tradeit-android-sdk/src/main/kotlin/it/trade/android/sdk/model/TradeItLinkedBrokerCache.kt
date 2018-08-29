@@ -37,7 +37,7 @@ class TradeItLinkedBrokerCache(private val context: Context) {
         if (linkedBrokerCache!!.contains(userId)) {
             val linkedBrokerSerialized = sharedPreferences.getString(LINKED_BROKER_CACHE_KEY_PREFIX + userId, "")
             try {
-                val linkedBrokerDeserialized = gson.fromJson<TradeItLinkedBrokerParcelable>(linkedBrokerSerialized, TradeItLinkedBrokerParcelable::class.java!!)
+                val linkedBrokerDeserialized = gson.fromJson<TradeItLinkedBrokerParcelable>(linkedBrokerSerialized, TradeItLinkedBrokerParcelable::class.java)
                 linkedBroker.accounts = linkedBrokerDeserialized.accounts
                 linkedBroker.accountsLastUpdated = linkedBrokerDeserialized.accountsLastUpdated
 
@@ -79,6 +79,6 @@ class TradeItLinkedBrokerCache(private val context: Context) {
     companion object {
         val LINKED_BROKER_CACHE_KEY_PREFIX = "TRADE_IT_LINKED_BROKER_CACHE_"
         val TRADE_IT_SDK_SHARED_PREFS_KEY = "TRADE_IT_SDK_SHARED_PREFS_KEY"
-        private val TAG = TradeItLinkedBrokerCache::class.java!!.getName()
+        private val TAG = TradeItLinkedBrokerCache::class.java.getName()
     }
 }

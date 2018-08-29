@@ -41,11 +41,11 @@ class TradeItFillParcelable : Parcelable {
                 '}'.toString()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItFillParcelable?
+        val that = other as TradeItFillParcelable?
 
         if (if (timestampFormat != null) timestampFormat != that!!.timestampFormat else that!!.timestampFormat != null)
             return false
@@ -77,9 +77,9 @@ class TradeItFillParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.timestampFormat = `in`.readString()
-        this.price = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.price = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.timestamp = `in`.readString()
-        this.quantity = `in`.readValue(Int::class.java!!.getClassLoader()) as? Int
+        this.quantity = `in`.readValue(Int::class.java.getClassLoader()) as? Int
     }
 
     companion object {

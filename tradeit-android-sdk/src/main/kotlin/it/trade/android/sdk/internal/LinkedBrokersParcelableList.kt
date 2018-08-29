@@ -1,8 +1,7 @@
 package it.trade.android.sdk.internal
 
-import java.util.ArrayList
-
 import it.trade.android.sdk.model.TradeItLinkedBrokerParcelable
+import java.util.*
 
 
 class LinkedBrokersParcelableList(linkedBrokers: List<TradeItLinkedBrokerParcelable>) : ArrayList<TradeItLinkedBrokerParcelable>() {
@@ -12,11 +11,8 @@ class LinkedBrokersParcelableList(linkedBrokers: List<TradeItLinkedBrokerParcela
     }
 
     fun containsSameAccounts(linkedBrokerParcelable: TradeItLinkedBrokerParcelable): Boolean {
-        for (o in this) {
-            if (o != null && o == linkedBrokerParcelable && o.equalsAccounts(linkedBrokerParcelable)) {
-                return true
-            }
+        return this.any {
+            it == linkedBrokerParcelable && it.equalsAccounts(linkedBrokerParcelable)
         }
-        return false
     }
 }

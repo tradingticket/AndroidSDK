@@ -66,11 +66,11 @@ class TradeItOrderStatusParcelable : Parcelable {
                 '}'.toString()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItOrderStatusParcelable?
+        val that = other as TradeItOrderStatusParcelable?
 
         if (if (groupOrderType != null) groupOrderType != that!!.groupOrderType else that!!.groupOrderType != null)
             return false
@@ -132,7 +132,7 @@ class TradeItOrderStatusParcelable : Parcelable {
         this.orderNumber = `in`.readString()
         this.orderStatus = `in`.readString()
         this.groupOrders = ArrayList()
-        `in`.readList(this.groupOrders, TradeItOrderStatusParcelable::class.java!!.getClassLoader())
+        `in`.readList(this.groupOrders, TradeItOrderStatusParcelable::class.java.getClassLoader())
     }
 
     companion object {

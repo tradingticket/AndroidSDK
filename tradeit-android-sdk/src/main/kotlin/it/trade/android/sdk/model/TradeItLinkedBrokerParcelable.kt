@@ -95,8 +95,8 @@ class TradeItLinkedBrokerParcelable : Parcelable {
     }
 
     fun refreshAccountBalances(callback: TradeItCallBackCompletion) {
-        RxJavaPlugins.setErrorHandler(Consumer { e ->
-            var e: Throwable? = e
+        RxJavaPlugins.setErrorHandler(Consumer { ex ->
+            var e: Throwable? = ex
             if (e is UndeliverableException) {
                 e = e.cause
             }
@@ -231,11 +231,11 @@ class TradeItLinkedBrokerParcelable : Parcelable {
         return linkedBrokerAccounts
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItLinkedBrokerParcelable?
+        val that = other as TradeItLinkedBrokerParcelable?
 
         return linkedLogin!!.userId == that!!.linkedLogin!!.userId
     }
@@ -267,12 +267,12 @@ class TradeItLinkedBrokerParcelable : Parcelable {
     }
 
     protected constructor(`in`: Parcel) {
-        this.apiClient = `in`.readParcelable(TradeItApiClientParcelable::class.java!!.getClassLoader())
-        this.linkedLogin = `in`.readParcelable(TradeItLinkedLogin::class.java!!.getClassLoader())
+        this.apiClient = `in`.readParcelable(TradeItApiClientParcelable::class.java.getClassLoader())
+        this.linkedLogin = `in`.readParcelable(TradeItLinkedLogin::class.java.getClassLoader())
         this.accounts = `in`.createTypedArrayList(TradeItLinkedBrokerAccountParcelable.CREATOR)
         val tmpAccountsLastUpdated = `in`.readLong()
         this.accountsLastUpdated = if (tmpAccountsLastUpdated.equals(-1)) null else Date(tmpAccountsLastUpdated)
-        this.error = `in`.readParcelable(TradeItErrorResultParcelable::class.java!!.getClassLoader())
+        this.error = `in`.readParcelable(TradeItErrorResultParcelable::class.java.getClassLoader())
         this.linkedBrokerCache = TradeItSDK.linkedBrokerCache
 
         for (accountParcelable in this.accounts) {
@@ -289,7 +289,7 @@ class TradeItLinkedBrokerParcelable : Parcelable {
 
     companion object {
 
-        private val TAG = TradeItLinkedBrokerParcelable::class.java!!.getName()
+        private val TAG = TradeItLinkedBrokerParcelable::class.java.getName()
 
         @JvmField
         val CREATOR: Parcelable.Creator<TradeItLinkedBrokerParcelable> = object : Parcelable.Creator<TradeItLinkedBrokerParcelable> {

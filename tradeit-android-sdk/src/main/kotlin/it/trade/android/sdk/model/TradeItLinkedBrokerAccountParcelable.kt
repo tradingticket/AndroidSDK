@@ -171,11 +171,11 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         return positionsParcelable
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItLinkedBrokerAccountParcelable?
+        val that = other as TradeItLinkedBrokerAccountParcelable?
 
         if (if (accountName != null) accountName != that!!.accountName else that!!.accountName != null)
             return false
@@ -226,14 +226,14 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         this.accountBaseCurrency = `in`.readString()
         this.userCanDisableMargin = `in`.readByte().toInt() != 0
         this.orderCapabilities = ArrayList()
-        `in`.readList(this.orderCapabilities, TradeItOrderCapabilityParcelable::class.java!!.getClassLoader())
-        this.balance = `in`.readParcelable(TradeItBalanceParcelable::class.java!!.getClassLoader())
+        `in`.readList(this.orderCapabilities, TradeItOrderCapabilityParcelable::class.java.getClassLoader())
+        this.balance = `in`.readParcelable(TradeItBalanceParcelable::class.java.getClassLoader())
         val tmpBalanceLastUpdated = `in`.readLong()
         this.balanceLastUpdated = if (tmpBalanceLastUpdated.equals(-1)) null else Date(tmpBalanceLastUpdated)
         this.positions = ArrayList()
-        `in`.readList(this.positions, TradeItPositionParcelable::class.java!!.getClassLoader())
+        `in`.readList(this.positions, TradeItPositionParcelable::class.java.getClassLoader())
         this.userId = `in`.readString()
-        this.linkedBroker = this.userId?.let { userId -> linkedBrokersMap[userId] } ?: null
+        this.linkedBroker = this.userId?.let { userId -> linkedBrokersMap[userId] }
         this.linkedBroker?.accounts?.indexOf(this)?.let { indexAccount ->
             if (indexAccount != -1) { // updating account reference on the linkedBroker as we created a new object
                 this.linkedBroker?.accounts?.removeAt(indexAccount)

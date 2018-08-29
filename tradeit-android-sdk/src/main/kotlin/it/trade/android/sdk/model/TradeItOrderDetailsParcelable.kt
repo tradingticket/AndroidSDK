@@ -100,7 +100,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
     protected constructor(`in`: Parcel) {
         this.orderSymbol = `in`.readString()
         this.orderAction = `in`.readString()
-        this.orderQuantity = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.orderQuantity = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.orderExpiration = `in`.readString()
         this.orderPrice = `in`.readString()
         this.orderValueLabel = `in`.readString()
@@ -110,13 +110,13 @@ class TradeItOrderDetailsParcelable : Parcelable {
         this.bidPrice = `in`.readString()
         this.askPrice = `in`.readString()
         this.timestamp = `in`.readString()
-        this.buyingPower = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.availableCash = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.estimatedOrderCommission = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.longHoldings = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.shortHoldings = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.estimatedOrderValue = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.estimatedTotalValue = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.buyingPower = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.availableCash = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.estimatedOrderCommission = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.longHoldings = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.shortHoldings = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.estimatedOrderValue = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.estimatedTotalValue = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.warnings = `in`.createTypedArrayList(TradeItWarningParcelable.CREATOR)
     }
 

@@ -33,7 +33,7 @@ class TradeItApiClientParcelable : TradeItApiClient, Parcelable {
     }
 
     protected constructor(`in`: Parcel) {
-        this.requestInterceptorParcelable = `in`.readParcelable(RequestInterceptorParcelable::class.java!!.getClassLoader())
+        this.requestInterceptorParcelable = `in`.readParcelable(RequestInterceptorParcelable::class.java.getClassLoader())
         this.serverUuid = `in`.readString()
         this.sessionToken = `in`.readString()
         val tmpEnvironment = `in`.readInt()

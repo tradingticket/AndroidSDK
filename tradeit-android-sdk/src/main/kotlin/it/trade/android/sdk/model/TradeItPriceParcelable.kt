@@ -62,11 +62,11 @@ class TradeItPriceParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.type = `in`.readString()
-        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.last = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.bid = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.ask = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.limitPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.stopPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.last = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.bid = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.ask = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.timestamp = `in`.readString()
     }
 

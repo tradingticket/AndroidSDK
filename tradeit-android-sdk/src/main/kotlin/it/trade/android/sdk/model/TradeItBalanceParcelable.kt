@@ -54,11 +54,11 @@ class TradeItBalanceParcelable : Parcelable {
                 '}'.toString()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItBalanceParcelable?
+        val that = other as TradeItBalanceParcelable?
 
         if (if (availableCash != null) availableCash != that!!.availableCash else that!!.availableCash != null)
             return false
@@ -103,13 +103,13 @@ class TradeItBalanceParcelable : Parcelable {
     }
 
     protected constructor(`in`: Parcel) {
-        this.availableCash = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.buyingPower = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.dayAbsoluteReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.dayPercentReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.totalAbsoluteReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.totalPercentReturn = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.totalValue = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.availableCash = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.buyingPower = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.dayAbsoluteReturn = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.dayPercentReturn = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.totalAbsoluteReturn = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.totalPercentReturn = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.totalValue = `in`.readValue(Double::class.java.getClassLoader()) as? Double
     }
 
     companion object {

@@ -45,7 +45,7 @@ class TradeItPreviewStockOrEtfOrderResponseParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.ackWarningsList = `in`.createStringArrayList()
-        this.orderDetails = `in`.readParcelable(OrderDetails::class.java!!.getClassLoader())
+        this.orderDetails = `in`.readParcelable(OrderDetails::class.java.getClassLoader())
         this.orderId = `in`.readString()
         this.warningsList = `in`.createStringArrayList()
     }

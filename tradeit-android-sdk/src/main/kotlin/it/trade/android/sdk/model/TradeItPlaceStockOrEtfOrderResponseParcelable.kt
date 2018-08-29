@@ -55,7 +55,7 @@ class TradeItPlaceStockOrEtfOrderResponseParcelable : Parcelable {
         this.confirmationMessage = `in`.readString()
         this.orderNumber = `in`.readString()
         this.timestamp = `in`.readString()
-        this.orderInfo = `in`.readParcelable(TradeItOrderInfoParcelable::class.java!!.getClassLoader())
+        this.orderInfo = `in`.readParcelable(TradeItOrderInfoParcelable::class.java.getClassLoader())
     }
 
     companion object {

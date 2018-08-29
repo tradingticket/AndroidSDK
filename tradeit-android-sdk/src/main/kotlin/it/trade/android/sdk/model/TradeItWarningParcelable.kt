@@ -20,11 +20,11 @@ class TradeItWarningParcelable : Parcelable {
         this.links = mapLinks(warning.links)
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItWarningParcelable?
+        val that = other as TradeItWarningParcelable?
 
         if (isRequiresAcknowledgement != that!!.isRequiresAcknowledgement) return false
         if (if (message != null) message != that.message else that.message != null) return false
@@ -52,7 +52,7 @@ class TradeItWarningParcelable : Parcelable {
         this.message = `in`.readString()
         this.isRequiresAcknowledgement = `in`.readByte().toInt() != 0
         this.links = ArrayList()
-        `in`.readList(this.links, TradeItWarningLinkParcelable::class.java!!.getClassLoader())
+        `in`.readList(this.links, TradeItWarningLinkParcelable::class.java.getClassLoader())
     }
 
     companion object {

@@ -73,7 +73,8 @@ constructor(
                     keystoreService.saveLinkedLogin(linkedLogin, linkedLogin.label)
                 }
 
-            } else if (!LinkedBrokersParcelableList(linkedBrokers).containsSameAccounts(linkedBrokerDataParcelable)) { // Update linkedBrokers accounts if they changed
+            } else if (!LinkedBrokersParcelableList(linkedBrokers)
+                    .containsSameAccounts(linkedBrokerDataParcelable)) { // Update linkedBrokers accounts if they changed
                 val index = linkedBrokers.indexOf(linkedBrokerDataParcelable)
 
                 if (index != -1) {
@@ -141,8 +142,8 @@ constructor(
 
     fun authenticateAll(callback: TradeItCallbackWithSecurityQuestionAndCompletion) {
         RxJavaPlugins.setErrorHandler(
-                Consumer { e ->
-                    var e = e
+                Consumer { ex ->
+                    var e = ex
                     if (e is UndeliverableException) {
                         e = e.cause!!
                     }
@@ -281,8 +282,8 @@ constructor(
             val single = Single.create(
                     SingleOnSubscribe<List<Broker>> { emitter ->
                         RxJavaPlugins.setErrorHandler(
-                                Consumer { e ->
-                                    var e = e
+                                Consumer { ex ->
+                                    var e = ex
                                     if (e is UndeliverableException) {
                                         e = e.cause!!
                                     }
@@ -640,6 +641,6 @@ constructor(
     }
 
     companion object {
-        private val TAG = TradeItLinkedBrokerManager::class.java!!.getName()
+        private val TAG = TradeItLinkedBrokerManager::class.java.getName()
     }
 }

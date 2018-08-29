@@ -72,11 +72,11 @@ class TradeItPriceInfoParcelable : Parcelable {
                 '}'.toString()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItPriceInfoParcelable?
+        val that = other as TradeItPriceInfoParcelable?
 
         if (if (conditionType != null) conditionType != that!!.conditionType else that!!.conditionType != null)
             return false
@@ -136,16 +136,16 @@ class TradeItPriceInfoParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.conditionType = `in`.readString()
-        this.initialStopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.initialStopPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.conditionSymbol = `in`.readString()
-        this.trailPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.conditionFollowPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.limitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.triggerPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.conditionPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
-        this.bracketLimitPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.trailPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.conditionFollowPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.limitPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.triggerPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.conditionPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.bracketLimitPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.type = `in`.readString()
-        this.stopPrice = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.stopPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
     }
 
     companion object {

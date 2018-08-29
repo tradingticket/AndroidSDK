@@ -52,9 +52,9 @@ class TradeItOrderInfoParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         this.action = `in`.readString()
-        this.quantity = `in`.readValue(Double::class.java!!.getClassLoader()) as? Double
+        this.quantity = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.symbol = `in`.readString()
-        this.price = `in`.readParcelable(Price::class.java!!.getClassLoader())
+        this.price = `in`.readParcelable(Price::class.java.getClassLoader())
         this.expiration = `in`.readString()
     }
 

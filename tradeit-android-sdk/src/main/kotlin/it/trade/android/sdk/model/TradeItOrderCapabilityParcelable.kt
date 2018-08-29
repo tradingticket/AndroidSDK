@@ -64,11 +64,11 @@ class TradeItOrderCapabilityParcelable : Parcelable {
                 '}'.toString()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItOrderCapabilityParcelable?
+        val that = other as TradeItOrderCapabilityParcelable?
 
         if (instrument != that!!.instrument) return false
         if (if (actions != null) actions != that.actions else that.actions != null) return false
@@ -100,11 +100,11 @@ class TradeItOrderCapabilityParcelable : Parcelable {
         val tmpInstrument = `in`.readInt()
         this.instrument = if (tmpInstrument == -1) null else Instrument.values()[tmpInstrument]
         this.actions = ArrayList()
-        `in`.readList(this.actions, TradeItOrderActionParcelable::class.java!!.getClassLoader())
+        `in`.readList(this.actions, TradeItOrderActionParcelable::class.java.getClassLoader())
         this.priceTypes = ArrayList()
-        `in`.readList(this.priceTypes, TradeItOrderPriceTypeParcelable::class.java!!.getClassLoader())
+        `in`.readList(this.priceTypes, TradeItOrderPriceTypeParcelable::class.java.getClassLoader())
         this.expirationTypes = ArrayList()
-        `in`.readList(this.expirationTypes, TradeItOrderExpirationTypeParcelable::class.java!!.getClassLoader())
+        `in`.readList(this.expirationTypes, TradeItOrderExpirationTypeParcelable::class.java.getClassLoader())
     }
 
     companion object {

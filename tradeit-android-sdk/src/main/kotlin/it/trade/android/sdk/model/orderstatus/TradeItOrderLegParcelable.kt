@@ -53,11 +53,11 @@ class TradeItOrderLegParcelable : Parcelable {
                 '}'.toString()
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
 
-        val that = o as TradeItOrderLegParcelable?
+        val that = other as TradeItOrderLegParcelable?
 
         if (if (priceInfo != null) priceInfo != that!!.priceInfo else that!!.priceInfo != null)
             return false
@@ -104,11 +104,11 @@ class TradeItOrderLegParcelable : Parcelable {
     }
 
     protected constructor(`in`: Parcel) {
-        this.priceInfo = `in`.readParcelable(TradeItPriceInfoParcelable::class.java!!.getClassLoader())
+        this.priceInfo = `in`.readParcelable(TradeItPriceInfoParcelable::class.java.getClassLoader())
         this.fills = `in`.createTypedArrayList(TradeItFillParcelable.CREATOR)
         this.symbol = `in`.readString()
-        this.orderedQuantity = `in`.readValue(Int::class.java!!.getClassLoader()) as? Int
-        this.filledQuantity = `in`.readValue(Int::class.java!!.getClassLoader()) as? Int
+        this.orderedQuantity = `in`.readValue(Int::class.java.getClassLoader()) as? Int
+        this.filledQuantity = `in`.readValue(Int::class.java.getClassLoader()) as? Int
         this.action = `in`.readString()
     }
 

@@ -39,7 +39,10 @@ constructor(private val context: Context) {
 
                 for (linkedLoginEncryptedJson in linkedLoginEncryptedJsonSet!!) {
                     val linkedLoginJson = decryptString(linkedLoginEncryptedJson)
-                    val linkedLogin = gson.fromJson<TradeItLinkedLoginParcelable>(linkedLoginJson, TradeItLinkedLoginParcelable::class.java!!)
+                    val linkedLogin = gson.fromJson<TradeItLinkedLoginParcelable>(
+                        linkedLoginJson,
+                        TradeItLinkedLoginParcelable::class.java
+                    )
                     linkedLoginList.add(linkedLogin)
                 }
 
@@ -143,7 +146,7 @@ constructor(private val context: Context) {
 
     @Throws(IOException::class)
     private fun loadSecretKeyFromPrivateData(): SecretKey? {
-        var secretKey: SecretKey? = null
+        var secretKey: SecretKey?
         var fileInputStream: FileInputStream? = null
         try {
             fileInputStream = this.context.openFileInput(SECRET_KEY_FILE_NAME)
@@ -186,7 +189,7 @@ constructor(private val context: Context) {
 
     @Throws(TradeItKeystoreServiceCreateKeyException::class)
     private fun createKeyIfNotExists(): SecretKey {
-        var secretKey: SecretKey? = null
+        var secretKey: SecretKey?
         try {
             secretKey = loadSecretKeyFromPrivateData()
             if (secretKey == null) {
@@ -261,7 +264,7 @@ constructor(private val context: Context) {
 
     companion object {
         private val SECRET_KEY_FILE_NAME = "TRADE_IT_SECRET_KEY"
-        private val TAG = TradeItKeystoreService::class.java!!.getName()
+        private val TAG = TradeItKeystoreService::class.java.getName()
 
         val TRADE_IT_SHARED_PREFS_KEY = "TRADE_IT_SHARED_PREFS_KEY"
         private val TRADE_IT_LINKED_BROKERS_KEY = "TRADE_IT_LINKED_BROKERS_KEY"
