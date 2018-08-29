@@ -6,9 +6,9 @@ import android.os.Parcelable
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 
 class TradeItOrderExpirationTypeParcelable : Parcelable {
-    var expirationType: TradeItOrderExpirationType? = null
+    var expirationType: TradeItOrderExpirationType
         private set
-    var displayLabel: String? = null
+    var displayLabel: String
 
     internal constructor(expiration: TradeItOrderExpirationType, displayLabel: String) {
         this.expirationType = expiration
@@ -21,17 +21,19 @@ class TradeItOrderExpirationTypeParcelable : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
-        val that = other as TradeItOrderExpirationTypeParcelable?
+        other as TradeItOrderExpirationTypeParcelable
 
-        if (expirationType != that!!.expirationType) return false
-        return if (displayLabel != null) displayLabel == that.displayLabel else that.displayLabel == null
+        if (expirationType != other.expirationType) return false
+        if (displayLabel != other.displayLabel) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = if (expirationType != null) expirationType!!.hashCode() else 0
-        result = 31 * result + if (displayLabel != null) displayLabel!!.hashCode() else 0
+        var result = expirationType.hashCode()
+        result = 31 * result + displayLabel.hashCode()
         return result
     }
 
@@ -40,13 +42,13 @@ class TradeItOrderExpirationTypeParcelable : Parcelable {
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(if (this.expirationType == null) -1 else this.expirationType!!.ordinal)
+        dest.writeInt(this.expirationType.ordinal)
         dest.writeString(this.displayLabel)
     }
 
     protected constructor(`in`: Parcel) {
         val tmpExpiration = `in`.readInt()
-        this.expirationType = if (tmpExpiration == -1) null else TradeItOrderExpirationType.values()[tmpExpiration]
+        this.expirationType = TradeItOrderExpirationType.values()[tmpExpiration]
         this.displayLabel = `in`.readString()
     }
 

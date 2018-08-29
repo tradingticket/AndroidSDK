@@ -7,7 +7,7 @@ import it.trade.model.reponse.OrderInfo
 import it.trade.model.reponse.Price
 
 class TradeItOrderInfoParcelable : Parcelable {
-    var action: String = ""
+    var action: String? = ""
         internal set
     var quantity: Double? = null
         internal set
@@ -15,7 +15,7 @@ class TradeItOrderInfoParcelable : Parcelable {
         internal set
     var price: TradeItPriceParcelable? = null
         internal set
-    var expiration: String = ""
+    var expiration: String? = ""
         internal set
 
     internal constructor(orderInfo: OrderInfo) {

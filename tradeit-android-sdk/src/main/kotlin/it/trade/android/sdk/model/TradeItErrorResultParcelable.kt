@@ -20,7 +20,11 @@ class TradeItErrorResultParcelable : TradeItErrorResult, Parcelable {
         this.systemMessage = throwable.message
     }
 
-    constructor(errorCode: TradeItErrorCode, shortMessage: String, longMessages: List<String>) : super(errorCode, shortMessage, longMessages) {}
+    constructor(
+        errorCode: TradeItErrorCode,
+        shortMessage: String,
+        longMessages: List<String>
+    ) : super(errorCode, shortMessage, longMessages) {}
 
     constructor(title: String, message: String) : super(title, message) {}
 

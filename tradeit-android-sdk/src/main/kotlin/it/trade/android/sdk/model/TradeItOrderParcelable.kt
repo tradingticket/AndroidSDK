@@ -22,9 +22,21 @@ class TradeItOrderParcelable : Parcelable {
     var limitPrice: Double? = null
     var stopPrice: Double? = null
     var quoteLastPrice: Double? = null
-    var action: TradeItOrderAction? = TradeItOrderAction.BUY
-    var priceType: TradeItOrderPriceType? = TradeItOrderPriceType.MARKET
-    var expiration: TradeItOrderExpirationType? = TradeItOrderExpirationType.GOOD_FOR_DAY
+    var action: TradeItOrderAction = TradeItOrderAction.BUY
+    var priceType: TradeItOrderPriceType = TradeItOrderPriceType.MARKET
+        set(value) {
+            field = value
+            if (!requiresExpiration()) {
+                expiration = TradeItOrderExpirationType.GOOD_FOR_DAY
+            }
+            if (!requiresLimitPrice()) {
+                limitPrice = null
+            }
+            if (!requiresStopPrice()) {
+                stopPrice = null
+            }
+        }
+    var expiration: TradeItOrderExpirationType = TradeItOrderExpirationType.GOOD_FOR_DAY
     var isUserDisabledMargin = false
 
     constructor(linkedBrokerAccount: TradeItLinkedBrokerAccountParcelable, symbol: String) {
@@ -32,16 +44,38 @@ class TradeItOrderParcelable : Parcelable {
         this.symbol = symbol
     }
 
+    fun requiresLimitPrice(): Boolean {
+        return arrayListOf(
+            TradeItOrderPriceType.LIMIT,
+            TradeItOrderPriceType.STOP_LIMIT
+        ).contains(priceType)
+    }
+
+    fun requiresStopPrice(): Boolean {
+        return arrayListOf(
+            TradeItOrderPriceType.STOP_MARKET,
+            TradeItOrderPriceType.STOP_LIMIT
+        ).contains(priceType)
+    }
+
+    fun requiresExpiration(): Boolean {
+        return arrayListOf(
+            TradeItOrderPriceType.LIMIT,
+            TradeItOrderPriceType.STOP_MARKET,
+            TradeItOrderPriceType.STOP_LIMIT
+        ).contains(priceType)
+    }
+
     fun previewOrder(callback: TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable>) {
         val previewRequest = TradeItPreviewStockOrEtfOrderRequest(
                 this.linkedBrokerAccount!!.accountNumber,
-                this.action!!.actionValue,
+                this.action.actionValue,
                 if (this.quantity != null) this.quantity!!.toString() else "1",
                 this.symbol,
-                this.priceType!!.priceTypeValue,
+                this.priceType.priceTypeValue,
                 if (this.limitPrice != null) this.limitPrice!!.toString() else null,
                 if (this.stopPrice != null) this.stopPrice!!.toString() else null,
-                this.expiration!!.expirationValue,
+                this.expiration.expirationValue,
                 this.isUserDisabledMargin
         )
 
@@ -87,9 +121,9 @@ class TradeItOrderParcelable : Parcelable {
         dest.writeValue(this.limitPrice)
         dest.writeValue(this.stopPrice)
         dest.writeValue(this.quoteLastPrice)
-        dest.writeInt(if (this.action == null) -1 else this.action!!.ordinal)
-        dest.writeInt(if (this.priceType == null) -1 else this.priceType!!.ordinal)
-        dest.writeInt(if (this.expiration == null) -1 else this.expiration!!.ordinal)
+        dest.writeInt(this.action.ordinal)
+        dest.writeInt(this.priceType.ordinal)
+        dest.writeInt(this.expiration.ordinal)
         dest.writeByte((if (isUserDisabledMargin) 1 else 0).toByte())
     }
 
@@ -101,11 +135,11 @@ class TradeItOrderParcelable : Parcelable {
         this.stopPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.quoteLastPrice = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         val tmpAction = `in`.readInt()
-        this.action = if (tmpAction == -1) null else TradeItOrderAction.values()[tmpAction]
+        this.action = TradeItOrderAction.values()[tmpAction]
         val tmpPriceType = `in`.readInt()
-        this.priceType = if (tmpPriceType == -1) null else TradeItOrderPriceType.values()[tmpPriceType]
+        this.priceType = TradeItOrderPriceType.values()[tmpPriceType]
         val tmpExpiration = `in`.readInt()
-        this.expiration = if (tmpExpiration == -1) null else TradeItOrderExpirationType.values()[tmpExpiration]
+        this.expiration = TradeItOrderExpirationType.values()[tmpExpiration]
         this.isUserDisabledMargin = `in`.readByte().toInt() != 0
     }
 

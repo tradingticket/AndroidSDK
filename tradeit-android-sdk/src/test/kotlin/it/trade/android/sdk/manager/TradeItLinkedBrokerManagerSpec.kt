@@ -593,6 +593,7 @@ class TradeItLinkedBrokerManagerSpec {
         account1.accountNumber = linkedBrokerAccountData1.accountNumber
         account1.accountBaseCurrency = linkedBrokerAccountData1.accountBaseCurrency
         account1.accountNumber = "MyAccountNumber"
+        account1.name = "MyAccountName"
         linkedBrokerParcelable.accounts.add(
             TradeItLinkedBrokerAccountParcelable(linkedBrokerParcelable, account1)
         )

@@ -45,11 +45,12 @@ class TradeItLinkedBrokerCacheSpec {
         @Test
         fun `Cache handles a linked broker not yet cached with an empty cache`() {
             // given a linked broker with one account
-            val linkedBroker = TradeItLinkedBrokerParcelable(apiClient, linkedLogin!!, linkedBrokerCache);
-            val account1 = TradeItLinkedBrokerAccountParcelable(linkedBroker, mock<TradeItBrokerAccount>())
-            account1.accountName = "My Account Name"
-            account1.accountNumber = "My Account Number"
-            account1.accountBaseCurrency = "My Account base currency"
+            val linkedBroker = TradeItLinkedBrokerParcelable(apiClient, linkedLogin!!, linkedBrokerCache)
+            val account = TradeItBrokerAccount()
+            account.name = "My Account Name"
+            account.accountNumber = "My Account Number"
+            account.accountBaseCurrency = "My Account base currency"
+            val account1 = TradeItLinkedBrokerAccountParcelable(linkedBroker, account)
             account1.balance = TradeItBalanceParcelable()
             account1.balance?.availableCash = 20000.0
             linkedBroker.accountsLastUpdated = Date()
@@ -102,17 +103,18 @@ class TradeItLinkedBrokerCacheSpec {
         fun `Cache update a linked broker already cached`() {
             // given a linked broker with one account
             val linkedBroker = TradeItLinkedBrokerParcelable(apiClient, linkedLogin!!, linkedBrokerCache);
-            val account1 = TradeItLinkedBrokerAccountParcelable(linkedBroker, mock())
-            account1.accountName = "My Account Name"
-            account1.accountNumber = "My Account Number"
-            account1.accountBaseCurrency = "My Account base currency"
+            val account = TradeItBrokerAccount()
+            account.name = "My Account Name"
+            account.accountNumber = "My Account Number"
+            account.accountBaseCurrency = "My Account base currency"
+
+            val account1 = TradeItLinkedBrokerAccountParcelable(linkedBroker, account)
             account1.balance = TradeItBalanceParcelable()
             account1.balance?.availableCash = 20000.0
             linkedBroker.accountsLastUpdated = Date()
             linkedBroker.accounts = arrayListOf(account1)
 
             // and an already cached linkedBroker
-
             whenever(sharedPreferences.getStringSet(anyString(), eq(HashSet<String>()))).then {
                 val set = HashSet<String>()
                 set.add(userId)
@@ -184,10 +186,11 @@ class TradeItLinkedBrokerCacheSpec {
                     linkedLogin!!,
                     linkedBrokerCache
                 )
-                val account1 = TradeItLinkedBrokerAccountParcelable(linkedBrokerCached, mock())
-                account1.accountName = "My Account Name"
-                account1.accountNumber = "My Account Number"
-                account1.accountBaseCurrency = "My Account base currency"
+                val account = TradeItBrokerAccount()
+                account.name = "My Account Name"
+                account.accountNumber = "My Account Number"
+                account.accountBaseCurrency = "My Account base currency"
+                val account1 = TradeItLinkedBrokerAccountParcelable(linkedBrokerCached, account)
                 account1.balance = TradeItBalanceParcelable()
                 account1.balance!!.availableCash = 20000.0
                 linkedBrokerCached.accountsLastUpdated = Date()

@@ -14,7 +14,11 @@ class TradeItApiClientParcelable : TradeItApiClient, Parcelable {
     var requestInterceptorParcelable: RequestInterceptorParcelable? = null
         private set
 
-    @JvmOverloads constructor(apiKey: String, environment: TradeItEnvironment, requestInterceptorParcelable: RequestInterceptorParcelable? = null) : super(apiKey, environment, requestInterceptorParcelable, forceTLS12()) {
+    @JvmOverloads constructor(
+        apiKey: String,
+        environment: TradeItEnvironment,
+        requestInterceptorParcelable: RequestInterceptorParcelable? = null
+    ) : super(apiKey, environment, requestInterceptorParcelable, forceTLS12()) {
         this.requestInterceptorParcelable = requestInterceptorParcelable
     }
 

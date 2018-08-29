@@ -118,8 +118,8 @@ constructor(
     private fun createNewLinkedBroker(linkedBrokerData: TradeItLinkedBrokerData): TradeItLinkedBrokerParcelable {
         val linkedLoginParcelable = TradeItLinkedLoginParcelable(
                 linkedBrokerData.broker,
-                linkedBrokerData.userId ?: "",
-                linkedBrokerData.userToken ?: ""
+                linkedBrokerData.userId,
+                linkedBrokerData.userToken
         )
 
         val linkedBrokerParcelable = createNewLinkedBroker(linkedLoginParcelable)

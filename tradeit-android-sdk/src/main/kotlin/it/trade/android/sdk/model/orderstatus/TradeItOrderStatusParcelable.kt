@@ -27,7 +27,7 @@ class TradeItOrderStatusParcelable : Parcelable {
         private set
 
     @SerializedName("orderLegs")
-    var orderLegs: List<TradeItOrderLegParcelable> = ArrayList()
+    var orderLegs: List<TradeItOrderLegParcelable>? = null
         private set
 
     @SerializedName("orderNumber")
@@ -92,7 +92,7 @@ class TradeItOrderStatusParcelable : Parcelable {
         result = 31 * result + if (orderExpiration != null) orderExpiration!!.hashCode() else 0
         result = 31 * result + if (orderType != null) orderType!!.hashCode() else 0
         result = 31 * result + if (groupOrderId != null) groupOrderId!!.hashCode() else 0
-        result = 31 * result + orderLegs.hashCode()
+        result = 31 * result + (orderLegs?.hashCode() ?: 0)
         result = 31 * result + if (orderNumber != null) orderNumber!!.hashCode() else 0
         result = 31 * result + if (orderStatus != null) orderStatus!!.hashCode() else 0
         result = 31 * result + groupOrders.hashCode()

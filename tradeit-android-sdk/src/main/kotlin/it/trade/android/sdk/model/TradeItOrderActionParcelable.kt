@@ -6,8 +6,8 @@ import android.os.Parcelable
 import it.trade.android.sdk.enums.TradeItOrderAction
 
 class TradeItOrderActionParcelable : Parcelable {
-    var action: TradeItOrderAction? = null
-    var displayLabel: String? = null
+    var action: TradeItOrderAction
+    var displayLabel: String
 
     internal constructor(action: TradeItOrderAction, displayLabel: String) {
         this.action = action
@@ -16,17 +16,19 @@ class TradeItOrderActionParcelable : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
-        val that = other as TradeItOrderActionParcelable?
+        other as TradeItOrderActionParcelable
 
-        if (action != that!!.action) return false
-        return if (displayLabel != null) displayLabel == that.displayLabel else that.displayLabel == null
+        if (action != other.action) return false
+        if (displayLabel != other.displayLabel) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = if (action != null) action!!.hashCode() else 0
-        result = 31 * result + if (displayLabel != null) displayLabel!!.hashCode() else 0
+        var result = action.hashCode()
+        result = 31 * result + displayLabel.hashCode()
         return result
     }
 
@@ -35,13 +37,13 @@ class TradeItOrderActionParcelable : Parcelable {
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(if (this.action == null) -1 else this.action!!.ordinal)
+        dest.writeInt(this.action.ordinal)
         dest.writeString(this.displayLabel)
     }
 
     protected constructor(`in`: Parcel) {
         val tmpAction = `in`.readInt()
-        this.action = if (tmpAction == -1) null else TradeItOrderAction.values()[tmpAction]
+        this.action = TradeItOrderAction.values()[tmpAction]
         this.displayLabel = `in`.readString()
     }
 

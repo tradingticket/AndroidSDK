@@ -33,6 +33,7 @@ class TradeItLinkedBrokerParcelableSpec {
             val account1 = TradeItBrokerAccount()
             account1.accountNumber = "My account number 1"
             account1.name = "My account name 1"
+            account1.accountBaseCurrency = "USD"
 
             val orderCapability = OrderCapability()
             val action = DisplayLabelValue("Buy", "buy")
@@ -45,6 +46,8 @@ class TradeItLinkedBrokerParcelableSpec {
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
             account2.userCanDisableMargin = true
+            account2.accountBaseCurrency = "USD"
+
             val accountsExpected = arrayListOf(
                 TradeItLinkedBrokerAccountParcelable(linkedBroker, account1),
                 TradeItLinkedBrokerAccountParcelable(linkedBroker, account2)
@@ -213,9 +216,11 @@ class TradeItLinkedBrokerParcelableSpec {
             val account1 = TradeItBrokerAccount();
             account1.accountNumber = "My account number 1"
             account1.name = "My account name 1"
+            account1.accountBaseCurrency = "USD"
             val account2 = TradeItBrokerAccount();
             account2.accountNumber = "My account number 2"
             account2.name = "My account name 2"
+            account2.accountBaseCurrency = "USD"
             val accountsExpected = arrayListOf(
                 TradeItLinkedBrokerAccountParcelable(linkedBroker, account1),
                 TradeItLinkedBrokerAccountParcelable(linkedBroker, account2)

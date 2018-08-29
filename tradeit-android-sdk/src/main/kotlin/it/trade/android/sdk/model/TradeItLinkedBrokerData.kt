@@ -5,8 +5,8 @@ import java.util.*
 class TradeItLinkedBrokerData {
 
     var broker: String
-    var userId: String? = null
-    var userToken: String? = null
+    var userId: String
+    var userToken: String
     var isLinkActivationPending = false
     var linkedBrokerAccounts: MutableList<TradeItLinkedBrokerAccountData> = ArrayList()
 
@@ -45,8 +45,8 @@ class TradeItLinkedBrokerData {
     }
 
     override fun hashCode(): Int {
-        var result = if (userId != null) userId!!.hashCode() else 0
-        result = 31 * result + if (userToken != null) userToken!!.hashCode() else 0
+        var result = userId.hashCode()
+        result = 31 * result + userToken.hashCode()
         return result
     }
 }

@@ -5,5 +5,8 @@ import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl
 
 
 interface TradeItCallbackWithSecurityQuestionAndCompletion : TradeItCallBackCompletion {
-    fun onSecurityQuestion(securityQuestion: TradeItSecurityQuestion, callback: TradeItCallbackWithSecurityQuestionImpl<*>)
+    fun onSecurityQuestion(
+        securityQuestion: TradeItSecurityQuestion,
+        callback: TradeItCallbackWithSecurityQuestionImpl<*>
+    )
 }

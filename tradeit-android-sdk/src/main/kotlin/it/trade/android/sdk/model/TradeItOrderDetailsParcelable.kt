@@ -10,11 +10,11 @@ class TradeItOrderDetailsParcelable : Parcelable {
     var orderSymbol: String = ""
     var orderAction: String = ""
         protected set
-    var orderQuantity: Double? = null
+    var orderQuantity: Double = 0.0
         protected set
     var orderExpiration: String = ""
         protected set
-    var orderPrice: String? = ""
+    var orderPrice: String = ""
         protected set
     var orderValueLabel: String = ""
         protected set
@@ -100,7 +100,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
     protected constructor(`in`: Parcel) {
         this.orderSymbol = `in`.readString()
         this.orderAction = `in`.readString()
-        this.orderQuantity = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.orderQuantity = `in`.readValue(Double::class.java.getClassLoader()) as Double
         this.orderExpiration = `in`.readString()
         this.orderPrice = `in`.readString()
         this.orderValueLabel = `in`.readString()

@@ -7,7 +7,7 @@ import it.trade.model.reponse.Price
 
 class TradeItPriceParcelable : Parcelable {
 
-    var type: String = ""
+    var type: String? = ""
         internal set
     var limitPrice: Double? = null
         internal set

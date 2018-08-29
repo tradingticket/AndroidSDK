@@ -14,7 +14,7 @@ class TradeItOrderLegParcelable : Parcelable {
         private set
 
     @SerializedName("fills")
-    var fills: List<TradeItFillParcelable> = ArrayList()
+    var fills: List<TradeItFillParcelable>? = null
         private set
 
     @SerializedName("symbol")
@@ -73,7 +73,7 @@ class TradeItOrderLegParcelable : Parcelable {
 
     override fun hashCode(): Int {
         var result = if (priceInfo != null) priceInfo!!.hashCode() else 0
-        result = 31 * result + fills.hashCode()
+        result = 31 * result + (fills?.hashCode() ?: 0)
         result = 31 * result + if (symbol != null) symbol!!.hashCode() else 0
         result = 31 * result + if (orderedQuantity != null) orderedQuantity!!.hashCode() else 0
         result = 31 * result + if (filledQuantity != null) filledQuantity!!.hashCode() else 0

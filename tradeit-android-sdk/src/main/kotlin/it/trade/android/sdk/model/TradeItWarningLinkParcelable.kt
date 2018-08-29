@@ -6,9 +6,9 @@ import android.os.Parcelable
 import it.trade.model.reponse.WarningLink
 
 class TradeItWarningLinkParcelable : Parcelable {
-    var label: String? = null
+    var label: String
         protected set
-    var url: String? = null
+    var url: String
         protected set
 
     internal constructor(link: WarningLink) {
@@ -18,17 +18,19 @@ class TradeItWarningLinkParcelable : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
-        val that = other as TradeItWarningLinkParcelable?
+        other as TradeItWarningLinkParcelable
 
-        if (if (label != null) label != that!!.label else that!!.label != null) return false
-        return if (url != null) url == that.url else that.url == null
+        if (label != other.label) return false
+        if (url != other.url) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = if (label != null) label!!.hashCode() else 0
-        result = 31 * result + if (url != null) url!!.hashCode() else 0
+        var result = label.hashCode()
+        result = 31 * result + url.hashCode()
         return result
     }
 

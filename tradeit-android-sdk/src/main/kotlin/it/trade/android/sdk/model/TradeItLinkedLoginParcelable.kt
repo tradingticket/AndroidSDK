@@ -13,9 +13,15 @@ import it.trade.model.request.TradeItOAuthAccessTokenRequest
 class TradeItLinkedLoginParcelable : TradeItLinkedLogin, Parcelable {
     constructor(broker: String, userId: String, userToken: String) : super(broker, userId, userToken) {}
 
-    constructor(linkLoginRequest: TradeItLinkLoginRequest, linkLoginResponse: TradeItLinkLoginResponse) : super(linkLoginRequest, linkLoginResponse) {}
+    constructor(
+        linkLoginRequest: TradeItLinkLoginRequest,
+        linkLoginResponse: TradeItLinkLoginResponse
+    ) : super(linkLoginRequest, linkLoginResponse) {}
 
-    constructor(oAuthAccessTokenRequest: TradeItOAuthAccessTokenRequest, oAuthAccessTokenResponse: TradeItOAuthAccessTokenResponse) : super(oAuthAccessTokenRequest, oAuthAccessTokenResponse) {}
+    constructor(
+        oAuthAccessTokenRequest: TradeItOAuthAccessTokenRequest,
+        oAuthAccessTokenResponse: TradeItOAuthAccessTokenResponse
+    ) : super(oAuthAccessTokenRequest, oAuthAccessTokenResponse) {}
 
     constructor(linkedLogin: TradeItLinkedLogin) {
         this.broker = linkedLogin.broker

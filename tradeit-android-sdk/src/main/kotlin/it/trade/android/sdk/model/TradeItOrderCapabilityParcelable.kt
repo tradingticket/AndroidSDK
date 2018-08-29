@@ -8,17 +8,16 @@ import it.trade.android.sdk.enums.TradeItOrderPriceType
 import it.trade.model.reponse.DisplayLabelValue
 import it.trade.model.reponse.Instrument
 import it.trade.model.reponse.OrderCapability
-import java.util.*
 
 class TradeItOrderCapabilityParcelable : Parcelable {
 
-    var instrument: Instrument? = null
+    var instrument: Instrument
         private set
-    var actions: List<TradeItOrderActionParcelable>? = null
+    var actions: List<TradeItOrderActionParcelable> = ArrayList()
         private set
-    var priceTypes: List<TradeItOrderPriceTypeParcelable>? = null
+    var priceTypes: List<TradeItOrderPriceTypeParcelable> = ArrayList()
         private set
-    var expirationTypes: List<TradeItOrderExpirationTypeParcelable>? = null
+    var expirationTypes: List<TradeItOrderExpirationTypeParcelable> = ArrayList()
         private set
 
     constructor(orderCapability: OrderCapability) {
@@ -29,7 +28,7 @@ class TradeItOrderCapabilityParcelable : Parcelable {
     }
 
     fun getActionForEnum(actionEnum: TradeItOrderAction): TradeItOrderActionParcelable? {
-        for (action in actions!!) {
+        for (action in actions) {
             if (action.action == actionEnum) {
                 return action
             }
@@ -38,7 +37,7 @@ class TradeItOrderCapabilityParcelable : Parcelable {
     }
 
     fun getPriceTypeForEnum(priceTypeEnum: TradeItOrderPriceType): TradeItOrderPriceTypeParcelable? {
-        for (priceType in priceTypes!!) {
+        for (priceType in priceTypes) {
             if (priceType.priceType == priceTypeEnum) {
                 return priceType
             }
@@ -47,7 +46,7 @@ class TradeItOrderCapabilityParcelable : Parcelable {
     }
 
     fun getExpirationTypeForEnum(expirationEnum: TradeItOrderExpirationType): TradeItOrderExpirationTypeParcelable? {
-        for (expiration in expirationTypes!!) {
+        for (expiration in expirationTypes) {
             if (expiration.expirationType == expirationEnum) {
                 return expiration
             }
@@ -66,22 +65,23 @@ class TradeItOrderCapabilityParcelable : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
-        val that = other as TradeItOrderCapabilityParcelable?
+        other as TradeItOrderCapabilityParcelable
 
-        if (instrument != that!!.instrument) return false
-        if (if (actions != null) actions != that.actions else that.actions != null) return false
-        if (if (priceTypes != null) priceTypes != that.priceTypes else that.priceTypes != null)
-            return false
-        return if (expirationTypes != null) expirationTypes == that.expirationTypes else that.expirationTypes == null
+        if (instrument != other.instrument) return false
+        if (actions != other.actions) return false
+        if (priceTypes != other.priceTypes) return false
+        if (expirationTypes != other.expirationTypes) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = if (instrument != null) instrument!!.hashCode() else 0
-        result = 31 * result + if (actions != null) actions!!.hashCode() else 0
-        result = 31 * result + if (priceTypes != null) priceTypes!!.hashCode() else 0
-        result = 31 * result + if (expirationTypes != null) expirationTypes!!.hashCode() else 0
+        var result = instrument.hashCode()
+        result = 31 * result + actions.hashCode()
+        result = 31 * result + priceTypes.hashCode()
+        result = 31 * result + expirationTypes.hashCode()
         return result
     }
 
@@ -90,7 +90,7 @@ class TradeItOrderCapabilityParcelable : Parcelable {
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(if (this.instrument == null) -1 else this.instrument!!.ordinal)
+        dest.writeInt(this.instrument.ordinal)
         dest.writeList(this.actions)
         dest.writeList(this.priceTypes)
         dest.writeList(this.expirationTypes)
@@ -98,7 +98,7 @@ class TradeItOrderCapabilityParcelable : Parcelable {
 
     protected constructor(`in`: Parcel) {
         val tmpInstrument = `in`.readInt()
-        this.instrument = if (tmpInstrument == -1) null else Instrument.values()[tmpInstrument]
+        this.instrument = Instrument.values()[tmpInstrument]
         this.actions = ArrayList()
         `in`.readList(this.actions, TradeItOrderActionParcelable::class.java.getClassLoader())
         this.priceTypes = ArrayList()

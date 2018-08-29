@@ -6,8 +6,8 @@ import android.os.Parcelable
 import it.trade.android.sdk.enums.TradeItOrderPriceType
 
 class TradeItOrderPriceTypeParcelable : Parcelable {
-    var priceType: TradeItOrderPriceType? = null
-    var displayLabel: String? = null
+    var priceType: TradeItOrderPriceType
+    var displayLabel: String
 
     internal constructor(priceType: TradeItOrderPriceType, displayLabel: String) {
         this.priceType = priceType
@@ -16,17 +16,19 @@ class TradeItOrderPriceTypeParcelable : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
-        val that = other as TradeItOrderPriceTypeParcelable?
+        other as TradeItOrderPriceTypeParcelable
 
-        if (priceType != that!!.priceType) return false
-        return if (displayLabel != null) displayLabel == that.displayLabel else that.displayLabel == null
+        if (priceType != other.priceType) return false
+        if (displayLabel != other.displayLabel) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = if (priceType != null) priceType!!.hashCode() else 0
-        result = 31 * result + if (displayLabel != null) displayLabel!!.hashCode() else 0
+        var result = priceType.hashCode()
+        result = 31 * result + displayLabel.hashCode()
         return result
     }
 
@@ -35,13 +37,13 @@ class TradeItOrderPriceTypeParcelable : Parcelable {
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(if (this.priceType == null) -1 else this.priceType!!.ordinal)
+        dest.writeInt(this.priceType.ordinal)
         dest.writeString(this.displayLabel)
     }
 
     protected constructor(`in`: Parcel) {
         val tmpPriceType = `in`.readInt()
-        this.priceType = if (tmpPriceType == -1) null else TradeItOrderPriceType.values()[tmpPriceType]
+        this.priceType = TradeItOrderPriceType.values()[tmpPriceType]
         this.displayLabel = `in`.readString()
     }
 

@@ -18,13 +18,13 @@ import kotlin.collections.HashMap
 class TradeItLinkedBrokerAccountParcelable : Parcelable {
 
     @SerializedName("accountName")
-    var accountName: String? = null
+    var accountName: String
 
     @SerializedName("accountNumber")
-    var accountNumber: String? = null
+    var accountNumber: String
 
     @SerializedName("accountBaseCurrency")
-    var accountBaseCurrency: String? = null
+    var accountBaseCurrency: String
 
     @SerializedName("userCanDisableMargin")
     var userCanDisableMargin: Boolean = false
@@ -171,26 +171,6 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         return positionsParcelable
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
-
-        val that = other as TradeItLinkedBrokerAccountParcelable?
-
-        if (if (accountName != null) accountName != that!!.accountName else that!!.accountName != null)
-            return false
-        if (if (accountNumber != null) accountNumber != that.accountNumber else that.accountNumber != null)
-            return false
-        return if (accountBaseCurrency != null) accountBaseCurrency == that.accountBaseCurrency else that.accountBaseCurrency == null
-
-    }
-
-    override fun hashCode(): Int {
-        var result = if (accountName != null) accountName!!.hashCode() else 0
-        result = 31 * result + if (accountNumber != null) accountNumber!!.hashCode() else 0
-        result = 31 * result + if (accountBaseCurrency != null) accountBaseCurrency!!.hashCode() else 0
-        return result
-    }
 
     override fun toString(): String {
         return "TradeItLinkedBrokerAccountParcelable{" +
@@ -218,6 +198,35 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         dest.writeList(this.positions)
         dest.writeString(this.userId)
         userId?.let {userId ->  linkedBrokersMap[userId] = this.linkedBroker }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TradeItLinkedBrokerAccountParcelable
+
+        if (accountName != other.accountName) return false
+        if (accountNumber != other.accountNumber) return false
+        if (accountBaseCurrency != other.accountBaseCurrency) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = accountName.hashCode()
+        result = 31 * result + accountNumber.hashCode()
+        result = 31 * result + accountBaseCurrency.hashCode()
+        result = 31 * result + userCanDisableMargin.hashCode()
+        result = 31 * result + orderCapabilities.hashCode()
+        result = 31 * result + (linkedBroker?.hashCode() ?: 0)
+        result = 31 * result + (balance?.hashCode() ?: 0)
+        result = 31 * result + (fxBalance?.hashCode() ?: 0)
+        result = 31 * result + (balanceLastUpdated?.hashCode() ?: 0)
+        result = 31 * result + (positions?.hashCode() ?: 0)
+        result = 31 * result + (ordersStatus?.hashCode() ?: 0)
+        result = 31 * result + (userId?.hashCode() ?: 0)
+        return result
     }
 
     protected constructor(`in`: Parcel) {

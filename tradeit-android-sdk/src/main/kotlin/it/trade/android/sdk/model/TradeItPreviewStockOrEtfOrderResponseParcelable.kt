@@ -10,10 +10,10 @@ class TradeItPreviewStockOrEtfOrderResponseParcelable : Parcelable {
     var orderId: String = ""
 
     @get:Deprecated("Use orderDetails.warnings")
-    var ackWarningsList: List<String> = arrayListOf()
+    var ackWarningsList: List<String>? = arrayListOf()
 
     @get:Deprecated("Use orderDetails.warnings")
-    var warningsList: List<String> = arrayListOf()
+    var warningsList: List<String>? = arrayListOf()
     var orderDetails: TradeItOrderDetailsParcelable? = null
 
     internal constructor(response: TradeItPreviewStockOrEtfOrderResponse) {
