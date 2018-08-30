@@ -153,12 +153,12 @@ public class MainActivityTest {
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         UiSelector selector = new UiSelector();
-        UiObject login = device.findObject(selector.resourceId("loginUser"));
+        UiObject login = device.findObject(selector.className(EditText.class).instance(0));
         login.clearTextField();
         login.click();
         login.setText(dummyLogin);
 
-        UiObject password = device.findObject(selector.resourceId("loginPwd"));
+        UiObject password = device.findObject(selector.className(EditText.class).instance(1));
         password.clearTextField();
         password.click();
         password.setText("dummy");
@@ -169,7 +169,7 @@ public class MainActivityTest {
         Thread.sleep(3000l); //TODO there should be a better way for waiting
 
         if ("dummySecurity".equals(dummyLogin) || "dummyOption".equals(dummyLogin)) {
-            UiObject answer = device.findObject(selector.resourceId("securityAnswer"));
+            UiObject answer = device.findObject(selector.className(EditText.class).instance(0));
             answer.clearTextField();
             answer.click();
             answer.setText("dummySecurity".equals(dummyLogin) ? "tradingticket" : "option 1");
@@ -199,6 +199,7 @@ public class MainActivityTest {
 
         appCompatCheckedTextView.perform(click());
     }
+
     private void testGetLinkedBrokers(int number) throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.GET_LINKED_BROKERS.getLabel());
 
@@ -260,7 +261,7 @@ public class MainActivityTest {
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.preview_order_textview,"TradeItPlaceStockOrEtfOrderResponseParcelable{broker='Dummy', confirmationMessage='Your order message");
+        checkFieldContainsText(R.id.preview_order_textview, "TradeItPlaceStockOrEtfOrderResponseParcelable{broker='Dummy', confirmationMessage='Your order message");
 
         navigateUp();
     }

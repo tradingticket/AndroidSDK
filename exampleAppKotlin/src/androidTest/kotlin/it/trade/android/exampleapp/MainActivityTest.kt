@@ -25,7 +25,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     var mActivityTestRule: ActivityTestRule<MainActivity> = object : ActivityTestRule<MainActivity>(MainActivity::class.java) {
         override fun beforeActivityLaunched() {
             clearSharedPrefs(InstrumentationRegistry.getTargetContext(), TradeItKeystoreService.TRADE_IT_SHARED_PREFS_KEY)
@@ -137,13 +138,15 @@ class MainActivityTest {
 
         Thread.sleep(3000L) //TODO there should be a better way for waiting
 
+        val name = "android.widget.EditText"
+
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val login = device.findObject(UiSelector().resourceId("loginUser"))
+        val login = device.findObject(UiSelector().className(name).instance(0))
         login.clearTextField()
         login.click()
         login.text = dummyLogin
 
-        val password = device.findObject(UiSelector().resourceId("loginPwd"))
+        val password = device.findObject(UiSelector().className(name).instance(1))
         password.clearTextField()
         password.click()
         password.text = "dummy"
@@ -154,7 +157,7 @@ class MainActivityTest {
         Thread.sleep(3000L) //TODO there should be a better way for waiting
 
         if (dummyLogin in arrayOf("dummySecurity", "dummyOption")) {
-            device.findObject(UiSelector().resourceId("securityAnswer")).run {
+            device.findObject(UiSelector().className(name).instance(0)).run {
                 clearTextField()
                 click()
                 text = if (dummyLogin == "dummySecurity") "tradingticket" else "option 1"
