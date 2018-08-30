@@ -12,7 +12,7 @@ class LinkedBrokerAccountsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_linked_broker_accounts)
-        val textView = linked_broker_accounts_textview //this.findViewById(R.id.linked_broker_accounts_textview) as TextView?
+        val textView = linked_broker_accounts_textview
 
         val intent = intent
         val linkedBrokerAccounts = intent.getParcelableArrayListExtra<TradeItLinkedBrokerAccountParcelable>(MainActivity.LINKED_BROKER_ACCOUNTS_PARAMETER)
