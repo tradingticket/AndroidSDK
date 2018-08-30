@@ -36,38 +36,28 @@ public class TradeItOrderDetailsParcelable implements Parcelable {
 
     @Override
     public String toString() {
-        final String strDelimiter = "', ";
-        final String numberDelimiter = ", ";
-        StringBuilder builder = new StringBuilder();
-        builder.append("OrderDetails{");
-        builder.append("orderSymbol='").append(orderSymbol).append(strDelimiter);
-        builder.append("orderAction='").append(orderAction).append(strDelimiter);
-        builder.append("orderQuantity=").append(orderQuantity).append(numberDelimiter);
-        builder.append("orderExpiration='").append(orderExpiration).append(strDelimiter);
-        builder.append("orderPrice='").append(orderPrice).append(strDelimiter);
-        builder.append("orderValueLabel='").append(orderValueLabel).append(strDelimiter);
-        builder.append("orderCommissionLabel='").append(orderCommissionLabel).append(strDelimiter);
-        builder.append("orderMessage='").append(orderMessage).append(strDelimiter);
-        builder.append("lastPrice='").append(lastPrice).append(strDelimiter);
-        builder.append("bidPrice='").append(bidPrice).append(strDelimiter);
-        builder.append("askPrice='").append(askPrice).append(strDelimiter);
-        builder.append("timestamp='").append(timestamp).append(strDelimiter);
-        builder.append("buyingPower=").append(buyingPower).append(numberDelimiter);
-        builder.append("availableCash=").append(availableCash).append(numberDelimiter);
-        builder.append("estimatedOrderCommission=").append(estimatedOrderCommission).append(numberDelimiter);
-        builder.append("longHoldings=").append(longHoldings).append(numberDelimiter);
-        builder.append("shortHoldings=").append(shortHoldings).append(numberDelimiter);
-        builder.append("estimatedOrderValue=").append(estimatedOrderValue).append(numberDelimiter);
-        builder.append("estimatedTotalValue=").append(estimatedTotalValue).append(numberDelimiter);
-        builder.append("warnings=[");
-        for (TradeItWarningParcelable warning: warnings) {
-            builder.append(warning.toString()).append(numberDelimiter);
-        }
-        builder.append("]");
-
-        builder.append("}");
-
-        return builder.toString();
+        return "TradeItOrderDetailsParcelable{" +
+                "orderSymbol='" + orderSymbol + '\'' +
+                ", orderAction='" + orderAction + '\'' +
+                ", orderQuantity=" + orderQuantity +
+                ", orderExpiration='" + orderExpiration + '\'' +
+                ", orderPrice='" + orderPrice + '\'' +
+                ", orderValueLabel='" + orderValueLabel + '\'' +
+                ", orderCommissionLabel='" + orderCommissionLabel + '\'' +
+                ", orderMessage='" + orderMessage + '\'' +
+                ", lastPrice='" + lastPrice + '\'' +
+                ", bidPrice='" + bidPrice + '\'' +
+                ", askPrice='" + askPrice + '\'' +
+                ", timestamp='" + timestamp + '\'' +
+                ", buyingPower=" + buyingPower +
+                ", availableCash=" + availableCash +
+                ", estimatedOrderCommission=" + estimatedOrderCommission +
+                ", longHoldings=" + longHoldings +
+                ", shortHoldings=" + shortHoldings +
+                ", estimatedOrderValue=" + estimatedOrderValue +
+                ", estimatedTotalValue=" + estimatedTotalValue +
+                ", warnings=" + warnings +
+                '}';
     }
 
     TradeItOrderDetailsParcelable(OrderDetails orderDetails) {

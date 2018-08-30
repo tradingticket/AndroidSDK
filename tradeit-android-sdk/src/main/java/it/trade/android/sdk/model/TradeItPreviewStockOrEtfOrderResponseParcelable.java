@@ -27,10 +27,10 @@ public class TradeItPreviewStockOrEtfOrderResponseParcelable implements Parcelab
     @Override
     public String toString() {
         return "TradeItPreviewStockOrEtfOrderResponseParcelable{" +
-                "orderId='" + orderId + "'" +
-                ", ackWarningsList=[]" +
-                ", warningsList=[]" +
-                ", orderDetails=" + orderDetails.toString() +
+                "orderId='" + orderId + '\'' +
+                ", ackWarningsList=" + ackWarningsList +
+                ", warningsList=" + warningsList +
+                ", orderDetails=" + orderDetails +
                 '}';
     }
 
