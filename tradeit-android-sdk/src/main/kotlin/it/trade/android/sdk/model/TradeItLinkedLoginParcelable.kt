@@ -2,21 +2,13 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.os.Parcelable
-
-import it.trade.model.reponse.TradeItLinkLoginResponse
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
-import it.trade.model.request.TradeItLinkLoginRequest
 import it.trade.model.request.TradeItLinkedLogin
 import it.trade.model.request.TradeItOAuthAccessTokenRequest
 
 
 class TradeItLinkedLoginParcelable : TradeItLinkedLogin, Parcelable {
     constructor(broker: String, userId: String, userToken: String) : super(broker, userId, userToken) {}
-
-    constructor(
-        linkLoginRequest: TradeItLinkLoginRequest,
-        linkLoginResponse: TradeItLinkLoginResponse
-    ) : super(linkLoginRequest, linkLoginResponse) {}
 
     constructor(
         oAuthAccessTokenRequest: TradeItOAuthAccessTokenRequest,

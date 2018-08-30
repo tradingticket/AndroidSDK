@@ -171,7 +171,7 @@ class TradeItLinkedBrokerManagerSpec {
             }
 
             // and an already linked broker with this user id
-            val request = TradeItOAuthAccessTokenRequest("My oAuthVerifier")
+            val request = TradeItOAuthAccessTokenRequest(apiKey, "My oAuthVerifier")
             val response = TradeItOAuthAccessTokenResponse()
             response.userId = myUserId
             response.userToken = "My old userToken"

@@ -6,8 +6,8 @@ import android.content.SharedPreferences.Editor
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.*
 import it.trade.model.reponse.TradeItBrokerAccount
-import it.trade.model.reponse.TradeItLinkLoginResponse
-import it.trade.model.request.TradeItLinkLoginRequest
+import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
+import it.trade.model.request.TradeItOAuthAccessTokenRequest
 import org.junit.jupiter.api.*
 import org.mockito.ArgumentMatchers.anySet
 import org.mockito.ArgumentMatchers.anyString
@@ -24,15 +24,18 @@ class TradeItLinkedBrokerCacheSpec {
     val editor: Editor = mock()
     val userId = "My userId"
     var linkedLogin: TradeItLinkedLoginParcelable? = null
-    val linkLoginRequest = TradeItLinkLoginRequest("my id", "my password", "broker")
-    val linkLoginResponse = TradeItLinkLoginResponse()
+    val oAuthAccessTokenRequest = TradeItOAuthAccessTokenRequest(
+        "My Api Key",
+        "oauth verifier"
+    )
+    val OAuthAccessTokenResponse = TradeItOAuthAccessTokenResponse()
 
     @BeforeEach
     fun init() {
         clearInvocations(editor)
-        linkLoginResponse.userId = userId
-        linkLoginResponse.userToken = "My userToken"
-        linkedLogin = TradeItLinkedLoginParcelable(linkLoginRequest, linkLoginResponse)
+        OAuthAccessTokenResponse.userId = userId
+        OAuthAccessTokenResponse.userToken = "My userToken"
+        linkedLogin = TradeItLinkedLoginParcelable(oAuthAccessTokenRequest, OAuthAccessTokenResponse)
 
         whenever(context.getSharedPreferences(anyString(), eq(Context.MODE_PRIVATE)))
             .thenReturn(sharedPreferences)

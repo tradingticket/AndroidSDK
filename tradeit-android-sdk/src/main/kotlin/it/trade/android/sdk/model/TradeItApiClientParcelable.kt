@@ -3,11 +3,9 @@ package it.trade.android.sdk.model
 import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
-
-import it.trade.api.TradeItApi
+import it.trade.api.StatelessTradeItApiClient
 import it.trade.api.TradeItApiClient
 import it.trade.model.request.TradeItEnvironment
-import it.trade.model.request.TradeItRequestWithKey
 
 class TradeItApiClientParcelable : TradeItApiClient, Parcelable {
 
@@ -22,7 +20,10 @@ class TradeItApiClientParcelable : TradeItApiClient, Parcelable {
         this.requestInterceptorParcelable = requestInterceptorParcelable
     }
 
-    protected constructor(tradeItApi: TradeItApi) : super(tradeItApi) {}
+    protected constructor(
+        apiKey: String,
+        statelessTradeItApiClient: StatelessTradeItApiClient
+    ) : super(apiKey, statelessTradeItApiClient) {}
 
     override fun describeContents(): Int {
         return 0
@@ -43,8 +44,11 @@ class TradeItApiClientParcelable : TradeItApiClient, Parcelable {
         val tmpEnvironment = `in`.readInt()
         this.environment = if (tmpEnvironment == -1) null else TradeItEnvironment.values()[tmpEnvironment]
         this.apiKey = `in`.readString()
-        TradeItRequestWithKey.API_KEY = apiKey
-        this.tradeItApi = this.createTradeItApi(environment, requestInterceptorParcelable, forceTLS12())
+        this.statelessTradeItApiClient = this.createStatelessTradeItApiClient(
+            environment,
+            requestInterceptorParcelable,
+            forceTLS12()
+        );
     }
 
     companion object {

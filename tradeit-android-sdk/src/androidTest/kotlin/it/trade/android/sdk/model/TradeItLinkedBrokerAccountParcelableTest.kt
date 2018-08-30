@@ -29,8 +29,10 @@ class TradeItLinkedBrokerAccountParcelableTest {
         TradeItSDK.clearConfig()
         TradeItSDK.configure(TradeItConfigurationBuilder(instrumentationCtx.applicationContext, "tradeit-test-api-key", TradeItEnvironment.QA))
 
-        val oAuthAccessTokenRequest = TradeItOAuthAccessTokenRequest("MyOauthVerifier")
-        oAuthAccessTokenRequest.apiKey = "MyApiKey"
+        val oAuthAccessTokenRequest = TradeItOAuthAccessTokenRequest(
+            "MyApiKey",
+            "MyOauthVerifier"
+        )
         val oAuthAccessTokenResponse = TradeItOAuthAccessTokenResponse()
         oAuthAccessTokenResponse.userId = "MyUserId"
         oAuthAccessTokenResponse.userToken = "MyUserToken"
