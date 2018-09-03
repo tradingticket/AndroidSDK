@@ -62,14 +62,14 @@ class TradeItOrderCapabilityParcelableTest {
 
         // Verify that the received data is correct.
         assertThat(instrument, `is`(Instrument.EQUITIES))
-        assertFalse(actions!!.isEmpty())
-        assertThat(actions[0].action!!.actionValue, `is`(action!!.value))
+        assertFalse(actions.isEmpty())
+        assertThat(actions[0].action.actionValue, `is`(action!!.value))
         assertThat(actions[0].displayLabel, `is`(action!!.displayLabel))
-        assertFalse(expirationTypes!!.isEmpty())
-        assertThat(expirationTypes[0].expirationType!!.expirationValue, `is`(expirationType!!.value))
+        assertFalse(expirationTypes.isEmpty())
+        assertThat(expirationTypes[0].expirationType.expirationValue, `is`(expirationType!!.value))
         assertThat(expirationTypes[0].displayLabel, `is`(expirationType!!.displayLabel))
-        assertFalse(priceTypes!!.isEmpty())
-        assertThat(priceTypes[0].priceType!!.priceTypeValue, `is`(priceType!!.value))
+        assertFalse(priceTypes.isEmpty())
+        assertThat(priceTypes[0].priceType.priceTypeValue, `is`(priceType!!.value))
         assertThat(priceTypes[0].displayLabel, `is`(priceType!!.displayLabel))
     }
 

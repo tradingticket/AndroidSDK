@@ -97,7 +97,7 @@ class TradeItLinkedBrokerAccountParcelableTest {
         val createdPositions = createdFromParcel.positions
         val orderCapabilities = createdFromParcel.orderCapabilities
 
-        val actionParcelable = orderCapabilities[0].actions!![0]
+        val actionParcelable = orderCapabilities[0].actions[0]
 
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue())
@@ -111,7 +111,7 @@ class TradeItLinkedBrokerAccountParcelableTest {
         assertThat(createdBalance, `is`(balance))
         assertThat(createdPositions, `is`<List<TradeItPositionParcelable>>(positions))
         assertThat(orderCapabilities.isEmpty(), `is`(false))
-        assertThat(actionParcelable.action!!.actionValue, `is`("buy"))
+        assertThat(actionParcelable.action.actionValue, `is`("buy"))
         assertThat(actionParcelable.displayLabel, `is`("Buy"))
     }
 }
