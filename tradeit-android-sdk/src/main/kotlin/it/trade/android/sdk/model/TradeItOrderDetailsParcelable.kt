@@ -97,6 +97,17 @@ class TradeItOrderDetailsParcelable : Parcelable {
         dest.writeTypedList(this.warnings)
     }
 
+    override fun toString(): String {
+        return "TradeItOrderDetailsParcelable{orderSymbol='$orderSymbol', orderAction='$orderAction'" +
+                ", orderQuantity=$orderQuantity, orderExpiration='$orderExpiration', orderPrice='$orderPrice'" +
+                ", orderValueLabel='$orderValueLabel', orderCommissionLabel='$orderCommissionLabel'" +
+                ", orderMessage='$orderMessage', lastPrice='$lastPrice', bidPrice='$bidPrice', askPrice='$askPrice'" +
+                ", timestamp=$timestamp, buyingPower=$buyingPower, availableCash=$availableCash" +
+                ", estimatedOrderCommission=$estimatedOrderCommission, longHoldings=$longHoldings" +
+                ", shortHoldings=$shortHoldings, estimatedOrderValue=$estimatedOrderValue" +
+                ", estimatedTotalValue=$estimatedTotalValue, warnings=$warnings}"
+    }
+
     protected constructor(`in`: Parcel) {
         this.orderSymbol = `in`.readString()
         this.orderAction = `in`.readString()
