@@ -2,8 +2,8 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.support.test.InstrumentationRegistry
+import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
-import android.test.suitebuilder.annotation.SmallTest
 import it.trade.android.sdk.TradeItConfigurationBuilder
 import it.trade.android.sdk.TradeItSDK
 import it.trade.model.reponse.*
