@@ -21,7 +21,7 @@ import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker
 
 class OauthLinkBrokerActivity : AppCompatActivity(), CustomTabActivityHelper.ConnectionCallback {
-    private var linkedBrokerManager = TradeItSDK.getLinkedBrokerManager()
+    private var linkedBrokerManager = TradeItSDK.linkedBrokerManager
     private lateinit var oAuthResultTextView: TextView
     private lateinit var brokersSpinner: Spinner
     private lateinit var customTabActivityHelper: CustomTabActivityHelper
@@ -104,15 +104,17 @@ class OauthLinkBrokerActivity : AppCompatActivity(), CustomTabActivityHelper.Con
     }
 
     fun relinkOauthFlow(userId: String?) {
-        linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrlByUserId(userId, APP_DEEP_LINK, object : TradeItCallback<String> {
-            override fun onSuccess(oAuthUrl: String) {
-                launchCustomTab(oAuthUrl)
-            }
+        userId?.let {
+            linkedBrokerManager.getOAuthLoginPopupForTokenUpdateUrlByUserId(userId!!, APP_DEEP_LINK, object : TradeItCallback<String> {
+                override fun onSuccess(oAuthUrl: String) {
+                    launchCustomTab(oAuthUrl)
+                }
 
-            override fun onError(error: TradeItErrorResult) {
-                oAuthResultTextView.text = "getOAuthLoginPopupForTokenUpdateUrlByUserId Error: $error\n"
-            }
-        })
+                override fun onError(error: TradeItErrorResult) {
+                    oAuthResultTextView.text = "getOAuthLoginPopupForTokenUpdateUrlByUserId Error: $error\n"
+                }
+            })
+        }
     }
 
     private fun launchCustomTab(url: String) {

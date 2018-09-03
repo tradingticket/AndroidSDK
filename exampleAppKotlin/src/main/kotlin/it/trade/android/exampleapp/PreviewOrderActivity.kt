@@ -45,31 +45,35 @@ class PreviewOrderActivity : AppCompatActivity() {
     }
 
     fun placeTrade(view: View) {
-        order!!.placeOrder(orderId, object : TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable> {
-            override fun onSuccess(placeOrderResponse: TradeItPlaceStockOrEtfOrderResponseParcelable) {
-                textView!!.append(placeOrderResponse.toString())
-                cancelOrderButton!!.isEnabled = true
-                orderNumber = placeOrderResponse.orderNumber
-            }
+        orderId?.let {
+            order!!.placeOrder(orderId!!, object : TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable> {
+                override fun onSuccess(placeOrderResponse: TradeItPlaceStockOrEtfOrderResponseParcelable) {
+                    textView!!.append(placeOrderResponse.toString())
+                    cancelOrderButton!!.isEnabled = true
+                    orderNumber = placeOrderResponse.orderNumber
+                }
 
-            override fun onError(error: TradeItErrorResult) {
-                Log.e(TAG, "ERROR placeOrder: " + error.toString())
-                textView!!.text = "ERROR placeOrder: $error"
-            }
-        })
+                override fun onError(error: TradeItErrorResult) {
+                    Log.e(TAG, "ERROR placeOrder: " + error.toString())
+                    textView!!.text = "ERROR placeOrder: $error"
+                }
+            })
+        }
     }
 
     fun cancelOrder(view: View) {
-        order!!.linkedBrokerAccount.cancelOrder(orderNumber, object : TradeItCallback<TradeItOrderStatusParcelable> {
-            override fun onSuccess(orderStatusParcelable: TradeItOrderStatusParcelable) {
-                textView!!.append(orderStatusParcelable.toString())
-            }
+        orderNumber?.let {
+            order!!.linkedBrokerAccount?.cancelOrder(orderNumber!!, object : TradeItCallback<TradeItOrderStatusParcelable> {
+                override fun onSuccess(orderStatusParcelable: TradeItOrderStatusParcelable) {
+                    textView!!.append(orderStatusParcelable.toString())
+                }
 
-            override fun onError(error: TradeItErrorResult) {
-                Log.e(TAG, "ERROR cancelOrder: " + error.toString())
-                textView!!.text = "ERROR cancelOrder: $error"
-            }
-        })
+                override fun onError(error: TradeItErrorResult) {
+                    Log.e(TAG, "ERROR cancelOrder: " + error.toString())
+                    textView!!.text = "ERROR cancelOrder: $error"
+                }
+            })
+        }
     }
 
     companion object {

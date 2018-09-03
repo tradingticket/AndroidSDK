@@ -13,13 +13,13 @@ object TradeItSDK {
     private var instance: TradeItSdkInstance? = null
 
     @JvmStatic
-    val linkedBrokerManager: TradeItLinkedBrokerManager?
+    val linkedBrokerManager: TradeItLinkedBrokerManager
         @Throws(TradeItSDKConfigurationException::class)
         get() {
             if (instance == null) {
                 throw TradeItSDKConfigurationException("ERROR: TradeItSDK.linkedBrokerManager referenced before calling TradeItSDK.configure()!")
             }
-            return instance!!.linkedBrokerManager
+            return instance!!.linkedBrokerManager!!
         }
 
     val environment: TradeItEnvironment?

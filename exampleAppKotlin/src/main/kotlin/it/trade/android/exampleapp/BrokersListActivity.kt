@@ -12,7 +12,7 @@ import it.trade.model.reponse.TradeItAvailableBrokersResponse.Broker
 import kotlinx.android.synthetic.main.activity_brokers_list.*
 
 class BrokersListActivity : AppCompatActivity() {
-    private var linkedBrokerManager = TradeItSDK.getLinkedBrokerManager()
+    private var linkedBrokerManager = TradeItSDK.linkedBrokerManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +24,7 @@ class BrokersListActivity : AppCompatActivity() {
         val action = intent.extras!!.get(MainActivity.GET_BROKERS_LIST_PARAMETER) as MainActivity.MainActivityActions
         val brokersListActivity = this
         when (action) {
-            MainActivity.MainActivityActions.GET_ALL_FEATURED_BROKERS -> linkedBrokerManager.getAllFeaturedBrokers(object : TradeItCallback<List<Broker>> {
+            MainActivity.MainActivityActions.GET_ALL_FEATURED_BROKERS -> linkedBrokerManager?.getAllFeaturedBrokers(object : TradeItCallback<List<Broker>> {
                 override fun onSuccess(brokersList: List<Broker>) {
                     brokersSpinner!!.adapter = BrokerAdapter(brokersListActivity, brokersList)
                     textView.text = brokersList.toString()
@@ -34,7 +34,7 @@ class BrokersListActivity : AppCompatActivity() {
                     textView.text = error.toString()
                 }
             })
-            MainActivity.MainActivityActions.GET_ALL_NON_FEATURED_BROKERS -> linkedBrokerManager.getAllNonFeaturedBrokers(object : TradeItCallback<List<Broker>> {
+            MainActivity.MainActivityActions.GET_ALL_NON_FEATURED_BROKERS -> linkedBrokerManager?.getAllNonFeaturedBrokers(object : TradeItCallback<List<Broker>> {
                 override fun onSuccess(brokersList: List<Broker>) {
                     brokersSpinner!!.adapter = BrokerAdapter(brokersListActivity, brokersList)
                     textView.text = brokersList.toString()

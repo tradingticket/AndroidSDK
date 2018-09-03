@@ -16,7 +16,7 @@ import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl
 class ParceledAccountActivity : AppCompatActivity() {
     private lateinit var textView: TextView
     private lateinit var linkedBrokerAccount: TradeItLinkedBrokerAccountParcelable
-    private lateinit var originalLinkedBrokerAccount: TradeItLinkedBrokerAccountParcelable
+    private var originalLinkedBrokerAccount: TradeItLinkedBrokerAccountParcelable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +26,8 @@ class ParceledAccountActivity : AppCompatActivity() {
         val intent = intent
         linkedBrokerAccount = intent.getParcelableExtra(MainActivity.PARCELED_ACCOUNT_PARAMETER)
         originalLinkedBrokerAccount = TradeItSDK
-                .getLinkedBrokerManager()
-                .getLinkedBrokerByUserId(linkedBrokerAccount.linkedBroker.linkedLogin.userId)!!
+                .linkedBrokerManager
+                .getLinkedBrokerByUserId(linkedBrokerAccount.linkedBroker?.linkedLogin?.userId!!)!!
                 .getLinkedBrokerAccount(linkedBrokerAccount.accountNumber)
 
         val message = ("Parceled LinkedBrokerAccount(@"
@@ -77,7 +77,7 @@ class ParceledAccountActivity : AppCompatActivity() {
                         + "LinkedBrokerManager->LinkedBrokerAccount.positions(@"
                         + System.identityHashCode(originalLinkedBrokerAccount)
                         + "):\n"
-                        + originalLinkedBrokerAccount.positions.toString())
+                        + originalLinkedBrokerAccount?.positions.toString())
                 textView.text = message
             }
 
@@ -88,7 +88,7 @@ class ParceledAccountActivity : AppCompatActivity() {
     }
 
     fun authenticate(view: View) {
-        linkedBrokerAccount.linkedBroker.authenticate(object : TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+        linkedBrokerAccount.linkedBroker?.authenticate(object : TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
             override fun onSecurityQuestion(securityQuestion: TradeItSecurityQuestion) {
 
             }

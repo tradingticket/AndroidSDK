@@ -28,9 +28,10 @@ import it.trade.model.TradeItErrorResult
 import it.trade.model.TradeItSecurityQuestion
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl
+import it.trade.model.reponse.TradeItResponse
 import it.trade.model.request.TradeItEnvironment
-import java.util.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -137,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
         TradeItSDK.configure(configurationBuilder)
 
-        linkedBrokerManager = TradeItSDK.getLinkedBrokerManager()
+        linkedBrokerManager = TradeItSDK.linkedBrokerManager
     }
 
     private fun initTable() {
@@ -227,8 +228,8 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "# of linkedBrokers before deletion: " + linkedBrokersToDelete.size)
 
             for (linkedBroker in ArrayList(linkedBrokersToDelete)) {
-                linkedBrokerManager.unlinkBroker(linkedBroker, object : TradeItCallback<Any> {
-                    override fun onSuccess(type: Any) {
+                linkedBrokerManager.unlinkBroker(linkedBroker, object : TradeItCallback<TradeItResponse> {
+                    override fun onSuccess(type: TradeItResponse) {
                         Log.d(TAG, "# of linkedBrokers after deletion: " + linkedBrokerManager.linkedBrokers.size)
                     }
 
@@ -325,7 +326,11 @@ class MainActivity : AppCompatActivity() {
             linkedBrokers[0].accounts.isEmpty() -> showAlert("refreshAllBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.")
             else -> {
                 val linkedBroker = linkedBrokers[0]
-                linkedBroker.refreshAccountBalances { goToLinkedBrokerAccountsActivity(linkedBroker.accounts) }
+                linkedBroker.refreshAccountBalances(object: TradeItCallBackCompletion {
+                    override fun onFinished() {
+                        goToLinkedBrokerAccountsActivity(linkedBroker.accounts)
+                    }
+                })
             }
         }
     }
@@ -336,7 +341,11 @@ class MainActivity : AppCompatActivity() {
         when {
             linkedBrokers.isEmpty() -> showAlert("refreshAllBalancesFirstLinkedBroker", "No linked broker!")
             linkedBrokers[0].accounts.isEmpty() -> showAlert("refreshAllBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.")
-            else -> linkedBrokerManager.refreshAccountBalances { goToLinkedBrokersActivity() }
+            else -> linkedBrokerManager.refreshAccountBalances(object: TradeItCallBackCompletion {
+                override fun onFinished() {
+                    goToLinkedBrokersActivity()
+                }
+            })
         }
     }
 
@@ -424,7 +433,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun goToGetBrokersListActivity(action: MainActivityActions) {
+    private fun goToGetBrokersListActivity(action: MainActivity.MainActivityActions) {
         val intent = Intent(this.applicationContext, BrokersListActivity::class.java)
         intent.putExtra(GET_BROKERS_LIST_PARAMETER, action)
         startActivity(intent)
@@ -461,7 +470,7 @@ class MainActivity : AppCompatActivity() {
             showAlert("relinkFirstLinkedBroker", "No linked broker!")
         } else {
             val intentRelinkOauth = Intent(this, OauthLinkBrokerActivity::class.java)
-            intentRelinkOauth.putExtra(RELINK_OAUTH_PARAMETER, linkedBrokerManager.linkedBrokers[0].linkedLogin.userId)
+            intentRelinkOauth.putExtra(RELINK_OAUTH_PARAMETER, linkedBrokerManager.linkedBrokers[0].linkedLogin?.userId)
             startActivity(intentRelinkOauth)
         }
     }
