@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         TradeItConfigurationBuilder configurationBuilder = new TradeItConfigurationBuilder(
             this.getApplicationContext(),
-            "tradeit-test-api-key",
+            "test-all-brokers",
             TradeItEnvironment.QA
         );
 
@@ -490,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             final TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokers.get(0).getAccounts().get(0), "GE");
-            order.setLimitPrice(20.0);
+            order.setLimitPrice(10.0);
             order.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
             order.setPriceType(TradeItOrderPriceType.LIMIT);
             Intent intent = new Intent(mainActivity, PreviewOrderActivity.class);
