@@ -79,10 +79,12 @@ public class MainActivityTest {
     }
 
     @Test
-    public void testDummySecurity() throws InterruptedException {
-        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE.getLabel());
+    public void testDummySecurity() throws InterruptedException, UiObjectNotFoundException {
+        testOauthFlow("dummySecurity");
 
-        Thread.sleep(1600l); //TODO there should be a better way for waiting
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.getLabel());
+
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "What is your mother's maiden name");
 
@@ -95,20 +97,22 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(500l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummySecurity");
+        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS");
 
-        tapOnText("OK");
+        navigateUp();
+
+        testDeleteAllLinkedBrokers();
     }
 
     @Test
-    public void testDummyMultiple() throws InterruptedException {
-        ViewInteraction textView = onView(
-                allOf(withText(MainActivity.MainActivityActions.AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS.getLabel()), isDisplayed()));
-        textView.perform(click());
+    public void testDummyMultiple() throws InterruptedException, UiObjectNotFoundException {
+        testOauthFlow("dummyOption");
 
-        Thread.sleep(1600l); //TODO there should be a better way for waiting
+        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.getLabel());
+
+        Thread.sleep(2000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "Select an option from the following");
 
@@ -123,11 +127,13 @@ public class MainActivityTest {
 
         tapOnText("OK");
 
-        Thread.sleep(500l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(android.R.id.message, "Successfully Authenticate dummyOption");
+        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS");
 
-        tapOnText("OK");
+        navigateUp();
+
+        testDeleteAllLinkedBrokers();
     }
 
     //TODO FIXME - oAuth flow automated test doesn't work anymore
@@ -143,24 +149,37 @@ public class MainActivityTest {
 
         tapOnText("Link broker");
 
-        Thread.sleep(1500l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         UiSelector selector = new UiSelector();
-        UiObject login = device.findObject(selector.descriptionContains("Dummy Broker Username"));
+        UiObject login = device.findObject(selector.className(EditText.class).instance(0));
         login.clearTextField();
         login.click();
         login.setText(dummyLogin);
 
-        UiObject password = device.findObject(selector.className(EditText.class).instance(2));
+        UiObject password = device.findObject(selector.className(EditText.class).instance(1));
         password.clearTextField();
         password.click();
         password.setText("dummy");
 
-        UiObject button = device.findObject(selector.descriptionContains("Sign In"));
+        UiObject button = device.findObject(selector.textContains("Sign In"));
         button.click();
 
-        Thread.sleep(2000l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
+
+        if ("dummySecurity".equals(dummyLogin) || "dummyOption".equals(dummyLogin)) {
+            UiObject answer = device.findObject(selector.className(EditText.class).instance(0));
+            answer.clearTextField();
+            answer.click();
+            answer.setText("dummySecurity".equals(dummyLogin) ? "tradingticket" : "option 1");
+
+            UiObject submit = device.findObject(selector.textContains("Submit"));
+            submit.click();
+
+            Thread.sleep(3000l); //TODO there should be a better way for waiting
+        }
+
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "oAuthFlow Success:");
 
@@ -180,6 +199,7 @@ public class MainActivityTest {
 
         appCompatCheckedTextView.perform(click());
     }
+
     private void testGetLinkedBrokers(int number) throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.GET_LINKED_BROKERS.getLabel());
 
@@ -203,7 +223,7 @@ public class MainActivityTest {
     private void testAuthenticateAllLinkedBroker(int number) throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_ALL_LINKED_BROKERS.getLabel());
 
-        Thread.sleep(1000l); //TODO there should be a better way for waiting
+        Thread.sleep(3000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, number + " PARCELED LINKED BROKERS");
 
@@ -213,7 +233,7 @@ public class MainActivityTest {
     private void testRefreshAllBalanceForAllLinkedBroker() throws InterruptedException {
         tapOnText(MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.getLabel());
 
-        Thread.sleep(2000l); //TODO there should be a better way for waiting
+        Thread.sleep(5000l); //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_broker_accounts_textview, "Refreshed first account balance again just to test.\n# of linkedBroker accounts: ");
 
@@ -235,13 +255,13 @@ public class MainActivityTest {
 
         Thread.sleep(1000l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponseParcelable{orderId='1', ackWarningsList=[], warningsList=[], orderDetails=OrderDetails{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00', orderValueLabel='Estimated Cost', orderCommissionLabel='Broker fee', orderMessage='You are about to place a limit order to buy GE', lastPrice='null', bidPrice='null', askPrice='null'");
+        checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponseParcelable{orderId='1', orderDetails=TradeItOrderDetailsParcelable{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00', orderValueLabel='Estimated Cost', orderCommissionLabel='Broker fee', orderMessage='You are about to place a limit order to buy GE', lastPrice='null', bidPrice='null', askPrice='null'");
         //place trade
         tapOnText("Place trade");
 
         Thread.sleep(1500l); //TODO there should be a better way for waiting
 
-        checkFieldContainsText(R.id.preview_order_textview,"TradeItPlaceStockOrEtfOrderResponseParcelable{broker='Dummy', confirmationMessage='Your order message");
+        checkFieldContainsText(R.id.preview_order_textview, "TradeItPlaceStockOrEtfOrderResponseParcelable{broker='Dummy', confirmationMessage='Your order message");
 
         navigateUp();
     }

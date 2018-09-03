@@ -266,6 +266,7 @@ constructor(private val context: Context) {
         private val SECRET_KEY_FILE_NAME = "TRADE_IT_SECRET_KEY"
         private val TAG = TradeItKeystoreService::class.java.getName()
 
+        @JvmField
         val TRADE_IT_SHARED_PREFS_KEY = "TRADE_IT_SHARED_PREFS_KEY"
         private val TRADE_IT_LINKED_BROKERS_KEY = "TRADE_IT_LINKED_BROKERS_KEY"
 

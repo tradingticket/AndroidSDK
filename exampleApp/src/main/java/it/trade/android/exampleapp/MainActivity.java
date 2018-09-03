@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
         DELETE_ALL_LINKED_BROKERS("Delete all linked brokers"),
         AUTHENTICATE_FIRST_LINKED_BROKER("Authenticate first linked broker"),
         AUTHENTICATE_ALL_LINKED_BROKERS("Authenticate all linked brokers"),
-        AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE("Simple security question"),
-        AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS("Security question with options"),
+//        AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE("Simple security question"),
+//        AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS("Security question with options"),
         REFRESH_ALL_BALANCES_ALL_LINKED_BROKERS("Refresh all balances for all linked brokers"),
         REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER("Refresh all balances for first linked broker"),
         PARCEL_FIRST_LINKED_BROKER_ACCOUNT("Parcel first linked broker account"),
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         TradeItConfigurationBuilder configurationBuilder = new TradeItConfigurationBuilder(
             this.getApplicationContext(),
-            "test-all-brokers",
+            "tradeit-test-api-key",
             TradeItEnvironment.QA
         );
 
@@ -490,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             final TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokers.get(0).getAccounts().get(0), "GE");
-            order.setLimitPrice(10.0);
+            order.setLimitPrice(20.0);
             order.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
             order.setPriceType(TradeItOrderPriceType.LIMIT);
             Intent intent = new Intent(mainActivity, PreviewOrderActivity.class);

@@ -2,13 +2,14 @@
 
 buildscript {
     ext.kotlin_version = '1.2.61'
+    ext.anko_version = '0.10.5'
     repositories {
         jcenter()
         google()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0-alpha18'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
         classpath 'org.codehaus.groovy:groovy-android-gradle-plugin:1.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
