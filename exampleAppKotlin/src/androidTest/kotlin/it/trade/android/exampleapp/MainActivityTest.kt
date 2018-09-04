@@ -70,7 +70,7 @@ class MainActivityTest {
 
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.label)
 
-        Thread.sleep(2000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "What is your mother's maiden name")
 
@@ -83,7 +83,7 @@ class MainActivityTest {
 
         tapOnText("OK")
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS")
 
@@ -99,7 +99,7 @@ class MainActivityTest {
 
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.label)
 
-        Thread.sleep(2000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.alertTitle, "Select an option from the following")
 
@@ -114,7 +114,7 @@ class MainActivityTest {
 
         tapOnText("OK")
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS")
 
@@ -127,7 +127,7 @@ class MainActivityTest {
     private fun testOauthFlow(dummyLogin: String) {
         tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.label)
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "Brokers available:")
 
@@ -136,7 +136,7 @@ class MainActivityTest {
 
         tapOnText("Link broker")
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         val name = "android.widget.EditText"
 
@@ -154,7 +154,7 @@ class MainActivityTest {
         val button = device.findObject(UiSelector().textContains("Sign In"))
         button.click()
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         if (dummyLogin in arrayOf("dummySecurity", "dummyOption")) {
             device.findObject(UiSelector().className(name).instance(0)).run {
@@ -166,7 +166,7 @@ class MainActivityTest {
             val submit = device.findObject(UiSelector().text("Submit"))
             submit.click()
 
-            Thread.sleep(3000L) //TODO there should be a better way for waiting
+            waitAwhile() //TODO there should be a better way for waiting
         }
 
         checkFieldContainsText(R.id.oAuthTextViewResult, "oAuthFlow Success:")
@@ -192,7 +192,7 @@ class MainActivityTest {
     private fun testGetLinkedBrokers(number: Int) {
         tapOnText(MainActivity.MainActivityActions.GET_LINKED_BROKERS.label)
 
-        Thread.sleep(1000L) //TODO there should be a better way for waiting
+        waitAwhile()
 
         checkFieldContainsText(R.id.linked_brokers_textview, number.toString() + " PARCELED LINKED BROKERS")
 
@@ -203,7 +203,7 @@ class MainActivityTest {
     private fun testAuthenticateFirstLinkedBroker() {
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.label)
 
-        Thread.sleep(2000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS")
 
@@ -214,7 +214,7 @@ class MainActivityTest {
     private fun testAuthenticateAllLinkedBroker(number: Int) {
         tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_ALL_LINKED_BROKERS.label)
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.linked_brokers_textview, number.toString() + " PARCELED LINKED BROKERS")
 
@@ -225,7 +225,7 @@ class MainActivityTest {
     private fun testRefreshAllBalanceForAllLinkedBroker() {
         tapOnText(MainActivity.MainActivityActions.REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER.label)
 
-        Thread.sleep(5000L) //TODO there should be a better way for waiting
+        waitAwhile(5000L)
 
         checkFieldContainsText(R.id.linked_broker_accounts_textview, "Refreshed first account balance again just to test.\n# of linkedBroker accounts: ")
 
@@ -236,7 +236,7 @@ class MainActivityTest {
     private fun testPositionsFirstLinkedBrokerAccount() {
         tapOnText(MainActivity.MainActivityActions.GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT.label)
 
-        Thread.sleep(1000L) //TODO there should be a better way for waiting
+        waitAwhile()
 
         checkFieldContainsText(R.id.positions_textview, "[TradeItPosition{costbasis=103.34, holdingType='LONG', lastPrice=112.34, quantity=1.0, symbol='AAPL', symbolClass='EQUITY_OR_ETF'")
 
@@ -247,17 +247,21 @@ class MainActivityTest {
     private fun testPreviewAndPlaceTradeFirstLinkedBrokerAccount() {
         scrollAndTapOnText(MainActivity.MainActivityActions.PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT.label)
 
-        Thread.sleep(2000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview, "TradeItPreviewStockOrEtfOrderResponseParcelable{orderId='1', orderDetails=TradeItOrderDetailsParcelable{orderSymbol='GE', orderAction='buy', orderQuantity=1.0, orderExpiration='day', orderPrice='$20.00', orderValueLabel='Estimated Cost', orderCommissionLabel='Broker fee', orderMessage='You are about to place a limit order to buy GE', lastPrice='null', bidPrice='null', askPrice='null'")
         //place trade
         tapOnText("Place trade")
 
-        Thread.sleep(3000L) //TODO there should be a better way for waiting
+        waitAwhile() //TODO there should be a better way for waiting
 
         checkFieldContainsText(R.id.preview_order_textview, "TradeItPlaceStockOrEtfOrderResponseParcelable{broker='Dummy', confirmationMessage='Your order message")
 
         navigateUp()
+    }
+
+    private fun waitAwhile(millis: Long = 3000L) {
+        Thread.sleep(millis)
     }
 
     private fun testDeleteAllLinkedBrokers() {
