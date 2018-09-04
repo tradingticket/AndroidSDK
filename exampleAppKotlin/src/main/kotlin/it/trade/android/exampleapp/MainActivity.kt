@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
 
         val configurationBuilder = TradeItConfigurationBuilder(
                 this.applicationContext,
-                "tradeit-test-api-key",
+                "test-all-brokers",
                 TradeItEnvironment.QA
         )
 
