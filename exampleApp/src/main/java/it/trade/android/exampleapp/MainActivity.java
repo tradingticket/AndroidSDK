@@ -16,19 +16,23 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
+import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
+import it.trade.android.sdk.enums.TradeItOrderQuantityType;
 import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
+import it.trade.android.sdk.model.TradeItCryptoOrderParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerData;
@@ -40,6 +44,7 @@ import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
+import it.trade.model.reponse.Instrument;
 import it.trade.model.request.TradeItEnvironment;
 
 public class MainActivity extends AppCompatActivity {
@@ -75,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
         PARCEL_FIRST_LINKED_BROKER_ACCOUNT("Parcel first linked broker account"),
         GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT("Get positions for first linked broker account"),
         REFRESH_ORDERS_STATUS_FIRST_LINKED_BROKER_ACCOUNT("Refresh orders status for first linked broker account"),
-        PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account");
+        PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account"),
+        PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT("Preview crypto trade for first crypto broker account");
 
         private String label;
         MainActivityActions(String label) {
@@ -216,6 +222,10 @@ public class MainActivity extends AppCompatActivity {
                 case PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT:
                     Log.d(TAG, "preview trade first linked broker account was tapped!");
                     previewTradeFirstLinkedBroker();
+                    break;
+                case PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT:
+                    Log.d(TAG, "preview trade first crypto broker account was tapped!");
+                    previewCryptoTradeFirstCryptoBrokerAccount();
                     break;
                 case SYNC_LOCAL_LINKED_BROKERS:
                     Log.d(TAG, "synch local linked brokers was tapped!");
@@ -496,6 +506,44 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(mainActivity, PreviewOrderActivity.class);
             intent.putExtra(PREVIEW_ORDER_PARAMETER, order);
             startActivity(intent);
+        }
+    }
+
+    private void previewCryptoTradeFirstCryptoBrokerAccount() {
+        final MainActivity mainActivity = this;
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        if (linkedBrokers.isEmpty()) {
+            showAlert("previewTradeFirstLinkedBroker", "No linked broker!");
+        } else {
+            TradeItLinkedBrokerAccountParcelable cryptoAccount = null;
+            for (TradeItLinkedBrokerParcelable linkedBroker: linkedBrokers) {
+                if (cryptoAccount != null) {
+                    break;
+                }
+                for (TradeItLinkedBrokerAccountParcelable accountParcelable: linkedBroker.getAccounts()) {
+                    if(accountParcelable.getOrderCapabilityForInstrument(Instrument.CRYPTO) != null) {
+                        cryptoAccount = accountParcelable;
+                        break;
+                    }
+                }
+            }
+            if (cryptoAccount != null) {
+                final TradeItCryptoOrderParcelable cryptoOrderParcelable = new TradeItCryptoOrderParcelable(
+                        cryptoAccount,
+                        "BTC/USD",
+                        TradeItOrderAction.BUY
+                );
+                cryptoOrderParcelable.setPriceType(TradeItOrderPriceType.LIMIT);
+                cryptoOrderParcelable.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
+                cryptoOrderParcelable.setLimitPrice(new BigDecimal(2000.0));
+                cryptoOrderParcelable.setOrderQuantityType(TradeItOrderQuantityType.QUOTE_CURRENCY);
+                cryptoOrderParcelable.setQuantity(new BigDecimal(1.0));
+                Intent intent = new Intent(mainActivity, PreviewCryptoOrderActivity.class);
+                intent.putExtra(PREVIEW_ORDER_PARAMETER, cryptoOrderParcelable);
+                startActivity(intent);
+            } else {
+                showAlert("previewTradeFirstLinkedBroker", "No crypto account!");
+            }
         }
     }
 

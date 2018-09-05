@@ -47,6 +47,9 @@
             android:name=".PreviewOrderActivity"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".PreviewCryptoOrderActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".BrokersListActivity"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".OrdersStatusActivity"
