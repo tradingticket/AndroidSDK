@@ -7,10 +7,7 @@ import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
-import it.trade.model.reponse.CryptoPreviewOrderDetails
-import it.trade.model.reponse.TradeItErrorCode
-import it.trade.model.reponse.TradeItPreviewCryptoOrderResponse
-import it.trade.model.reponse.TradeItResponseStatus
+import it.trade.model.reponse.*
 import org.junit.jupiter.api.*
 import java.math.BigDecimal
 
@@ -54,7 +51,6 @@ class TradeItCryptoOrderParcelableSpec {
                 tradeItPreviewCryptoOrderResponse.orderDetails.orderPriceType = "market"
                 tradeItPreviewCryptoOrderResponse.orderDetails.estimatedTotalValue = 25.0
                 tradeItPreviewCryptoOrderResponse.orderDetails.orderCommissionLabel = "MyOrderCommissionLabel"
-                tradeItPreviewCryptoOrderResponse.orderDetails.orderValueLabel = "MyOrderValueLabel"
                 tradeItPreviewCryptoOrderResponse.orderDetails.orderQuantityType = "MyOrderQuantityType"
                 callback.onSuccess(tradeItPreviewCryptoOrderResponse);
             }
@@ -85,7 +81,6 @@ class TradeItCryptoOrderParcelableSpec {
             previewResponse!!.orderDetails!!.orderPriceType == "market"
             previewResponse!!.orderDetails!!.estimatedTotalValue == 25.0
             previewResponse!!.orderDetails!!.orderCommissionLabel == "MyOrderCommissionLabel"
-            previewResponse!!.orderDetails!!.orderValueLabel == "MyOrderValueLabel"
             previewResponse!!.orderDetails!!.orderQuantityType == "MyOrderQuantityType"
         }
 
@@ -134,4 +129,104 @@ class TradeItCryptoOrderParcelableSpec {
         }
     }
 
+    @Nested
+    inner class PlaceCryptoOrderTestCases {
+        @Test
+        fun `placeCryptoOrder handles a successful response from trade it`() {
+            // given a successful response from trade it
+            var successfulCallbackCount = 0
+            var errorCallbackCount = 0
+
+            whenever(linkedBrokerAccount.tradeItApiClient!!.placeCryptoOrder(any(), any())).then {
+                val callback = it.getArgument<TradeItCallback<TradeItPlaceCryptoOrderResponse>>(1)
+                val tradeItPlaceCryptoOrderResponse = TradeItPlaceCryptoOrderResponse()
+                tradeItPlaceCryptoOrderResponse.sessionToken = "My session token"
+                tradeItPlaceCryptoOrderResponse.longMessages = null
+                tradeItPlaceCryptoOrderResponse.status = TradeItResponseStatus.SUCCESS
+                tradeItPlaceCryptoOrderResponse.orderNumber = "My Order Id"
+                tradeItPlaceCryptoOrderResponse.orderDetails = CryptoTradeOrderDetails()
+                tradeItPlaceCryptoOrderResponse.orderDetails.orderAction = "buy"
+                tradeItPlaceCryptoOrderResponse.orderDetails.orderPair = "My symbol"
+                tradeItPlaceCryptoOrderResponse.orderDetails.orderExpiration = "day"
+                tradeItPlaceCryptoOrderResponse.orderDetails.orderQuantity = 1.0
+                tradeItPlaceCryptoOrderResponse.orderDetails.orderQuantityType = "MyOrderQuantityType"
+                tradeItPlaceCryptoOrderResponse.orderDetails.orderPriceType = "market"
+                tradeItPlaceCryptoOrderResponse.confirmationMessage = "Confirmation"
+                tradeItPlaceCryptoOrderResponse.broker = "MyBroker"
+                tradeItPlaceCryptoOrderResponse.accountBaseCurrency = "MyAccountBaseCurrency"
+                tradeItPlaceCryptoOrderResponse.timestamp = "MyTimeStamp"
+                callback.onSuccess(tradeItPlaceCryptoOrderResponse);
+            }
+
+            // when calling place order
+            var placeOrderResponse: TradeItPlaceCryptoOrderResponseParcelable? = null
+            order.placeCryptoOrder("My Order Id", object : TradeItCallback<TradeItPlaceCryptoOrderResponseParcelable> {
+                override fun onSuccess(response: TradeItPlaceCryptoOrderResponseParcelable) {
+                    placeOrderResponse = response
+                    successfulCallbackCount++
+                }
+
+                override fun onError(error: TradeItErrorResult?) {
+                    errorCallbackCount++
+                }
+            })
+
+            // then expect the sucess callback called
+            Assertions.assertEquals(successfulCallbackCount, 1)
+            Assertions.assertEquals(errorCallbackCount, 0)
+
+            // and the place order response is correctly filled
+            Assertions.assertEquals(placeOrderResponse!!.orderNumber, "My Order Id")
+            Assertions.assertEquals(placeOrderResponse!!.orderDetails!!.orderAction, "buy")
+            Assertions.assertEquals(placeOrderResponse!!.orderDetails!!.orderPair, "My symbol")
+            Assertions.assertEquals(placeOrderResponse!!.orderDetails!!.orderExpiration, "day")
+            Assertions.assertEquals(placeOrderResponse!!.orderDetails!!.orderQuantity, 1.0)
+            Assertions.assertEquals(placeOrderResponse!!.orderDetails!!.orderQuantityType, "MyOrderQuantityType")
+            Assertions.assertEquals(placeOrderResponse!!.orderDetails!!.orderPriceType, "market")
+            Assertions.assertEquals(placeOrderResponse!!.confirmationMessage, "Confirmation")
+            Assertions.assertEquals(placeOrderResponse!!.broker, "MyBroker")
+            Assertions.assertEquals(placeOrderResponse!!.accountBaseCurrency, "MyAccountBaseCurrency")
+            Assertions.assertEquals(placeOrderResponse!!.timestamp, "MyTimeStamp")
+        }
+
+        @Test
+        fun `placeCryptoOrder handles an error response from trade it`() {
+            // given an error response from trade it
+            var successfulCallbackCount = 0
+            var errorCallbackCount = 0
+            whenever(linkedBrokerAccount.tradeItApiClient!!.placeCryptoOrder(any(), any())).then {
+                val callback = it.getArgument<TradeItCallback<TradeItPlaceCryptoOrderResponse>>(1)
+                callback.onError(
+                    TradeItErrorResult(
+                        TradeItErrorCode.PARAMETER_ERROR,
+                        "My short error message",
+                        arrayListOf("My long error message")
+                    )
+                )
+            }
+
+            // when: calling preview order
+            var errorResult: TradeItErrorResult? = null
+            order.placeCryptoOrder("My Order Id", object : TradeItCallback<TradeItPlaceCryptoOrderResponseParcelable> {
+                override fun onSuccess(type: TradeItPlaceCryptoOrderResponseParcelable) {
+                    successfulCallbackCount++
+                }
+
+                override fun onError(error: TradeItErrorResult) {
+                    errorCallbackCount++
+                    errorResult = error
+                }
+            })
+
+            // then expect the sucess callback called
+            Assertions.assertEquals(successfulCallbackCount, 0)
+            Assertions.assertEquals(errorCallbackCount, 1)
+
+            // and the error is correctly populated
+            Assertions.assertEquals(errorResult!!.errorCode, TradeItErrorCode.PARAMETER_ERROR)
+            Assertions.assertEquals(errorResult!!.shortMessage, "My short error message")
+            Assertions.assertEquals(errorResult!!.longMessages, arrayListOf("My long error message"))
+            Assertions.assertEquals(errorResult!!.httpCode, 200)
+        }
+    }
 }
