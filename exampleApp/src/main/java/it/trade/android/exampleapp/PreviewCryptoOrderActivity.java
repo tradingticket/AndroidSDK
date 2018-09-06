@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import it.trade.android.sdk.model.TradeItCryptoOrderParcelable;
+import it.trade.android.sdk.model.TradeItPlaceCryptoOrderResponseParcelable;
 import it.trade.android.sdk.model.TradeItPreviewCryptoOrderResponseParcelable;
 import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable;
 import it.trade.model.TradeItErrorResult;
@@ -51,22 +52,22 @@ public class PreviewCryptoOrderActivity extends AppCompatActivity {
         });
     }
 
-//    public void placeTrade(View view) {
-//        order.placeOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable>() {
-//            @Override
-//            public void onSuccess(TradeItPlaceStockOrEtfOrderResponseParcelable placeOrderResponse) {
-//                textView.append(placeOrderResponse.toString());
-//                cancelOrderButton.setEnabled(true);
-//                orderNumber = placeOrderResponse.getOrderNumber();
-//            }
-//
-//            @Override
-//            public void onError(TradeItErrorResult error) {
-//                Log.e(TAG, "ERROR placeOrder: " + error.toString());
-//                textView.setText("ERROR placeOrder: " + error);
-//            }
-//        });
-//    }
+    public void placeTrade(View view) {
+        order.placeCryptoOrder(orderId, new TradeItCallback<TradeItPlaceCryptoOrderResponseParcelable>() {
+            @Override
+            public void onSuccess(TradeItPlaceCryptoOrderResponseParcelable placeOrderResponse) {
+                textView.append(placeOrderResponse.toString());
+                cancelOrderButton.setEnabled(true);
+                orderNumber = placeOrderResponse.getOrderNumber();
+            }
+
+            @Override
+            public void onError(TradeItErrorResult error) {
+                Log.e(TAG, "ERROR placeOrder: " + error.toString());
+                textView.setText("ERROR placeOrder: " + error);
+            }
+        });
+    }
 
     public void cancelOrder(View view) {
         order.getLinkedBrokerAccount().cancelOrder(orderNumber, new TradeItCallback<TradeItOrderStatusParcelable>() {

@@ -8,6 +8,7 @@ import it.trade.android.sdk.enums.TradeItOrderPriceType
 import it.trade.android.sdk.enums.TradeItOrderQuantityType
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
+import it.trade.model.reponse.TradeItPlaceCryptoOrderResponse
 import it.trade.model.reponse.TradeItPreviewCryptoOrderResponse
 import it.trade.model.request.TradeItPreviewCryptoOrderRequest
 import java.math.BigDecimal
@@ -114,6 +115,24 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
             object: TradeItCallback<TradeItPreviewCryptoOrderResponse> {
                 override fun onSuccess(response: TradeItPreviewCryptoOrderResponse) {
                     callback.onSuccess(TradeItPreviewCryptoOrderResponseParcelable(response))
+                }
+
+                override fun onError(error: TradeItErrorResult) {
+                    val errorResultParcelable = TradeItErrorResultParcelable(error)
+                    order.linkedBrokerAccount?.setErrorOnLinkedBroker(errorResultParcelable)
+                    callback.onError(errorResultParcelable)
+                }
+            }
+        )
+    }
+
+    fun placeCryptoOrder(orderId: String, callback: TradeItCallback<TradeItPlaceCryptoOrderResponseParcelable>) {
+        val order = this
+        this.linkedBrokerAccount.tradeItApiClient?.placeCryptoOrder(
+            orderId,
+            object: TradeItCallback<TradeItPlaceCryptoOrderResponse> {
+                override fun onSuccess(response: TradeItPlaceCryptoOrderResponse) {
+                    callback.onSuccess(TradeItPlaceCryptoOrderResponseParcelable(response))
                 }
 
                 override fun onError(error: TradeItErrorResult) {
