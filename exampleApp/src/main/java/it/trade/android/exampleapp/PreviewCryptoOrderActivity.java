@@ -10,10 +10,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import it.trade.android.sdk.model.TradeItCryptoOrderParcelable;
+import it.trade.android.sdk.model.TradeItPreviewCryptoOrderResponseParcelable;
 import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
-import it.trade.model.reponse.TradeItPreviewCryptoOrderResponse;
 
 import static it.trade.android.exampleapp.MainActivity.PREVIEW_ORDER_PARAMETER;
 
@@ -35,11 +35,11 @@ public class PreviewCryptoOrderActivity extends AppCompatActivity {
         order = intent.getParcelableExtra(PREVIEW_ORDER_PARAMETER);
         final Button placeOrderButton = (Button) this.findViewById(R.id.place_trade_button);
         cancelOrderButton = (Button) this.findViewById(R.id.cancel_order_button);
-        order.previewCryptoOrder(new TradeItCallback<TradeItPreviewCryptoOrderResponse>() {
+        order.previewCryptoOrder(new TradeItCallback<TradeItPreviewCryptoOrderResponseParcelable>() {
             @Override
-            public void onSuccess(TradeItPreviewCryptoOrderResponse response) {
+            public void onSuccess(TradeItPreviewCryptoOrderResponseParcelable response) {
                 textView.setText(response.toString());
-                orderId = response.orderId;
+                orderId = response.getOrderId();
                 placeOrderButton.setEnabled(true);
             }
 

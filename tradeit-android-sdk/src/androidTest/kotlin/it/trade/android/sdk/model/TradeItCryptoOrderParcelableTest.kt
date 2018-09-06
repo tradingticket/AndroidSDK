@@ -9,6 +9,7 @@ import it.trade.android.sdk.TradeItSDK
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
+import it.trade.android.sdk.enums.TradeItOrderQuantityType
 import it.trade.api.TradeItApiClient
 import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
@@ -20,11 +21,12 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.math.BigDecimal
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class TradeItOrderParcelableTest {
-    private var order: TradeItOrderParcelable? = null
+class TradeItCryptoOrderParcelableTest {
+    private var order: TradeItCryptoOrderParcelable? = null
     private var linkedBrokerAccount: TradeItLinkedBrokerAccountParcelable? = null
 
     @Before
@@ -54,7 +56,7 @@ class TradeItOrderParcelableTest {
 
         linkedBrokerAccount = TradeItLinkedBrokerAccountParcelable(linkedBroker, account)
 
-        order = TradeItOrderParcelable(linkedBrokerAccount!!, "MySymbol")
+        order = TradeItCryptoOrderParcelable(linkedBrokerAccount!!, "MySymbol")
     }
 
     @Test
@@ -63,10 +65,10 @@ class TradeItOrderParcelableTest {
         order!!.action = TradeItOrderAction.BUY
         order!!.expiration = TradeItOrderExpirationType.GOOD_FOR_DAY
         order!!.priceType = TradeItOrderPriceType.LIMIT
-        order!!.limitPrice = 20.50
-        order!!.quantity = 3.14159
-        order!!.quoteLastPrice = 21.50
-        order!!.isUserDisabledMargin = true
+        order!!.limitPrice = BigDecimal(20.50)
+        order!!.quantity = BigDecimal(3.14159)
+//        order!!.quoteLastPrice = 21.50
+        order!!.orderQuantityType = TradeItOrderQuantityType.QUOTE_CURRENCY
         // Write the data.
         val parcel = Parcel.obtain()
         order!!.writeToParcel(parcel, order!!.describeContents())
@@ -75,7 +77,7 @@ class TradeItOrderParcelableTest {
         parcel.setDataPosition(0)
 
         // Read the data.
-        val createdFromParcel = TradeItOrderParcelable.CREATOR.createFromParcel(parcel)
+        val createdFromParcel = TradeItCryptoOrderParcelable.CREATOR.createFromParcel(parcel)
         val createdLinkedBrokerAccount = createdFromParcel.linkedBrokerAccount
         val action = createdFromParcel.action
         val expiration = createdFromParcel.expiration
@@ -83,9 +85,9 @@ class TradeItOrderParcelableTest {
         val priceType = createdFromParcel.priceType
         val quantity = createdFromParcel.quantity
         val stopPrice = createdFromParcel.stopPrice
-        val lastPrice = createdFromParcel.quoteLastPrice
+//        val lastPrice = createdFromParcel.quoteLastPrice
         val symbol = createdFromParcel.symbol
-        val userDisabledMargin = createdFromParcel.isUserDisabledMargin
+        val quantityType = createdFromParcel.orderQuantityType
 
         // Verify that the received data is correct.
         assertThat(createdLinkedBrokerAccount, `is`<TradeItLinkedBrokerAccountParcelable>(linkedBrokerAccount))
@@ -98,8 +100,8 @@ class TradeItOrderParcelableTest {
         assertThat(priceType, `is`(order!!.priceType))
         assertThat(quantity, `is`(order!!.quantity))
         assertThat(stopPrice, `is`(order!!.stopPrice))
-        assertThat(lastPrice, `is`(order!!.quoteLastPrice))
+//        assertThat(lastPrice, `is`(order!!.quoteLastPrice))
         assertThat(symbol, `is`(order!!.symbol))
-        assertThat(userDisabledMargin, `is`(order!!.isUserDisabledMargin))
+        assertThat(quantityType, `is`(order!!.orderQuantityType))
     }
 }
