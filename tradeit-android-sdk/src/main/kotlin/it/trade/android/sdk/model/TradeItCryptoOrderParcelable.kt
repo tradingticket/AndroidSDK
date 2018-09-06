@@ -6,6 +6,7 @@ import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
 import it.trade.android.sdk.enums.TradeItOrderQuantityType
+import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.TradeItPreviewCryptoOrderResponse
 import it.trade.model.request.TradeItPreviewCryptoOrderRequest
@@ -95,7 +96,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
         return linkedBrokerAccount?.userCanDisableMargin
     }
 
-    fun previewCryptoOrder(callback: TradeItCallback<TradeItPreviewCryptoOrderResponse>) {
+    fun previewCryptoOrder(callback: TradeItCallback<TradeItPreviewCryptoOrderResponseParcelable>) {
         val request = TradeItPreviewCryptoOrderRequest()
         request.accountNumber = this.linkedBrokerAccount.accountNumber
         request.orderAction = this.action.actionValue
@@ -107,7 +108,21 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
         request.orderStopPrice = this.stopPrice?.toDouble()
         request.orderQuantityType = this.orderQuantityType.name
 
-        this.linkedBrokerAccount.tradeItApiClient?.previewCryptoOrder(request, callback)
+        val order = this
+        this.linkedBrokerAccount.tradeItApiClient?.previewCryptoOrder(
+            request,
+            object: TradeItCallback<TradeItPreviewCryptoOrderResponse> {
+                override fun onSuccess(response: TradeItPreviewCryptoOrderResponse) {
+                    callback.onSuccess(TradeItPreviewCryptoOrderResponseParcelable(response))
+                }
+
+                override fun onError(error: TradeItErrorResult) {
+                    val errorResultParcelable = TradeItErrorResultParcelable(error)
+                    order.linkedBrokerAccount?.setErrorOnLinkedBroker(errorResultParcelable)
+                    callback.onError(errorResultParcelable)
+                }
+            }
+        )
     }
 
     fun isValid(): Boolean {
