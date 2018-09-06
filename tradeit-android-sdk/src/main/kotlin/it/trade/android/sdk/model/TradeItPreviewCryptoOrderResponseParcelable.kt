@@ -14,6 +14,10 @@ class TradeItPreviewCryptoOrderResponseParcelable: Parcelable {
         this.orderDetails = TradeItCryptoPreviewOrderDetailsParcelable(response.orderDetails)
     }
 
+    override fun toString(): String {
+        return "TradeItPreviewCryptoOrderResponseParcelable(orderId='$orderId', orderDetails=$orderDetails)"
+    }
+
     constructor(parcel: Parcel) {
         orderId = parcel.readString()
         orderDetails = parcel.readParcelable(TradeItCryptoPreviewOrderDetailsParcelable::class.java.classLoader)

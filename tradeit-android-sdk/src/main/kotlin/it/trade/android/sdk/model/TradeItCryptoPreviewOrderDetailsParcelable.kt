@@ -25,8 +25,6 @@ class TradeItCryptoPreviewOrderDetailsParcelable : Parcelable {
 
     var orderStopPrice: Double? = null
 
-    var orderValueLabel: String = ""
-
     var estimatedOrderCommission: Double? = null
 
     var estimatedOrderValue: Double? = null
@@ -34,6 +32,23 @@ class TradeItCryptoPreviewOrderDetailsParcelable : Parcelable {
     var orderPair: String = ""
 
     var warnings: List<TradeItWarningParcelable> = mutableListOf()
+
+    override fun toString(): String {
+        return "TradeItCryptoPreviewOrderDetailsParcelable(estimatedTotalValue=$estimatedTotalValue, " +
+            "orderQuantityType='$orderQuantityType', " +
+            "orderCommissionLabel='$orderCommissionLabel', " +
+            "orderExpiration='$orderExpiration', " +
+            "orderAction='$orderAction', " +
+            "orderPriceType='$orderPriceType', " +
+            "orderQuantity=$orderQuantity, " +
+            "orderLimitPrice=$orderLimitPrice, " +
+            "orderStopPrice=$orderStopPrice, " +
+            "estimatedOrderCommission=$estimatedOrderCommission, " +
+            "estimatedOrderValue=$estimatedOrderValue, " +
+            "orderPair='$orderPair', " +
+            "warnings=$warnings" +
+            ")"
+    }
 
     internal constructor(cryptoPreviewOrderDetails: CryptoPreviewOrderDetails) {
         estimatedTotalValue = cryptoPreviewOrderDetails.estimatedTotalValue
@@ -45,7 +60,6 @@ class TradeItCryptoPreviewOrderDetailsParcelable : Parcelable {
         orderQuantity = cryptoPreviewOrderDetails.orderQuantity
         orderLimitPrice = cryptoPreviewOrderDetails.orderLimitPrice
         orderStopPrice = cryptoPreviewOrderDetails.orderStopPrice
-        orderValueLabel = cryptoPreviewOrderDetails.orderValueLabel
         estimatedOrderCommission = cryptoPreviewOrderDetails.estimatedOrderCommission
         estimatedOrderValue = cryptoPreviewOrderDetails.estimatedOrderValue
         orderPair = cryptoPreviewOrderDetails.orderPair
@@ -62,7 +76,6 @@ class TradeItCryptoPreviewOrderDetailsParcelable : Parcelable {
         orderQuantity = parcel.readDouble()
         orderLimitPrice = parcel.readValue(Double::class.java.classLoader) as? Double
         orderStopPrice = parcel.readValue(Double::class.java.classLoader) as? Double
-        orderValueLabel = parcel.readString()
         estimatedOrderCommission = parcel.readValue(Double::class.java.classLoader) as? Double
         estimatedOrderValue = parcel.readValue(Double::class.java.classLoader) as? Double
         orderPair = parcel.readString()
@@ -79,7 +92,6 @@ class TradeItCryptoPreviewOrderDetailsParcelable : Parcelable {
         parcel.writeDouble(orderQuantity)
         parcel.writeValue(orderLimitPrice)
         parcel.writeValue(orderStopPrice)
-        parcel.writeString(orderValueLabel)
         parcel.writeValue(estimatedOrderCommission)
         parcel.writeValue(estimatedOrderValue)
         parcel.writeString(orderPair)
