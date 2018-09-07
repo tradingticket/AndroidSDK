@@ -9,6 +9,8 @@ class TradeItPreviewCryptoOrderResponseParcelable: Parcelable {
 
     var orderDetails: TradeItCryptoPreviewOrderDetailsParcelable? = null
 
+    internal constructor() {}
+
     internal constructor (response: TradeItPreviewCryptoOrderResponse) {
         this.orderId = response.orderId
         this.orderDetails = TradeItCryptoPreviewOrderDetailsParcelable(response.orderDetails)

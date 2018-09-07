@@ -12,6 +12,8 @@ class TradeItPlaceCryptoOrderResponseParcelable: Parcelable {
     var timestamp: String = ""
     var orderDetails: TradeItCryptoTradeOrderDetailsParcelable? = null
 
+    internal constructor() {}
+
     internal constructor (response: TradeItPlaceCryptoOrderResponse) {
         this.orderNumber = response.orderNumber
         this.confirmationMessage = response.confirmationMessage

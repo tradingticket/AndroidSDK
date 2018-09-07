@@ -16,6 +16,8 @@ class TradeItCryptoQuoteResponseParcelable : Parcelable {
     var volume: BigDecimal? = null
     var dateTime: String? = null
 
+    internal constructor() {}
+
     internal constructor(cryptoQuote: TradeItCryptoQuoteResponse) {
         this.ask = cryptoQuote.ask
         this.bid = cryptoQuote.bid

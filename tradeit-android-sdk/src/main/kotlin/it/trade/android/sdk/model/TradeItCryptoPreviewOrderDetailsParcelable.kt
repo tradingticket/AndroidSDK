@@ -50,6 +50,8 @@ class TradeItCryptoPreviewOrderDetailsParcelable : Parcelable {
             ")"
     }
 
+    internal constructor() {}
+
     internal constructor(cryptoPreviewOrderDetails: CryptoPreviewOrderDetails) {
         estimatedTotalValue = cryptoPreviewOrderDetails.estimatedTotalValue
         orderQuantityType = cryptoPreviewOrderDetails.orderQuantityType

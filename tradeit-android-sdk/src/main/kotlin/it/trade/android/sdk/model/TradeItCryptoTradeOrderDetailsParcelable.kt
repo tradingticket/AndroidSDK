@@ -26,6 +26,8 @@ class TradeItCryptoTradeOrderDetailsParcelable : Parcelable {
         orderQuantityType = parcel.readString()
     }
 
+    internal constructor() {}
+
     internal constructor(cryptoTradeOrderDetails: CryptoTradeOrderDetails) {
         this.orderLimitPrice = cryptoTradeOrderDetails.orderLimitPrice
         this.orderStopPrice = cryptoTradeOrderDetails.orderStopPrice
