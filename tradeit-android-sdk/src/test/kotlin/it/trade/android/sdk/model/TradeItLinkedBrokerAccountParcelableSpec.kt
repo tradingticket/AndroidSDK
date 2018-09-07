@@ -8,6 +8,8 @@ import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.*
 import org.junit.jupiter.api.*
+import org.mockito.ArgumentMatchers.anyString
+import java.math.BigDecimal
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TradeItLinkedBrokerAccountParcelableSpec {
@@ -382,4 +384,55 @@ class TradeItLinkedBrokerAccountParcelableSpec {
         }
     }
 
+    @Nested
+    inner class GetCryptoQuoteTestCases {
+        @Test
+        fun `GetCryptoQuote handles a successful response from trade it`() {
+            // given a successful response from trade it api
+            var successCallbackCount = 0
+            var errorCallbackCount = 0
+
+
+            whenever(tradeItApiClient.getCryptoQuote(anyString(), anyString(), any())).then {
+                val callback = it.getArgument<TradeItCallback<TradeItCryptoQuoteResponse>>(2)
+                val cryptoQuoteResponse = TradeItCryptoQuoteResponse()
+                cryptoQuoteResponse.ask = BigDecimal(9000.0)
+                cryptoQuoteResponse.bid = BigDecimal(7000.0)
+                cryptoQuoteResponse.open = BigDecimal(10000)
+                cryptoQuoteResponse.last = BigDecimal(7984)
+                cryptoQuoteResponse.volume = BigDecimal(1265438.23)
+                cryptoQuoteResponse.dayHigh = BigDecimal(11989.2)
+                cryptoQuoteResponse.dayLow = BigDecimal(6900.0)
+                cryptoQuoteResponse.dateTime = "MyDateTime"
+
+                callback.onSuccess(cryptoQuoteResponse)
+            }
+
+            // when calling getCryptoQuote
+            var cryptoQuoteResponse: TradeItCryptoQuoteResponseParcelable? = null
+            linkedBrokerAccount!!.getCryptoQuote(
+                "BTC/USD",
+                object: TradeItCallback<TradeItCryptoQuoteResponseParcelable> {
+                    override fun onSuccess(response: TradeItCryptoQuoteResponseParcelable) {
+                        cryptoQuoteResponse = response
+                        successCallbackCount++
+
+                    }
+
+                    override fun onError(error: TradeItErrorResult) {
+                        errorCallbackCount++
+                    }
+                }
+            )
+
+            // then expects response correctly populated
+            Assertions.assertEquals(cryptoQuoteResponse!!.ask, BigDecimal(9000.0))
+            Assertions.assertEquals(cryptoQuoteResponse!!.bid, BigDecimal(7000.0))
+            Assertions.assertEquals(cryptoQuoteResponse!!.open, BigDecimal(10000.0))
+            Assertions.assertEquals(cryptoQuoteResponse!!.last, BigDecimal(7984.0))
+            Assertions.assertEquals(cryptoQuoteResponse!!.volume, BigDecimal(1265438.23))
+            Assertions.assertEquals(cryptoQuoteResponse!!.dayHigh, BigDecimal(11989.2))
+            Assertions.assertEquals(cryptoQuoteResponse!!.dateTime, "MyDateTime")
+        }
+    }
 }
