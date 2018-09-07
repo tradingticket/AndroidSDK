@@ -534,9 +534,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             linkedBrokerManager.syncLocalLinkedBrokers(Arrays.asList(linkedBrokerData1, linkedBrokerData2));
             goToLinkedBrokersActivity();
-        } catch (TradeItSaveLinkedLoginException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (TradeItDeleteLinkedLoginException e) {
+        } catch (TradeItSaveLinkedLoginException | TradeItDeleteLinkedLoginException e) {
             Log.e(TAG, e.getMessage(), e);
         }
     }

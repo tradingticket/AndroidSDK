@@ -6,14 +6,10 @@ import it.trade.android.sdk.model.RequestInterceptorParcelable
 import it.trade.model.request.TradeItEnvironment
 
 class TradeItConfigurationBuilder (
-        context: Context,
-        apiKey: String,
-        environment: TradeItEnvironment
+        val context: Context,
+        val apiKey: String,
+        val environment: TradeItEnvironment
     ) {
-
-    val context = context
-    val apiKey = apiKey
-    val environment = environment
 
     var baseUrl: String? = null
         private set

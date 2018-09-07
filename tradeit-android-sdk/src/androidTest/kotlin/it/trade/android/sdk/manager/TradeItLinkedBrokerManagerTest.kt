@@ -1,18 +1,11 @@
 package it.trade.android.sdk.manager
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.support.test.InstrumentationRegistry
+import android.support.test.InstrumentationRegistry.getInstrumentation
+import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
-import android.test.suitebuilder.annotation.LargeTest
 import android.util.Log
-
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-
 import it.trade.android.sdk.TradeItConfigurationBuilder
 import it.trade.android.sdk.TradeItSDK
 import it.trade.android.sdk.internal.TradeItKeystoreService
@@ -20,15 +13,16 @@ import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.TradeItAvailableBrokersResponse
 import it.trade.model.request.TradeItEnvironment
-
-import android.support.test.InstrumentationRegistry.getInstrumentation
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.notNullValue
-import org.hamcrest.Matchers.nullValue
+import org.hamcrest.Matchers.*
 import org.junit.Assert.assertThat
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
-@RunWith(AndroidJUnit4::class)
 @LargeTest
+@RunWith(AndroidJUnit4::class)
 class TradeItLinkedBrokerManagerTest {
 
     private val lock = CountDownLatch(1)

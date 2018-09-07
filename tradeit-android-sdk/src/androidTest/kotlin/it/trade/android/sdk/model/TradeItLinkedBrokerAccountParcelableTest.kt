@@ -2,8 +2,8 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.support.test.InstrumentationRegistry
+import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
-import android.test.suitebuilder.annotation.SmallTest
 import it.trade.android.sdk.TradeItConfigurationBuilder
 import it.trade.android.sdk.TradeItSDK
 import it.trade.model.reponse.*
@@ -97,7 +97,7 @@ class TradeItLinkedBrokerAccountParcelableTest {
         val createdPositions = createdFromParcel.positions
         val orderCapabilities = createdFromParcel.orderCapabilities
 
-        val actionParcelable = orderCapabilities[0].actions!![0]
+        val actionParcelable = orderCapabilities[0].actions[0]
 
         // Verify that the received data is correct.
         assertThat(apiClient, notNullValue())
@@ -111,7 +111,7 @@ class TradeItLinkedBrokerAccountParcelableTest {
         assertThat(createdBalance, `is`(balance))
         assertThat(createdPositions, `is`<List<TradeItPositionParcelable>>(positions))
         assertThat(orderCapabilities.isEmpty(), `is`(false))
-        assertThat(actionParcelable.action!!.actionValue, `is`("buy"))
+        assertThat(actionParcelable.action.actionValue, `is`("buy"))
         assertThat(actionParcelable.displayLabel, `is`("Buy"))
     }
 }

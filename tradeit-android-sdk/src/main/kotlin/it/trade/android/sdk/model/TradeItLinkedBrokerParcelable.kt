@@ -279,11 +279,11 @@ class TradeItLinkedBrokerParcelable : Parcelable {
             accountParcelable.linkedBroker = this
         }
 
-        val indexLinkedBroker = TradeItSDK.linkedBrokerManager!!.linkedBrokers.indexOf(this)
+        val indexLinkedBroker = TradeItSDK.linkedBrokerManager.linkedBrokers.indexOf(this)
 
         if (indexLinkedBroker != -1) { // updating linkedBroker reference on the linkedBrokerManager as we created a new object
-            TradeItSDK.linkedBrokerManager!!.linkedBrokers.removeAt(indexLinkedBroker)
-            TradeItSDK.linkedBrokerManager!!.linkedBrokers.add(indexLinkedBroker, this)
+            TradeItSDK.linkedBrokerManager.linkedBrokers.removeAt(indexLinkedBroker)
+            TradeItSDK.linkedBrokerManager.linkedBrokers.add(indexLinkedBroker, this)
         }
     }
 
