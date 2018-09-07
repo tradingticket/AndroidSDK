@@ -33,6 +33,7 @@ import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
 import it.trade.android.sdk.model.TradeItCryptoOrderParcelable;
+import it.trade.android.sdk.model.TradeItCryptoQuoteResponseParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerData;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String ORDERS_STATUS_PARAMETER = "it.trade.android.exampleapp.ORDERS_STATUS";
     public final static String PREVIEW_ORDER_PARAMETER = "it.trade.android.exampleapp.PREVIEW_ORDER";
     public final static String RELINK_OAUTH_PARAMETER = "it.trade.android.exampleapp.RELINK_OAUTH";
+    public final static String GET_CRYPTO_QUOTE_PARAMETER = "it.trade.android.exampleapp.GET_CRYPTO_QUOTE";
 
     private TradeItLinkedBrokerManager linkedBrokerManager;
 
@@ -81,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
         GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT("Get positions for first linked broker account"),
         REFRESH_ORDERS_STATUS_FIRST_LINKED_BROKER_ACCOUNT("Refresh orders status for first linked broker account"),
         PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account"),
-        PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT("Preview crypto trade for first crypto broker account");
+        PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT("Preview crypto trade for first crypto broker account"),
+        GET_CRYPTO_QUOTE_FIRST_CRYPTO_BROKER_ACCOUNT("Get crypto quote for first crypto broker account");
 
         private String label;
         MainActivityActions(String label) {
@@ -226,6 +229,10 @@ public class MainActivity extends AppCompatActivity {
                 case PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT:
                     Log.d(TAG, "preview trade first crypto broker account was tapped!");
                     previewCryptoTradeFirstCryptoBrokerAccount();
+                    break;
+                case GET_CRYPTO_QUOTE_FIRST_CRYPTO_BROKER_ACCOUNT:
+                    Log.d(TAG, "getCryptoQuote first crypto broker account was tapped!");
+                    getCryptoQuoteFirstCryptoBrokerAccount();
                     break;
                 case SYNC_LOCAL_LINKED_BROKERS:
                     Log.d(TAG, "synch local linked brokers was tapped!");
@@ -543,6 +550,46 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             } else {
                 showAlert("previewTradeFirstLinkedBroker", "No crypto account!");
+            }
+        }
+    }
+
+    private void getCryptoQuoteFirstCryptoBrokerAccount() {
+        final MainActivity mainActivity = this;
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        if (linkedBrokers.isEmpty()) {
+            showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No linked broker!");
+        } else {
+            TradeItLinkedBrokerAccountParcelable cryptoAccount = null;
+            for (TradeItLinkedBrokerParcelable linkedBroker: linkedBrokers) {
+                if (cryptoAccount != null) {
+                    break;
+                }
+                for (TradeItLinkedBrokerAccountParcelable accountParcelable: linkedBroker.getAccounts()) {
+                    if(accountParcelable.getOrderCapabilityForInstrument(Instrument.CRYPTO) != null) {
+                        cryptoAccount = accountParcelable;
+                        break;
+                    }
+                }
+            }
+            if (cryptoAccount != null) {
+                cryptoAccount.getCryptoQuote("BTC/USD", new TradeItCallback<TradeItCryptoQuoteResponseParcelable>() {
+                    @Override
+                    public void onSuccess(TradeItCryptoQuoteResponseParcelable tradeItCryptoQuoteResponseParcelable) {
+                        Intent intent = new Intent(mainActivity, GetCryptoQuoteActivity.class);
+                        intent.putExtra(GET_CRYPTO_QUOTE_PARAMETER, tradeItCryptoQuoteResponseParcelable);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onError(TradeItErrorResult tradeItErrorResult) {
+                        showAlert(tradeItErrorResult.getShortMessage(),
+                                tradeItErrorResult.getLongMessages().toString()
+                        );
+                    }
+                });
+            } else {
+                showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!");
             }
         }
     }
