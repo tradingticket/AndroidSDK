@@ -163,6 +163,26 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         })
     }
 
+    fun getCryptoQuote(pair: String, callback: TradeItCallback<TradeItCryptoQuoteResponseParcelable>) {
+        val linkedBrokerAccount = this
+        this.tradeItApiClient?.getCryptoQuote(
+            this.accountNumber,
+            pair,
+            object: TradeItCallback<TradeItCryptoQuoteResponse> {
+                override fun onSuccess(response: TradeItCryptoQuoteResponse) {
+                    callback.onSuccess(TradeItCryptoQuoteResponseParcelable(response))
+                }
+
+                override fun onError(error: TradeItErrorResult) {
+                    val errorResultParcelable = TradeItErrorResultParcelable(error)
+                    linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable)
+                    callback.onError(errorResultParcelable)
+                }
+
+            }
+        )
+    }
+
     private fun mapPositionsToPositionsParcelable(positions: List<TradeItPosition>): List<TradeItPositionParcelable> {
         val positionsParcelable = ArrayList<TradeItPositionParcelable>()
         for (position in positions) {
