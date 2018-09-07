@@ -55,6 +55,8 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
     var quoteSymbol: String = ""
         private set
 
+    var quoteLastPrice: BigDecimal? = null
+
     fun requiresLimitPrice(): Boolean {
         return priceType in arrayListOf(
             TradeItOrderPriceType.LIMIT,
@@ -190,6 +192,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
         this.limitPrice = source.readSerializable() as? BigDecimal
         this.stopPrice = source.readSerializable() as? BigDecimal
         this.orderQuantityType = TradeItOrderQuantityType.values()[source.readInt()]
+        this.quoteLastPrice = source.readSerializable() as? BigDecimal
     }
 
     override fun describeContents() = 0
@@ -204,6 +207,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
         writeSerializable(limitPrice)
         writeSerializable(stopPrice)
         writeInt(orderQuantityType.ordinal)
+        writeSerializable(quoteLastPrice)
     }
 
     companion object {
