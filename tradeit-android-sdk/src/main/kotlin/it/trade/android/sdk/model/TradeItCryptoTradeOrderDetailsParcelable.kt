@@ -39,6 +39,18 @@ class TradeItCryptoTradeOrderDetailsParcelable : Parcelable {
         this.orderQuantityType = cryptoTradeOrderDetails.orderQuantityType
     }
 
+    override fun toString(): String {
+        return "TradeItCryptoTradeOrderDetailsParcelable(" +
+            "orderLimitPrice=$orderLimitPrice, " +
+            "orderStopPrice=$orderStopPrice, " +
+            "orderExpiration='$orderExpiration', " +
+            "orderAction='$orderAction', " +
+            "orderPair='$orderPair', " +
+            "orderPriceType='$orderPriceType', " +
+            "orderQuantity=$orderQuantity, " +
+            "orderQuantityType='$orderQuantityType')"
+    }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeValue(orderLimitPrice)
         parcel.writeValue(orderStopPrice)
