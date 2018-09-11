@@ -80,18 +80,18 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
     }
 
     fun getQuantitySymbol(): String? {
-        when (orderQuantityType) {
-            TradeItOrderQuantityType.QUOTE_CURRENCY -> return quoteSymbol
-            TradeItOrderQuantityType.BASE_CURRENCY -> return baseSymbol
-            else -> return null
+        return when (orderQuantityType) {
+            TradeItOrderQuantityType.QUOTE_CURRENCY -> quoteSymbol
+            TradeItOrderQuantityType.BASE_CURRENCY -> baseSymbol
+            else -> null
         }
     }
 
     fun getEstimateSymbol(): String? {
-        when (orderQuantityType) {
-            TradeItOrderQuantityType.BASE_CURRENCY -> return quoteSymbol
-            TradeItOrderQuantityType.QUOTE_CURRENCY -> return baseSymbol
-            else -> return null
+        return when (orderQuantityType) {
+            TradeItOrderQuantityType.BASE_CURRENCY -> quoteSymbol
+            TradeItOrderQuantityType.QUOTE_CURRENCY -> baseSymbol
+            else -> null
         }
     }
 
@@ -156,12 +156,12 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
     }
 
     private fun validateOrderPriceType(): Boolean {
-        when (priceType) {
-            TradeItOrderPriceType.MARKET -> return true
-            TradeItOrderPriceType.LIMIT -> return validateLimit()
-            TradeItOrderPriceType.STOP_MARKET -> return validateStopMarket()
-            TradeItOrderPriceType.STOP_LIMIT -> return validateStopLimit()
-            else -> return false
+        return when (priceType) {
+            TradeItOrderPriceType.MARKET -> true
+            TradeItOrderPriceType.LIMIT -> validateLimit()
+            TradeItOrderPriceType.STOP_MARKET -> validateStopMarket()
+            TradeItOrderPriceType.STOP_LIMIT -> validateStopLimit()
+            else -> false
         }
     }
 
