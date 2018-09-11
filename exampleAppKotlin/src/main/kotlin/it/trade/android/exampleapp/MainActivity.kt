@@ -441,16 +441,7 @@ class MainActivity : AppCompatActivity() {
         if (linkedBrokers.isEmpty()) {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker!")
         } else {
-            var cryptoAccount: TradeItLinkedBrokerAccountParcelable? = null
-            for (linkedBroker in linkedBrokers) {
-                cryptoAccount = linkedBroker.accounts.find {
-                    it.getOrderCapabilityForInstrument(Instrument.CRYPTO) != null
-                }
-                if (cryptoAccount != null) {
-                    break
-                }
-            }
-
+            val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
             if (cryptoAccount != null) {
                 val cryptoOrderParcelable = TradeItCryptoOrderParcelable(
                     cryptoAccount,
@@ -477,15 +468,7 @@ class MainActivity : AppCompatActivity() {
         if (linkedBrokers.isEmpty()) {
             showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No linked broker!")
         } else {
-            var cryptoAccount: TradeItLinkedBrokerAccountParcelable? = null
-            for (linkedBroker in linkedBrokers) {
-                cryptoAccount = linkedBroker.accounts.find {
-                    it.getOrderCapabilityForInstrument(Instrument.CRYPTO) != null
-                }
-                if (cryptoAccount != null) {
-                    break
-                }
-            }
+            val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
             if (cryptoAccount != null) {
                 cryptoAccount.getCryptoQuote("BTC/USD", object : TradeItCallback<TradeItCryptoQuoteResponseParcelable> {
                     override fun onSuccess(tradeItCryptoQuoteResponseParcelable: TradeItCryptoQuoteResponseParcelable) {
@@ -504,6 +487,16 @@ class MainActivity : AppCompatActivity() {
                 showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!")
             }
         }
+    }
+
+    private fun getFirstCryptoAccount(
+        linkedBrokers: List<TradeItLinkedBrokerParcelable>
+    ): TradeItLinkedBrokerAccountParcelable? {
+        return linkedBrokers.mapNotNull { linkedBroker ->
+            linkedBroker.accounts.find {
+                it.getOrderCapabilityForInstrument(Instrument.CRYPTO) != null
+            }
+        }.firstOrNull()
     }
 
     private fun goToLinkedBrokersActivity() {
