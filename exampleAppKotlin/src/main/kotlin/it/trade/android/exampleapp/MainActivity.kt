@@ -440,26 +440,26 @@ class MainActivity : AppCompatActivity() {
         val linkedBrokers = linkedBrokerManager.linkedBrokers
         if (linkedBrokers.isEmpty()) {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker!")
-        } else {
-            val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
-            if (cryptoAccount != null) {
-                val cryptoOrderParcelable = TradeItCryptoOrderParcelable(
-                    cryptoAccount,
-                    "BTC/USD",
-                    TradeItOrderAction.BUY
-                )
-                cryptoOrderParcelable.priceType = TradeItOrderPriceType.LIMIT
-                cryptoOrderParcelable.expiration = TradeItOrderExpirationType.GOOD_FOR_DAY
-                cryptoOrderParcelable.limitPrice = BigDecimal(2000.0)
-                cryptoOrderParcelable.orderQuantityType = TradeItOrderQuantityType.QUOTE_CURRENCY
-                cryptoOrderParcelable.quantity = BigDecimal(1.0)
-                val intent = Intent(mainActivity, PreviewCryptoOrderActivity::class.java)
-                intent.putExtra(PREVIEW_ORDER_PARAMETER, cryptoOrderParcelable)
-                startActivity(intent)
-            } else {
-                showAlert("previewTradeFirstLinkedBroker", "No crypto account!")
-            }
+            return
         }
+        val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
+        if (cryptoAccount == null) {
+            showAlert("previewTradeFirstLinkedBroker", "No crypto account!")
+            return
+        }
+        val cryptoOrderParcelable = TradeItCryptoOrderParcelable(
+            cryptoAccount,
+            "BTC/USD",
+            TradeItOrderAction.BUY
+        )
+        cryptoOrderParcelable.priceType = TradeItOrderPriceType.LIMIT
+        cryptoOrderParcelable.expiration = TradeItOrderExpirationType.GOOD_FOR_DAY
+        cryptoOrderParcelable.limitPrice = BigDecimal(2000.0)
+        cryptoOrderParcelable.orderQuantityType = TradeItOrderQuantityType.QUOTE_CURRENCY
+        cryptoOrderParcelable.quantity = BigDecimal(1.0)
+        val intent = Intent(mainActivity, PreviewCryptoOrderActivity::class.java)
+        intent.putExtra(PREVIEW_ORDER_PARAMETER, cryptoOrderParcelable)
+        startActivity(intent)
     }
 
     private fun getCryptoQuoteFirstCryptoBrokerAccount() {
@@ -467,26 +467,26 @@ class MainActivity : AppCompatActivity() {
         val linkedBrokers = linkedBrokerManager.linkedBrokers
         if (linkedBrokers.isEmpty()) {
             showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No linked broker!")
-        } else {
-            val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
-            if (cryptoAccount != null) {
-                cryptoAccount.getCryptoQuote("BTC/USD", object : TradeItCallback<TradeItCryptoQuoteResponseParcelable> {
-                    override fun onSuccess(tradeItCryptoQuoteResponseParcelable: TradeItCryptoQuoteResponseParcelable) {
-                        val intent = Intent(mainActivity, GetCryptoQuoteActivity::class.java)
-                        intent.putExtra(GET_CRYPTO_QUOTE_PARAMETER, tradeItCryptoQuoteResponseParcelable)
-                        startActivity(intent)
-                    }
-
-                    override fun onError(tradeItErrorResult: TradeItErrorResult) {
-                        showAlert(tradeItErrorResult.shortMessage,
-                            tradeItErrorResult.longMessages.joinToString()
-                        )
-                    }
-                })
-            } else {
-                showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!")
-            }
+            return
         }
+        val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
+        if (cryptoAccount == null) {
+            showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!")
+            return
+        }
+        cryptoAccount.getCryptoQuote("BTC/USD", object : TradeItCallback<TradeItCryptoQuoteResponseParcelable> {
+            override fun onSuccess(tradeItCryptoQuoteResponseParcelable: TradeItCryptoQuoteResponseParcelable) {
+                val intent = Intent(mainActivity, GetCryptoQuoteActivity::class.java)
+                intent.putExtra(GET_CRYPTO_QUOTE_PARAMETER, tradeItCryptoQuoteResponseParcelable)
+                startActivity(intent)
+            }
+
+            override fun onError(tradeItErrorResult: TradeItErrorResult) {
+                showAlert(tradeItErrorResult.shortMessage,
+                    tradeItErrorResult.longMessages.joinToString()
+                )
+            }
+        })
     }
 
     private fun getFirstCryptoAccount(
