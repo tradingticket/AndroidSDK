@@ -521,26 +521,26 @@ public class MainActivity extends AppCompatActivity {
         List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty()) {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker!");
-        } else {
-            TradeItLinkedBrokerAccountParcelable cryptoAccount = getFirstCryptoAccount(linkedBrokers);
-            if (cryptoAccount != null) {
-                final TradeItCryptoOrderParcelable cryptoOrderParcelable = new TradeItCryptoOrderParcelable(
-                        cryptoAccount,
-                        "BTC/USD",
-                        TradeItOrderAction.BUY
-                );
-                cryptoOrderParcelable.setPriceType(TradeItOrderPriceType.LIMIT);
-                cryptoOrderParcelable.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
-                cryptoOrderParcelable.setLimitPrice(new BigDecimal(2000.0));
-                cryptoOrderParcelable.setOrderQuantityType(TradeItOrderQuantityType.QUOTE_CURRENCY);
-                cryptoOrderParcelable.setQuantity(new BigDecimal(1.0));
-                Intent intent = new Intent(mainActivity, PreviewCryptoOrderActivity.class);
-                intent.putExtra(PREVIEW_ORDER_PARAMETER, cryptoOrderParcelable);
-                startActivity(intent);
-            } else {
-                showAlert("previewTradeFirstLinkedBroker", "No crypto account!");
-            }
+            return;
         }
+        TradeItLinkedBrokerAccountParcelable cryptoAccount = getFirstCryptoAccount(linkedBrokers);
+        if (cryptoAccount == null) {
+            showAlert("previewTradeFirstLinkedBroker", "No crypto account!");
+            return;
+        }
+        final TradeItCryptoOrderParcelable cryptoOrderParcelable = new TradeItCryptoOrderParcelable(
+                cryptoAccount,
+                "BTC/USD",
+                TradeItOrderAction.BUY
+        );
+        cryptoOrderParcelable.setPriceType(TradeItOrderPriceType.LIMIT);
+        cryptoOrderParcelable.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
+        cryptoOrderParcelable.setLimitPrice(new BigDecimal(2000.0));
+        cryptoOrderParcelable.setOrderQuantityType(TradeItOrderQuantityType.QUOTE_CURRENCY);
+        cryptoOrderParcelable.setQuantity(new BigDecimal(1.0));
+        Intent intent = new Intent(mainActivity, PreviewCryptoOrderActivity.class);
+        intent.putExtra(PREVIEW_ORDER_PARAMETER, cryptoOrderParcelable);
+        startActivity(intent);
     }
 
     private void getCryptoQuoteFirstCryptoBrokerAccount() {
@@ -548,28 +548,28 @@ public class MainActivity extends AppCompatActivity {
         List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
         if (linkedBrokers.isEmpty()) {
             showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No linked broker!");
-        } else {
-            TradeItLinkedBrokerAccountParcelable cryptoAccount = getFirstCryptoAccount(linkedBrokers);
-            if (cryptoAccount != null) {
-                cryptoAccount.getCryptoQuote("BTC/USD", new TradeItCallback<TradeItCryptoQuoteResponseParcelable>() {
-                    @Override
-                    public void onSuccess(TradeItCryptoQuoteResponseParcelable tradeItCryptoQuoteResponseParcelable) {
-                        Intent intent = new Intent(mainActivity, GetCryptoQuoteActivity.class);
-                        intent.putExtra(GET_CRYPTO_QUOTE_PARAMETER, tradeItCryptoQuoteResponseParcelable);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onError(TradeItErrorResult tradeItErrorResult) {
-                        showAlert(tradeItErrorResult.getShortMessage(),
-                                tradeItErrorResult.getLongMessages().toString()
-                        );
-                    }
-                });
-            } else {
-                showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!");
-            }
+            return;
         }
+        TradeItLinkedBrokerAccountParcelable cryptoAccount = getFirstCryptoAccount(linkedBrokers);
+        if (cryptoAccount == null) {
+            showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!");
+            return;
+        }
+        cryptoAccount.getCryptoQuote("BTC/USD", new TradeItCallback<TradeItCryptoQuoteResponseParcelable>() {
+            @Override
+            public void onSuccess(TradeItCryptoQuoteResponseParcelable tradeItCryptoQuoteResponseParcelable) {
+                Intent intent = new Intent(mainActivity, GetCryptoQuoteActivity.class);
+                intent.putExtra(GET_CRYPTO_QUOTE_PARAMETER, tradeItCryptoQuoteResponseParcelable);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(TradeItErrorResult tradeItErrorResult) {
+                showAlert(tradeItErrorResult.getShortMessage(),
+                        tradeItErrorResult.getLongMessages().toString()
+                );
+            }
+        });
     }
 
     private TradeItLinkedBrokerAccountParcelable getFirstCryptoAccount(
