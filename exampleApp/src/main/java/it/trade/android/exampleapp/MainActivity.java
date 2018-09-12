@@ -30,6 +30,7 @@ import it.trade.android.sdk.enums.TradeItOrderQuantityType;
 import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
+import it.trade.android.sdk.model.SymbolPairParcelable;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
 import it.trade.android.sdk.model.TradeItCryptoOrderParcelable;
@@ -530,7 +531,7 @@ public class MainActivity extends AppCompatActivity {
         }
         final TradeItCryptoOrderParcelable cryptoOrderParcelable = new TradeItCryptoOrderParcelable(
                 cryptoAccount,
-                "BTC/USD",
+                new SymbolPairParcelable("BTC","USD"),
                 TradeItOrderAction.BUY
         );
         cryptoOrderParcelable.setPriceType(TradeItOrderPriceType.LIMIT);

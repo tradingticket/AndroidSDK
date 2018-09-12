@@ -449,7 +449,7 @@ class MainActivity : AppCompatActivity() {
         }
         val cryptoOrderParcelable = TradeItCryptoOrderParcelable(
             cryptoAccount,
-            "BTC/USD",
+            SymbolPairParcelable("BTC", "USD"),
             TradeItOrderAction.BUY
         )
         cryptoOrderParcelable.priceType = TradeItOrderPriceType.LIMIT

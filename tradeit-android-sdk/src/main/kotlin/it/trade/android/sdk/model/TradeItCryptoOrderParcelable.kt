@@ -13,17 +13,11 @@ import it.trade.model.reponse.TradeItPreviewCryptoOrderResponse
 import it.trade.model.request.TradeItPreviewCryptoOrderRequest
 import java.math.BigDecimal
 
-class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerAccountParcelable,
-                                   symbol: String,
-                                   var action: TradeItOrderAction = TradeItOrderAction.BUY
-) : Parcelable {
-    var symbol: String = symbol
-        set(newValue) {
-            var symbolPair = newValue.split("/", "-")
-            baseSymbol = symbolPair.first()
-            quoteSymbol = symbolPair.last()
-            field = newValue
-        }
+class TradeItCryptoOrderParcelable(
+    val linkedBrokerAccount: TradeItLinkedBrokerAccountParcelable,
+    val symbolPair: SymbolPairParcelable,
+    var action: TradeItOrderAction = TradeItOrderAction.BUY
+): Parcelable {
 
     var priceType: TradeItOrderPriceType = TradeItOrderPriceType.MARKET
         set(value) {
@@ -48,12 +42,6 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
     var stopPrice: BigDecimal? = null
 
     var orderQuantityType: TradeItOrderQuantityType = TradeItOrderQuantityType.QUOTE_CURRENCY
-
-    var baseSymbol: String = ""
-        private set
-
-    var quoteSymbol: String = ""
-        private set
 
     var quoteLastPrice: BigDecimal? = null
 
@@ -81,22 +69,22 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
 
     fun getQuantitySymbol(): String? {
         return when (orderQuantityType) {
-            TradeItOrderQuantityType.QUOTE_CURRENCY -> quoteSymbol
-            TradeItOrderQuantityType.BASE_CURRENCY -> baseSymbol
+            TradeItOrderQuantityType.QUOTE_CURRENCY -> symbolPair.quoteSymbol
+            TradeItOrderQuantityType.BASE_CURRENCY -> symbolPair.baseSymbol
             else -> null
         }
     }
 
     fun getEstimateSymbol(): String? {
         return when (orderQuantityType) {
-            TradeItOrderQuantityType.BASE_CURRENCY -> quoteSymbol
-            TradeItOrderQuantityType.QUOTE_CURRENCY -> baseSymbol
+            TradeItOrderQuantityType.BASE_CURRENCY -> symbolPair.quoteSymbol
+            TradeItOrderQuantityType.QUOTE_CURRENCY -> symbolPair.baseSymbol
             else -> null
         }
     }
 
     fun userCanDisableMargin(): Boolean {
-        return linkedBrokerAccount?.userCanDisableMargin
+        return linkedBrokerAccount.userCanDisableMargin
     }
 
     fun previewCryptoOrder(callback: TradeItCallback<TradeItPreviewCryptoOrderResponseParcelable>) {
@@ -104,7 +92,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
         request.accountNumber = this.linkedBrokerAccount.accountNumber
         request.orderAction = this.action.actionValue
         request.orderQuantity = this.quantity?.toDouble()
-        request.orderPair = this.symbol
+        request.orderPair = this.symbolPair.baseSymbol + "/" + this.symbolPair.quoteSymbol
         request.orderPriceType = this.priceType.priceTypeValue
         request.orderExpiration = this.expiration.expirationValue
         request.orderLimitPrice = this.limitPrice?.toDouble()
@@ -121,7 +109,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
 
                 override fun onError(error: TradeItErrorResult) {
                     val errorResultParcelable = TradeItErrorResultParcelable(error)
-                    order.linkedBrokerAccount?.setErrorOnLinkedBroker(errorResultParcelable)
+                    order.linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable)
                     callback.onError(errorResultParcelable)
                 }
             }
@@ -139,7 +127,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
 
                 override fun onError(error: TradeItErrorResult) {
                     val errorResultParcelable = TradeItErrorResultParcelable(error)
-                    order.linkedBrokerAccount?.setErrorOnLinkedBroker(errorResultParcelable)
+                    order.linkedBrokerAccount.setErrorOnLinkedBroker(errorResultParcelable)
                     callback.onError(errorResultParcelable)
                 }
             }
@@ -183,7 +171,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
 
     constructor(source: Parcel) : this(
         source.readParcelable<TradeItLinkedBrokerAccountParcelable>(TradeItLinkedBrokerAccountParcelable::class.java.classLoader),
-        source.readString(),
+        source.readParcelable<SymbolPairParcelable>(SymbolPairParcelable::class.java.classLoader),
         TradeItOrderAction.values()[source.readInt()]
     ) {
         this.priceType = TradeItOrderPriceType.values()[source.readInt()]
@@ -199,7 +187,7 @@ class TradeItCryptoOrderParcelable(val linkedBrokerAccount: TradeItLinkedBrokerA
 
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
         writeParcelable(linkedBrokerAccount, 0)
-        writeString(symbol)
+        writeParcelable(symbolPair, 0)
         writeInt(action.ordinal)
         writeInt(priceType.ordinal)
         writeInt(expiration.ordinal)

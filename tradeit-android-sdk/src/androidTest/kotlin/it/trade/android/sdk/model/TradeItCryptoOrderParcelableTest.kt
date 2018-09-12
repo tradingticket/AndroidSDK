@@ -56,7 +56,11 @@ class TradeItCryptoOrderParcelableTest {
 
         linkedBrokerAccount = TradeItLinkedBrokerAccountParcelable(linkedBroker, account)
 
-        order = TradeItCryptoOrderParcelable(linkedBrokerAccount!!, "MySymbol")
+        val symbolPair = SymbolPairParcelable(
+            "baseSymbol",
+            "quoteSymbol"
+        )
+        order = TradeItCryptoOrderParcelable(linkedBrokerAccount!!,  symbolPair)
     }
 
     @Test
@@ -67,7 +71,7 @@ class TradeItCryptoOrderParcelableTest {
         order!!.priceType = TradeItOrderPriceType.LIMIT
         order!!.limitPrice = BigDecimal(20.50)
         order!!.quantity = BigDecimal(3.14159)
-//        order!!.quoteLastPrice = 21.50
+        order!!.quoteLastPrice = BigDecimal(21.50)
         order!!.orderQuantityType = TradeItOrderQuantityType.QUOTE_CURRENCY
         // Write the data.
         val parcel = Parcel.obtain()
@@ -85,8 +89,8 @@ class TradeItCryptoOrderParcelableTest {
         val priceType = createdFromParcel.priceType
         val quantity = createdFromParcel.quantity
         val stopPrice = createdFromParcel.stopPrice
-//        val lastPrice = createdFromParcel.quoteLastPrice
-        val symbol = createdFromParcel.symbol
+        val lastPrice = createdFromParcel.quoteLastPrice
+        val symbolPair = createdFromParcel.symbolPair
         val quantityType = createdFromParcel.orderQuantityType
 
         // Verify that the received data is correct.
@@ -100,8 +104,9 @@ class TradeItCryptoOrderParcelableTest {
         assertThat(priceType, `is`(order!!.priceType))
         assertThat(quantity, `is`(order!!.quantity))
         assertThat(stopPrice, `is`(order!!.stopPrice))
-//        assertThat(lastPrice, `is`(order!!.quoteLastPrice))
-        assertThat(symbol, `is`(order!!.symbol))
+        assertThat(lastPrice, `is`(order!!.quoteLastPrice))
+        assertThat(symbolPair.baseSymbol, `is`(order!!.symbolPair.baseSymbol))
+        assertThat(symbolPair.quoteSymbol, `is`(order!!.symbolPair.quoteSymbol))
         assertThat(quantityType, `is`(order!!.orderQuantityType))
     }
 }

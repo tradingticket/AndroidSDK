@@ -15,7 +15,10 @@ import java.math.BigDecimal
 class TradeItCryptoOrderParcelableSpec {
 
     private val linkedBrokerAccount: TradeItLinkedBrokerAccountParcelable = mock()
-    private val order = TradeItCryptoOrderParcelable(linkedBrokerAccount, "My symbol")
+    private val order = TradeItCryptoOrderParcelable(
+        linkedBrokerAccount,
+        SymbolPairParcelable("BTC", "USD")
+    )
 
     @BeforeEach
     fun init() {
