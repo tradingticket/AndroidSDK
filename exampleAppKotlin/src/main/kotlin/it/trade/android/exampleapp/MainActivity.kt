@@ -17,8 +17,10 @@ import android.widget.TableRow
 import android.widget.TextView
 import it.trade.android.sdk.TradeItConfigurationBuilder
 import it.trade.android.sdk.TradeItSDK
+import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
+import it.trade.android.sdk.enums.TradeItOrderQuantityType
 import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager
@@ -28,9 +30,11 @@ import it.trade.model.TradeItErrorResult
 import it.trade.model.TradeItSecurityQuestion
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl
+import it.trade.model.reponse.Instrument
 import it.trade.model.reponse.TradeItResponse
 import it.trade.model.request.TradeItEnvironment
 import kotlinx.android.synthetic.main.activity_main.*
+import java.math.BigDecimal
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -94,6 +98,14 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "preview trade first linked broker account was tapped!")
                 previewTradeFirstLinkedBroker()
             }
+            MainActivity.MainActivityActions.PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT -> {
+                Log.d(TAG, "preview trade first crypto broker account was tapped!")
+                previewCryptoTradeFirstCryptoBrokerAccount()
+            }
+            MainActivity.MainActivityActions.GET_CRYPTO_QUOTE_FIRST_CRYPTO_BROKER_ACCOUNT -> {
+                Log.d(TAG, "getCryptoQuote first crypto broker account was tapped!")
+                getCryptoQuoteFirstCryptoBrokerAccount()
+            }
             MainActivity.MainActivityActions.SYNC_LOCAL_LINKED_BROKERS -> {
                 Log.d(TAG, "synch local linked brokers was tapped!")
                 syncLocalLinkedBrokers()
@@ -121,7 +133,9 @@ class MainActivity : AppCompatActivity() {
         PARCEL_FIRST_LINKED_BROKER_ACCOUNT("Parcel first linked broker account"),
         GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT("Get positions for first linked broker account"),
         REFRESH_ORDERS_STATUS_FIRST_LINKED_BROKER_ACCOUNT("Refresh orders status for first linked broker account"),
-        PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account")
+        PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account"),
+        PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT("Preview crypto trade for first crypto broker account"),
+        GET_CRYPTO_QUOTE_FIRST_CRYPTO_BROKER_ACCOUNT("Get crypto quote for first crypto broker account")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -421,6 +435,70 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun previewCryptoTradeFirstCryptoBrokerAccount() {
+        val mainActivity = this
+        val linkedBrokers = linkedBrokerManager.linkedBrokers
+        if (linkedBrokers.isEmpty()) {
+            showAlert("previewTradeFirstLinkedBroker", "No linked broker!")
+            return
+        }
+        val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
+        if (cryptoAccount == null) {
+            showAlert("previewTradeFirstLinkedBroker", "No crypto account!")
+            return
+        }
+        val cryptoOrderParcelable = TradeItCryptoOrderParcelable(
+            cryptoAccount,
+            SymbolPairParcelable("BTC", "USD"),
+            TradeItOrderAction.BUY
+        )
+        cryptoOrderParcelable.priceType = TradeItOrderPriceType.LIMIT
+        cryptoOrderParcelable.expiration = TradeItOrderExpirationType.GOOD_FOR_DAY
+        cryptoOrderParcelable.limitPrice = BigDecimal(2000.0)
+        cryptoOrderParcelable.orderQuantityType = TradeItOrderQuantityType.QUOTE_CURRENCY
+        cryptoOrderParcelable.quantity = BigDecimal(1.0)
+        val intent = Intent(mainActivity, PreviewCryptoOrderActivity::class.java)
+        intent.putExtra(PREVIEW_ORDER_PARAMETER, cryptoOrderParcelable)
+        startActivity(intent)
+    }
+
+    private fun getCryptoQuoteFirstCryptoBrokerAccount() {
+        val mainActivity = this
+        val linkedBrokers = linkedBrokerManager.linkedBrokers
+        if (linkedBrokers.isEmpty()) {
+            showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No linked broker!")
+            return
+        }
+        val cryptoAccount = getFirstCryptoAccount(linkedBrokers)
+        if (cryptoAccount == null) {
+            showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!")
+            return
+        }
+        cryptoAccount.getCryptoQuote("BTC/USD", object : TradeItCallback<TradeItCryptoQuoteResponseParcelable> {
+            override fun onSuccess(tradeItCryptoQuoteResponseParcelable: TradeItCryptoQuoteResponseParcelable) {
+                val intent = Intent(mainActivity, GetCryptoQuoteActivity::class.java)
+                intent.putExtra(GET_CRYPTO_QUOTE_PARAMETER, tradeItCryptoQuoteResponseParcelable)
+                startActivity(intent)
+            }
+
+            override fun onError(tradeItErrorResult: TradeItErrorResult) {
+                showAlert(tradeItErrorResult.shortMessage,
+                    tradeItErrorResult.longMessages.joinToString()
+                )
+            }
+        })
+    }
+
+    private fun getFirstCryptoAccount(
+        linkedBrokers: List<TradeItLinkedBrokerParcelable>
+    ): TradeItLinkedBrokerAccountParcelable? {
+        return linkedBrokers.mapNotNull { linkedBroker ->
+            linkedBroker.accounts.find {
+                it.getOrderCapabilityForInstrument(Instrument.CRYPTO) != null
+            }
+        }.firstOrNull()
+    }
+
     private fun goToLinkedBrokersActivity() {
         val intent = Intent(this.applicationContext, LinkedBrokersActivity::class.java)
         intent.putParcelableArrayListExtra(LINKED_BROKERS_PARAMETER, linkedBrokerManager.linkedBrokers as ArrayList<out Parcelable>)
@@ -486,5 +564,6 @@ class MainActivity : AppCompatActivity() {
         const val ORDERS_STATUS_PARAMETER = "it.trade.android.exampleapp.ORDERS_STATUS"
         const val PREVIEW_ORDER_PARAMETER = "it.trade.android.exampleapp.PREVIEW_ORDER"
         const val RELINK_OAUTH_PARAMETER = "it.trade.android.exampleapp.RELINK_OAUTH"
+        const val GET_CRYPTO_QUOTE_PARAMETER = "it.trade.android.exampleapp.GET_CRYPTO_QUOTE"
     }
 }

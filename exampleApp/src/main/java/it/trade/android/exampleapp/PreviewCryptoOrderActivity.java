@@ -9,19 +9,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import it.trade.android.sdk.model.TradeItOrderParcelable;
-import it.trade.android.sdk.model.TradeItPlaceStockOrEtfOrderResponseParcelable;
-import it.trade.android.sdk.model.TradeItPreviewStockOrEtfOrderResponseParcelable;
+import it.trade.android.sdk.model.TradeItCryptoOrderParcelable;
+import it.trade.android.sdk.model.TradeItPlaceCryptoOrderResponseParcelable;
+import it.trade.android.sdk.model.TradeItPreviewCryptoOrderResponseParcelable;
 import it.trade.android.sdk.model.orderstatus.TradeItOrderStatusParcelable;
 import it.trade.model.TradeItErrorResult;
 import it.trade.model.callback.TradeItCallback;
 
 import static it.trade.android.exampleapp.MainActivity.PREVIEW_ORDER_PARAMETER;
 
-public class PreviewOrderActivity extends AppCompatActivity {
-    private static final String TAG = PreviewOrderActivity.class.getName();
+public class PreviewCryptoOrderActivity extends AppCompatActivity {
+    private static final String TAG = PreviewCryptoOrderActivity.class.getName();
     private String orderId;
-    private TradeItOrderParcelable order;
+    private TradeItCryptoOrderParcelable order;
     private TextView textView;
     private Button cancelOrderButton;
     String orderNumber = null;
@@ -36,9 +36,9 @@ public class PreviewOrderActivity extends AppCompatActivity {
         order = intent.getParcelableExtra(PREVIEW_ORDER_PARAMETER);
         final Button placeOrderButton = (Button) this.findViewById(R.id.place_trade_button);
         cancelOrderButton = (Button) this.findViewById(R.id.cancel_order_button);
-        order.previewOrder(new TradeItCallback<TradeItPreviewStockOrEtfOrderResponseParcelable>() {
+        order.previewCryptoOrder(new TradeItCallback<TradeItPreviewCryptoOrderResponseParcelable>() {
             @Override
-            public void onSuccess(TradeItPreviewStockOrEtfOrderResponseParcelable response) {
+            public void onSuccess(TradeItPreviewCryptoOrderResponseParcelable response) {
                 textView.setText(response.toString());
                 orderId = response.getOrderId();
                 placeOrderButton.setEnabled(true);
@@ -46,16 +46,16 @@ public class PreviewOrderActivity extends AppCompatActivity {
 
             @Override
             public void onError(TradeItErrorResult error) {
-                Log.e(TAG, "ERROR previewOrder: " + error);
-                textView.setText("ERROR previewOrder: " + error);
+                Log.e(TAG, "ERROR previewCryptoOrder: " + error);
+                textView.setText("ERROR previewCryptoOrder: " + error);
             }
         });
     }
 
     public void placeTrade(View view) {
-        order.placeOrder(orderId, new TradeItCallback<TradeItPlaceStockOrEtfOrderResponseParcelable>() {
+        order.placeCryptoOrder(orderId, new TradeItCallback<TradeItPlaceCryptoOrderResponseParcelable>() {
             @Override
-            public void onSuccess(TradeItPlaceStockOrEtfOrderResponseParcelable placeOrderResponse) {
+            public void onSuccess(TradeItPlaceCryptoOrderResponseParcelable placeOrderResponse) {
                 textView.append(placeOrderResponse.toString());
                 cancelOrderButton.setEnabled(true);
                 orderNumber = placeOrderResponse.getOrderNumber();
