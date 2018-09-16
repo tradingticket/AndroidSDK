@@ -81,3 +81,9 @@ apply from: 'https://raw.githubusercontent.com/tradingticket/JCenter/master/bint
 repositories {
     mavenCentral()
 }
+
+// Javadoc doesn't work with Kotlin :(
+tasks.withType(Javadoc).all {
+    enabled = false
+}
+
