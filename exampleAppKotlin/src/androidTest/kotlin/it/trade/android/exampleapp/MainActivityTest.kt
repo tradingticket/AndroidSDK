@@ -138,33 +138,31 @@ class MainActivityTest {
 
         waitAwhile() //TODO there should be a better way for waiting
 
-        val name = "android.widget.EditText"
-
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val login = device.findObject(UiSelector().className(name).instance(0))
+        val login = device.findObject(UiSelector().className("android.widget.EditText").instance(0))
         login.clearTextField()
         login.click()
         login.text = dummyLogin
 
-        val password = device.findObject(UiSelector().className(name).instance(1))
+        val password = device.findObject(UiSelector().className("android.widget.EditText").instance(1))
         password.clearTextField()
         password.click()
         password.text = "dummy"
 
-        val button = device.findObject(UiSelector().textContains("Sign In"))
-        button.click()
+        val signInButton = device.findObject(UiSelector().className("android.widget.Button").instance(0))
+        signInButton.click()
 
         waitAwhile() //TODO there should be a better way for waiting
 
         if (dummyLogin in arrayOf("dummySecurity", "dummyOption")) {
-            device.findObject(UiSelector().className(name).instance(0)).run {
+            device.findObject(UiSelector().className("android.widget.EditText").instance(0)).run {
                 clearTextField()
                 click()
                 text = if (dummyLogin == "dummySecurity") "tradingticket" else "option 1"
             }
 
-            val submit = device.findObject(UiSelector().text("Submit"))
-            submit.click()
+            val submitButton = device.findObject(UiSelector().className("android.widget.Button").instance(0))
+            submitButton.click()
 
             waitAwhile() //TODO there should be a better way for waiting
         }
