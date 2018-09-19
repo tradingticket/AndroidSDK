@@ -26,6 +26,12 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
     @SerializedName("accountBaseCurrency")
     var accountBaseCurrency: String
 
+    @SerializedName("accountIndex")
+    var accountIndex: String = ""
+
+    @SerializedName("tradable")
+    var tradable: Boolean = true
+
     @SerializedName("userCanDisableMargin")
     var userCanDisableMargin: Boolean = false
 
@@ -67,6 +73,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         this.linkedBroker = linkedBroker
         this.accountName = account.name
         this.accountNumber = account.accountNumber
+        this.accountIndex = account.accountIndex
+        this.tradable = account.tradable
         this.accountBaseCurrency = account.accountBaseCurrency
         this.userCanDisableMargin = account.userCanDisableMargin
         this.orderCapabilities = TradeItOrderCapabilityParcelable.mapOrderCapabilitiesToTradeItOrderCapabilityParcelables(account.orderCapabilities)
@@ -197,6 +205,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
                 "accountBaseCurrency='" + accountBaseCurrency + '\''.toString() +
                 ", accountName='" + accountName + '\''.toString() +
                 ", accountNumber='" + accountNumber + '\''.toString() +
+                ", accountIndex='" + accountIndex + '\''.toString() +
+                ", tradable='" + tradable + '\''.toString() +
                 ", userCanDisableMargin='" + userCanDisableMargin + '\''.toString() +
                 ", balance='" + balance + '\''.toString() +
                 ", orderCapabilities='" + orderCapabilities + '\''.toString() +
@@ -218,6 +228,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         dest.writeList(this.positions)
         dest.writeString(this.userId)
         userId?.let {userId ->  linkedBrokersMap[userId] = this.linkedBroker }
+        dest.writeString(this.accountIndex)
+        dest.writeByte((if (tradable) 1 else 0).toByte())
     }
 
     override fun equals(other: Any?): Boolean {
@@ -237,6 +249,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         var result = accountName.hashCode()
         result = 31 * result + accountNumber.hashCode()
         result = 31 * result + accountBaseCurrency.hashCode()
+        result = 31 * result + accountIndex.hashCode()
+        result = 31 * result + tradable.hashCode()
         result = 31 * result + userCanDisableMargin.hashCode()
         result = 31 * result + orderCapabilities.hashCode()
         result = 31 * result + (linkedBroker?.hashCode() ?: 0)
@@ -269,6 +283,8 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
                 this.linkedBroker?.accounts?.add(indexAccount, this)
             }
         }
+        this.accountIndex = `in`.readString()
+        this.tradable = `in`.readByte().toInt() != 0
     }
 
     companion object {

@@ -48,6 +48,8 @@ class TradeItLinkedBrokerAccountParcelableTest {
         account.accountBaseCurrency = "MyAccountBaseCurrency"
         account.name = "MyAccountName"
         account.userCanDisableMargin = true
+        account.tradable = false
+        account.accountIndex = "TestIndex"
 
         val orderCapability = OrderCapability()
         val action = DisplayLabelValue("Buy", "buy", arrayListOf("SHARES"))
@@ -116,5 +118,7 @@ class TradeItLinkedBrokerAccountParcelableTest {
         assertThat(orderCapabilities.isEmpty(), `is`(false))
         assertThat(actionParcelable.action.actionValue, `is`("buy"))
         assertThat(actionParcelable.displayLabel, `is`("Buy"))
+        assertThat(createdFromParcel.accountIndex, `is`("TestIndex"))
+        assertThat(createdFromParcel.tradable, `is`(false))
     }
 }
