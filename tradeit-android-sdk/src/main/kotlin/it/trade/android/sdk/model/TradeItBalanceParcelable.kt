@@ -30,6 +30,15 @@ class TradeItBalanceParcelable : Parcelable {
     @SerializedName("totalValue")
     var totalValue: Double? = null
 
+    @SerializedName("buyingPowerLabel")
+    var buyingPowerLabel: String? = null
+
+    @SerializedName("accountBaseCurrency")
+    var accountBaseCurrency: String = "USD"
+
+    @SerializedName("marginCash")
+    var marginCash: Double? = null
+
     internal constructor() {}
 
     internal constructor(accountOverview: TradeItAccountOverview) {
@@ -40,6 +49,9 @@ class TradeItBalanceParcelable : Parcelable {
         this.totalAbsoluteReturn = accountOverview.totalAbsoluteReturn
         this.totalPercentReturn = accountOverview.totalPercentReturn
         this.totalValue = accountOverview.totalValue
+        this.buyingPowerLabel = accountOverview.buyingPowerLabel
+        this.accountBaseCurrency = accountOverview.accountBaseCurrency
+        this.marginCash = accountOverview.marginCash
     }
 
     override fun toString(): String {
@@ -51,42 +63,45 @@ class TradeItBalanceParcelable : Parcelable {
                 ", totalAbsoluteReturn=" + totalAbsoluteReturn +
                 ", totalPercentReturn=" + totalPercentReturn +
                 ", totalValue=" + totalValue +
+                ", buyingPowerLabel=" + buyingPowerLabel +
+                ", accountBaseCurrency=" + accountBaseCurrency +
+                ", marginCash=" + marginCash +
                 '}'.toString()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
-        val that = other as TradeItBalanceParcelable?
+        other as TradeItBalanceParcelable
 
-        if (if (availableCash != null) availableCash != that!!.availableCash else that!!.availableCash != null)
-            return false
-        if (if (buyingPower != null) buyingPower != that.buyingPower else that.buyingPower != null)
-            return false
-        if (if (dayAbsoluteReturn != null) dayAbsoluteReturn != that.dayAbsoluteReturn else that.dayAbsoluteReturn != null)
-            return false
-        if (if (dayPercentReturn != null) dayPercentReturn != that.dayPercentReturn else that.dayPercentReturn != null)
-            return false
-        if (if (totalAbsoluteReturn != null) totalAbsoluteReturn != that.totalAbsoluteReturn else that.totalAbsoluteReturn != null)
-            return false
-        if (if (totalPercentReturn != null) totalPercentReturn != that.totalPercentReturn else that.totalPercentReturn != null)
-            return false
-        return if (totalValue != null) totalValue == that.totalValue else that.totalValue == null
+        if (availableCash != other.availableCash) return false
+        if (buyingPower != other.buyingPower) return false
+        if (dayAbsoluteReturn != other.dayAbsoluteReturn) return false
+        if (dayPercentReturn != other.dayPercentReturn) return false
+        if (totalAbsoluteReturn != other.totalAbsoluteReturn) return false
+        if (totalPercentReturn != other.totalPercentReturn) return false
+        if (totalValue != other.totalValue) return false
+        if (buyingPowerLabel != other.buyingPowerLabel) return false
+        if (accountBaseCurrency != other.accountBaseCurrency) return false
+        if (marginCash != other.marginCash) return false
 
+        return true
     }
 
     override fun hashCode(): Int {
-        var result = if (availableCash != null) availableCash!!.hashCode() else 0
-        result = 31 * result + if (buyingPower != null) buyingPower!!.hashCode() else 0
-        result = 31 * result + if (dayAbsoluteReturn != null) dayAbsoluteReturn!!.hashCode() else 0
-        result = 31 * result + if (dayPercentReturn != null) dayPercentReturn!!.hashCode() else 0
-        result = 31 * result + if (totalAbsoluteReturn != null) totalAbsoluteReturn!!.hashCode() else 0
-        result = 31 * result + if (totalPercentReturn != null) totalPercentReturn!!.hashCode() else 0
-        result = 31 * result + if (totalValue != null) totalValue!!.hashCode() else 0
+        var result = availableCash?.hashCode() ?: 0
+        result = 31 * result + (buyingPower?.hashCode() ?: 0)
+        result = 31 * result + (dayAbsoluteReturn?.hashCode() ?: 0)
+        result = 31 * result + (dayPercentReturn?.hashCode() ?: 0)
+        result = 31 * result + (totalAbsoluteReturn?.hashCode() ?: 0)
+        result = 31 * result + (totalPercentReturn?.hashCode() ?: 0)
+        result = 31 * result + (totalValue?.hashCode() ?: 0)
+        result = 31 * result + (buyingPowerLabel?.hashCode() ?: 0)
+        result = 31 * result + accountBaseCurrency.hashCode()
+        result = 31 * result + (marginCash?.hashCode() ?: 0)
         return result
     }
-
 
     override fun describeContents(): Int {
         return 0
@@ -100,6 +115,9 @@ class TradeItBalanceParcelable : Parcelable {
         dest.writeValue(this.totalAbsoluteReturn)
         dest.writeValue(this.totalPercentReturn)
         dest.writeValue(this.totalValue)
+        dest.writeString(this.buyingPowerLabel)
+        dest.writeString(this.accountBaseCurrency)
+        dest.writeValue(this.marginCash)
     }
 
     protected constructor(`in`: Parcel) {
@@ -110,6 +128,9 @@ class TradeItBalanceParcelable : Parcelable {
         this.totalAbsoluteReturn = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.totalPercentReturn = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.totalValue = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.buyingPowerLabel = `in`.readString()
+        this.accountBaseCurrency = `in`.readString()
+        this.marginCash = `in`.readValue(Double::class.java.getClassLoader()) as? Double
     }
 
     companion object {

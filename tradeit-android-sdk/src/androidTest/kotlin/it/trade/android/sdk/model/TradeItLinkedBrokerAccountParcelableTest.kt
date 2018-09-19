@@ -77,6 +77,9 @@ class TradeItLinkedBrokerAccountParcelableTest {
         balance.totalAbsoluteReturn = -234.98
         balance.totalPercentReturn = -2.34
         balance.totalValue = 12983.34
+        balance.accountBaseCurrency = "EUR"
+        balance.marginCash = 105.0
+        balance.buyingPowerLabel = "MyLabel"
         linkedBrokerAccount!!.balance = balance
 
         // Write the data.
