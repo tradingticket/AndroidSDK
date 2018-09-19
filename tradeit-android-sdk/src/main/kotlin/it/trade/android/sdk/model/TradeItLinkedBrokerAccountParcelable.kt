@@ -27,7 +27,7 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
     var accountBaseCurrency: String
 
     @SerializedName("accountIndex")
-    var accountIndex: String = ""
+    var accountIndex: String? = ""
 
     @SerializedName("tradable")
     var tradable: Boolean = true
@@ -249,7 +249,7 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         var result = accountName.hashCode()
         result = 31 * result + accountNumber.hashCode()
         result = 31 * result + accountBaseCurrency.hashCode()
-        result = 31 * result + accountIndex.hashCode()
+        result = 31 * result + (accountIndex?.hashCode() ?: 0)
         result = 31 * result + tradable.hashCode()
         result = 31 * result + userCanDisableMargin.hashCode()
         result = 31 * result + orderCapabilities.hashCode()

@@ -34,7 +34,7 @@ class TradeItBalanceParcelable : Parcelable {
     var buyingPowerLabel: String? = null
 
     @SerializedName("accountBaseCurrency")
-    var accountBaseCurrency: String = "USD"
+    var accountBaseCurrency: String? = "USD"
 
     @SerializedName("marginCash")
     var marginCash: Double? = null
@@ -98,7 +98,7 @@ class TradeItBalanceParcelable : Parcelable {
         result = 31 * result + (totalPercentReturn?.hashCode() ?: 0)
         result = 31 * result + (totalValue?.hashCode() ?: 0)
         result = 31 * result + (buyingPowerLabel?.hashCode() ?: 0)
-        result = 31 * result + accountBaseCurrency.hashCode()
+        result = 31 * result + (accountBaseCurrency?.hashCode() ?: 0)
         result = 31 * result + (marginCash?.hashCode() ?: 0)
         return result
     }
