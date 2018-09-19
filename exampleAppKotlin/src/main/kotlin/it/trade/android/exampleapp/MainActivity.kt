@@ -424,7 +424,9 @@ class MainActivity : AppCompatActivity() {
             linkedBrokers.isEmpty() -> showAlert("previewTradeFirstLinkedBroker", "No linked broker!")
             linkedBrokers[0].accounts.isEmpty() -> showAlert("previewTradeFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.")
             else -> {
-                val order = TradeItOrderParcelable(linkedBrokers[0].accounts[0], "GE")
+                val broker = linkedBrokers.first()
+                val symbol = if (broker.brokerName == "kabu") "8703" else "GE"
+                val order = TradeItOrderParcelable(linkedBrokers[0].accounts[0], symbol)
                 order.limitPrice = 20.0
                 order.expiration = TradeItOrderExpirationType.GOOD_FOR_DAY
                 order.priceType = TradeItOrderPriceType.LIMIT
