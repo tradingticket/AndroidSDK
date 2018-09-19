@@ -55,6 +55,7 @@ class TradeItOrderParcelableSpec {
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderCommissionLabel = "MyOrderCommissionLabel"
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderValueLabel = "MyOrderValueLabel"
                 tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderMessage = "MyOrder message"
+                tradeItPreviewStockOrEtfOrderResponse.orderDetails.orderQuantityType = "SHARES"
                 callback.onSuccess(tradeItPreviewStockOrEtfOrderResponse);
             }
 

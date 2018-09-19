@@ -3,24 +3,20 @@ package it.trade.android.sdk.model
 import android.os.Parcel
 import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
-
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-
-import java.util.Arrays
-
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
 import it.trade.model.reponse.DisplayLabelValue
 import it.trade.model.reponse.Instrument
 import it.trade.model.reponse.OrderCapability
-
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.core.IsNull.nullValue
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThat
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -34,8 +30,8 @@ class TradeItOrderCapabilityParcelableTest {
     @Before
     fun createTradeItOrderCapabilityParcelable() {
         val orderCapability = OrderCapability()
-        action = DisplayLabelValue("Buy", "buy")
-        priceType = DisplayLabelValue("Market", "market")
+        action = DisplayLabelValue("Buy", "buy", arrayListOf("SHARES"))
+        priceType = DisplayLabelValue("Market", "market", arrayListOf("SHARES"))
         expirationType = DisplayLabelValue("Good for day", "day")
         orderCapability.instrument = Instrument.EQUITIES
         orderCapability.actions = Arrays.asList(action!!)

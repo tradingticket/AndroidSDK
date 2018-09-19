@@ -17,6 +17,7 @@ class TradeItOrderInfoParcelable : Parcelable {
         internal set
     var expiration: String? = ""
         internal set
+    var orderQuantityType: String? = ""
 
     internal constructor(orderInfo: OrderInfo) {
         this.action = orderInfo.action
@@ -24,6 +25,7 @@ class TradeItOrderInfoParcelable : Parcelable {
         this.symbol = orderInfo.symbol
         this.price = TradeItPriceParcelable(orderInfo.price)
         this.expiration = orderInfo.expiration
+        this.orderQuantityType = orderInfo.orderQuantityType
     }
 
     internal constructor() {}
@@ -35,6 +37,7 @@ class TradeItOrderInfoParcelable : Parcelable {
                 ", symbol='" + symbol + '\''.toString() +
                 ", price=" + price +
                 ", expiration='" + expiration + '\''.toString() +
+                ", orderQuantityType='" + orderQuantityType + '\''.toString() +
                 '}'.toString()
     }
 
@@ -48,6 +51,7 @@ class TradeItOrderInfoParcelable : Parcelable {
         dest.writeString(this.symbol)
         dest.writeParcelable(this.price, flags)
         dest.writeString(this.expiration)
+        dest.writeString(this.orderQuantityType)
     }
 
     protected constructor(`in`: Parcel) {
@@ -56,6 +60,7 @@ class TradeItOrderInfoParcelable : Parcelable {
         this.symbol = `in`.readString()
         this.price = `in`.readParcelable(Price::class.java.getClassLoader())
         this.expiration = `in`.readString()
+        this.orderQuantityType = `in`.readString()
     }
 
     companion object {

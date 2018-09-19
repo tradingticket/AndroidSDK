@@ -4,14 +4,21 @@ import android.os.Parcel
 import android.os.Parcelable
 
 import it.trade.android.sdk.enums.TradeItOrderPriceType
+import it.trade.android.sdk.enums.TradeItOrderQuantityType
 
 class TradeItOrderPriceTypeParcelable : Parcelable {
     var priceType: TradeItOrderPriceType
     var displayLabel: String
+    var supportedOrderQuantityTypes: List<TradeItOrderQuantityType> = arrayListOf()
 
-    internal constructor(priceType: TradeItOrderPriceType, displayLabel: String) {
+    internal constructor(
+        priceType: TradeItOrderPriceType,
+        displayLabel: String,
+        supportedOrderQuantityTypes: List<TradeItOrderQuantityType>
+    ) {
         this.priceType = priceType
         this.displayLabel = displayLabel
+        this.supportedOrderQuantityTypes = supportedOrderQuantityTypes
     }
 
     override fun equals(other: Any?): Boolean {
@@ -22,6 +29,7 @@ class TradeItOrderPriceTypeParcelable : Parcelable {
 
         if (priceType != other.priceType) return false
         if (displayLabel != other.displayLabel) return false
+        if (supportedOrderQuantityTypes != other.supportedOrderQuantityTypes) return false
 
         return true
     }
@@ -29,6 +37,7 @@ class TradeItOrderPriceTypeParcelable : Parcelable {
     override fun hashCode(): Int {
         var result = priceType.hashCode()
         result = 31 * result + displayLabel.hashCode()
+        result = 31 * result + supportedOrderQuantityTypes.hashCode()
         return result
     }
 
@@ -39,12 +48,15 @@ class TradeItOrderPriceTypeParcelable : Parcelable {
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeInt(this.priceType.ordinal)
         dest.writeString(this.displayLabel)
+        dest.writeList(this.supportedOrderQuantityTypes)
     }
 
     protected constructor(`in`: Parcel) {
         val tmpPriceType = `in`.readInt()
         this.priceType = TradeItOrderPriceType.values()[tmpPriceType]
         this.displayLabel = `in`.readString()
+        this.supportedOrderQuantityTypes = ArrayList()
+        `in`.readList(this.supportedOrderQuantityTypes, TradeItOrderQuantityType::class.java.getClassLoader())
     }
 
     companion object {

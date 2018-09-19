@@ -50,7 +50,7 @@ class TradeItLinkedBrokerAccountParcelableTest {
         account.userCanDisableMargin = true
 
         val orderCapability = OrderCapability()
-        val action = DisplayLabelValue("Buy", "buy")
+        val action = DisplayLabelValue("Buy", "buy", arrayListOf("SHARES"))
         orderCapability.actions = Arrays.asList(action)
         orderCapability.instrument = Instrument.EQUITIES
         account.orderCapabilities = Arrays.asList(orderCapability)

@@ -5,6 +5,7 @@ import android.os.Parcelable
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
+import it.trade.android.sdk.enums.TradeItOrderQuantityType
 import it.trade.model.reponse.DisplayLabelValue
 import it.trade.model.reponse.Instrument
 import it.trade.model.reponse.OrderCapability
@@ -135,7 +136,16 @@ class TradeItOrderCapabilityParcelable : Parcelable {
                 for (displayLabelValue in displayLabelValues) {
                     val action = TradeItOrderAction.getActionForValue(displayLabelValue.value)
                     if (action != null) {
-                        mappedValues.add(TradeItOrderActionParcelable(action, displayLabelValue.displayLabel))
+                        val supportedOrderQuantityTypes = displayLabelValue.supportedOrderQuantityTypes.map {
+                            TradeItOrderQuantityType.valueOf(it)
+                        }
+                        mappedValues.add(
+                            TradeItOrderActionParcelable(
+                                action,
+                                displayLabelValue.displayLabel,
+                                supportedOrderQuantityTypes
+                            )
+                        )
                     }
                 }
             }
@@ -148,7 +158,16 @@ class TradeItOrderCapabilityParcelable : Parcelable {
                 for (displayLabelValue in displayLabelValues) {
                     val priceType = TradeItOrderPriceType.getPriceTypeForValue(displayLabelValue.value)
                     if (priceType != null) {
-                        mappedValues.add(TradeItOrderPriceTypeParcelable(priceType, displayLabelValue.displayLabel))
+                        val supportedOrderQuantityTypes = displayLabelValue.supportedOrderQuantityTypes.map {
+                            TradeItOrderQuantityType.valueOf(it)
+                        }
+                        mappedValues.add(
+                            TradeItOrderPriceTypeParcelable(
+                                priceType,
+                                displayLabelValue.displayLabel,
+                                supportedOrderQuantityTypes
+                            )
+                        )
                     }
                 }
             }
