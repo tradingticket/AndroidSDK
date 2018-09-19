@@ -45,6 +45,8 @@ class TradeItOrderDetailsParcelable : Parcelable {
         protected set
     var estimatedTotalValue: Double? = null
         protected set
+    var userDisabledMargin: Boolean = false
+
     var warnings: List<TradeItWarningParcelable> = ArrayList()
 
     internal constructor() {}
@@ -71,6 +73,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
         this.shortHoldings = orderDetails.shortHoldings
         this.warnings = mapWarnings(orderDetails.warnings)
         this.orderQuantityType = orderDetails.orderQuantityType
+        this.userDisabledMargin = orderDetails.userDisabledMargin
     }
 
     override fun describeContents(): Int {
@@ -99,6 +102,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
         dest.writeValue(this.estimatedTotalValue)
         dest.writeTypedList(this.warnings)
         dest.writeString(this.orderQuantityType)
+        dest.writeByte((if (this.userDisabledMargin) 1 else 0).toByte())
     }
 
     override fun toString(): String {
@@ -110,6 +114,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
                 ", estimatedOrderCommission=$estimatedOrderCommission, longHoldings=$longHoldings" +
                 ", shortHoldings=$shortHoldings, estimatedOrderValue=$estimatedOrderValue" +
                 ", estimatedTotalValue=$estimatedTotalValue, orderQuantityType=$orderQuantityType," +
+                ", userDisabledMargin=$userDisabledMargin," +
                 " warnings=$warnings}"
     }
 
@@ -135,6 +140,7 @@ class TradeItOrderDetailsParcelable : Parcelable {
         this.estimatedTotalValue = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.warnings = `in`.createTypedArrayList(TradeItWarningParcelable.CREATOR)
         this.orderQuantityType = `in`.readString()
+        this.userDisabledMargin = `in`.readByte().toInt() != 0
     }
 
     companion object {
