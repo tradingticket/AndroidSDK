@@ -13,6 +13,7 @@ import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.widget.Button;
 import android.widget.EditText;
 
 import org.junit.Rule;
@@ -171,7 +172,7 @@ public class MainActivityTest {
         password.click();
         password.setText("dummy");
 
-        UiObject button = device.findObject(selector.textContains("Sign In"));
+        UiObject button = device.findObject(selector.className(Button.class).instance(0));
         button.click();
 
         waitAwhile();
@@ -182,7 +183,7 @@ public class MainActivityTest {
             answer.click();
             answer.setText("dummySecurity".equals(dummyLogin) ? "tradingticket" : "option 1");
 
-            UiObject submit = device.findObject(selector.textContains("Submit"));
+            UiObject submit = device.findObject(selector.className(Button.class).instance(0));
             submit.click();
 
             waitAwhile();
