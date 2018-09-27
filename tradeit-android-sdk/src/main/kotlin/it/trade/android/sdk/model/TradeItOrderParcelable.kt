@@ -6,6 +6,7 @@ import android.os.Parcelable
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
+import it.trade.android.sdk.enums.TradeItOrderQuantityType
 import it.trade.model.TradeItErrorResult
 import it.trade.model.callback.TradeItCallback
 import it.trade.model.reponse.TradeItPlaceStockOrEtfOrderResponse
@@ -38,6 +39,7 @@ class TradeItOrderParcelable : Parcelable {
         }
     var expiration: TradeItOrderExpirationType = TradeItOrderExpirationType.GOOD_FOR_DAY
     var isUserDisabledMargin = false
+    var orderQuantityType: TradeItOrderQuantityType = TradeItOrderQuantityType.SHARES
 
     constructor(linkedBrokerAccount: TradeItLinkedBrokerAccountParcelable, symbol: String) {
         this.linkedBrokerAccount = linkedBrokerAccount
@@ -76,6 +78,7 @@ class TradeItOrderParcelable : Parcelable {
                 if (this.limitPrice != null) this.limitPrice!!.toString() else null,
                 if (this.stopPrice != null) this.stopPrice!!.toString() else null,
                 this.expiration.expirationValue,
+                this.orderQuantityType.value,
                 this.isUserDisabledMargin
         )
 
@@ -125,6 +128,7 @@ class TradeItOrderParcelable : Parcelable {
         dest.writeInt(this.priceType.ordinal)
         dest.writeInt(this.expiration.ordinal)
         dest.writeByte((if (isUserDisabledMargin) 1 else 0).toByte())
+        dest.writeInt(this.orderQuantityType.ordinal)
     }
 
     protected constructor(`in`: Parcel) {
@@ -141,6 +145,7 @@ class TradeItOrderParcelable : Parcelable {
         val tmpExpiration = `in`.readInt()
         this.expiration = TradeItOrderExpirationType.values()[tmpExpiration]
         this.isUserDisabledMargin = `in`.readByte().toInt() != 0
+        this.orderQuantityType = TradeItOrderQuantityType.values()[`in`.readInt()]
     }
 
     companion object {

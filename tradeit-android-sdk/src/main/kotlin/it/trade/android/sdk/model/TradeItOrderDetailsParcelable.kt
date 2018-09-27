@@ -12,6 +12,8 @@ class TradeItOrderDetailsParcelable : Parcelable {
         protected set
     var orderQuantity: Double = 0.0
         protected set
+    var orderQuantityType: String = ""
+        protected set
     var orderExpiration: String = ""
         protected set
     var orderPrice: String = ""
@@ -43,6 +45,8 @@ class TradeItOrderDetailsParcelable : Parcelable {
         protected set
     var estimatedTotalValue: Double? = null
         protected set
+    var userDisabledMargin: Boolean = false
+
     var warnings: List<TradeItWarningParcelable> = ArrayList()
 
     internal constructor() {}
@@ -68,6 +72,8 @@ class TradeItOrderDetailsParcelable : Parcelable {
         this.longHoldings = orderDetails.longHoldings
         this.shortHoldings = orderDetails.shortHoldings
         this.warnings = mapWarnings(orderDetails.warnings)
+        this.orderQuantityType = orderDetails.orderQuantityType
+        this.userDisabledMargin = orderDetails.userDisabledMargin
     }
 
     override fun describeContents(): Int {
@@ -95,6 +101,8 @@ class TradeItOrderDetailsParcelable : Parcelable {
         dest.writeValue(this.estimatedOrderValue)
         dest.writeValue(this.estimatedTotalValue)
         dest.writeTypedList(this.warnings)
+        dest.writeString(this.orderQuantityType)
+        dest.writeByte((if (this.userDisabledMargin) 1 else 0).toByte())
     }
 
     override fun toString(): String {
@@ -105,7 +113,9 @@ class TradeItOrderDetailsParcelable : Parcelable {
                 ", timestamp=$timestamp, buyingPower=$buyingPower, availableCash=$availableCash" +
                 ", estimatedOrderCommission=$estimatedOrderCommission, longHoldings=$longHoldings" +
                 ", shortHoldings=$shortHoldings, estimatedOrderValue=$estimatedOrderValue" +
-                ", estimatedTotalValue=$estimatedTotalValue, warnings=$warnings}"
+                ", estimatedTotalValue=$estimatedTotalValue, orderQuantityType=$orderQuantityType," +
+                ", userDisabledMargin=$userDisabledMargin," +
+                " warnings=$warnings}"
     }
 
     protected constructor(`in`: Parcel) {
@@ -129,6 +139,8 @@ class TradeItOrderDetailsParcelable : Parcelable {
         this.estimatedOrderValue = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.estimatedTotalValue = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.warnings = `in`.createTypedArrayList(TradeItWarningParcelable.CREATOR)
+        this.orderQuantityType = `in`.readString()
+        this.userDisabledMargin = `in`.readByte().toInt() != 0
     }
 
     companion object {

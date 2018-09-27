@@ -36,7 +36,11 @@ class TradeItLinkedBrokerParcelableSpec {
             account1.accountBaseCurrency = "USD"
 
             val orderCapability = OrderCapability()
-            val action = DisplayLabelValue("Buy", "buy")
+            val action = DisplayLabelValue(
+                "Buy",
+                "buy",
+                arrayListOf("SHARES")
+            )
             orderCapability.instrument = Instrument.EQUITIES
             orderCapability.actions = arrayListOf(action)
             account1.orderCapabilities = arrayListOf(orderCapability)

@@ -9,6 +9,7 @@ import it.trade.android.sdk.TradeItSDK
 import it.trade.android.sdk.enums.TradeItOrderAction
 import it.trade.android.sdk.enums.TradeItOrderExpirationType
 import it.trade.android.sdk.enums.TradeItOrderPriceType
+import it.trade.android.sdk.enums.TradeItOrderQuantityType
 import it.trade.api.TradeItApiClient
 import it.trade.model.reponse.TradeItBrokerAccount
 import it.trade.model.reponse.TradeItOAuthAccessTokenResponse
@@ -67,6 +68,7 @@ class TradeItOrderParcelableTest {
         order!!.quantity = 3.14159
         order!!.quoteLastPrice = 21.50
         order!!.isUserDisabledMargin = true
+        order!!.orderQuantityType = TradeItOrderQuantityType.TOTAL_PRICE
         // Write the data.
         val parcel = Parcel.obtain()
         order!!.writeToParcel(parcel, order!!.describeContents())
@@ -82,6 +84,7 @@ class TradeItOrderParcelableTest {
         val limitPrice = createdFromParcel.limitPrice
         val priceType = createdFromParcel.priceType
         val quantity = createdFromParcel.quantity
+        val orderQuantityType = createdFromParcel.orderQuantityType
         val stopPrice = createdFromParcel.stopPrice
         val lastPrice = createdFromParcel.quoteLastPrice
         val symbol = createdFromParcel.symbol
@@ -101,5 +104,6 @@ class TradeItOrderParcelableTest {
         assertThat(lastPrice, `is`(order!!.quoteLastPrice))
         assertThat(symbol, `is`(order!!.symbol))
         assertThat(userDisabledMargin, `is`(order!!.isUserDisabledMargin))
+        assertThat(orderQuantityType, `is`(order!!.orderQuantityType))
     }
 }
