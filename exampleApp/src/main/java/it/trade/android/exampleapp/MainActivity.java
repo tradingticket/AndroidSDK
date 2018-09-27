@@ -16,19 +16,25 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import it.trade.android.sdk.TradeItConfigurationBuilder;
 import it.trade.android.sdk.TradeItSDK;
+import it.trade.android.sdk.enums.TradeItOrderAction;
 import it.trade.android.sdk.enums.TradeItOrderExpirationType;
 import it.trade.android.sdk.enums.TradeItOrderPriceType;
+import it.trade.android.sdk.enums.TradeItOrderQuantityType;
 import it.trade.android.sdk.exceptions.TradeItDeleteLinkedLoginException;
 import it.trade.android.sdk.exceptions.TradeItSaveLinkedLoginException;
 import it.trade.android.sdk.manager.TradeItLinkedBrokerManager;
+import it.trade.android.sdk.model.SymbolPairParcelable;
 import it.trade.android.sdk.model.TradeItCallBackCompletion;
 import it.trade.android.sdk.model.TradeItCallbackWithSecurityQuestionAndCompletion;
+import it.trade.android.sdk.model.TradeItCryptoOrderParcelable;
+import it.trade.android.sdk.model.TradeItCryptoQuoteResponseParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountData;
 import it.trade.android.sdk.model.TradeItLinkedBrokerAccountParcelable;
 import it.trade.android.sdk.model.TradeItLinkedBrokerData;
@@ -40,6 +46,7 @@ import it.trade.model.TradeItErrorResult;
 import it.trade.model.TradeItSecurityQuestion;
 import it.trade.model.callback.TradeItCallback;
 import it.trade.model.callback.TradeItCallbackWithSecurityQuestionImpl;
+import it.trade.model.reponse.Instrument;
 import it.trade.model.request.TradeItEnvironment;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public final static String ORDERS_STATUS_PARAMETER = "it.trade.android.exampleapp.ORDERS_STATUS";
     public final static String PREVIEW_ORDER_PARAMETER = "it.trade.android.exampleapp.PREVIEW_ORDER";
     public final static String RELINK_OAUTH_PARAMETER = "it.trade.android.exampleapp.RELINK_OAUTH";
-
+    public final static String GET_CRYPTO_QUOTE_PARAMETER = "it.trade.android.exampleapp.GET_CRYPTO_QUOTE";
 
     private TradeItLinkedBrokerManager linkedBrokerManager;
 
@@ -69,14 +76,16 @@ public class MainActivity extends AppCompatActivity {
         DELETE_ALL_LINKED_BROKERS("Delete all linked brokers"),
         AUTHENTICATE_FIRST_LINKED_BROKER("Authenticate first linked broker"),
         AUTHENTICATE_ALL_LINKED_BROKERS("Authenticate all linked brokers"),
-        AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE("Simple security question"),
-        AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS("Security question with options"),
+//        AUTHENTICATE_WITH_SECURITY_QUESTION_SIMPLE("Simple security question"),
+//        AUTHENTICATE_WITH_SECURITY_QUESTION_OPTIONS("Security question with options"),
         REFRESH_ALL_BALANCES_ALL_LINKED_BROKERS("Refresh all balances for all linked brokers"),
         REFRESH_ALL_BALANCES_FIRST_LINKED_BROKER("Refresh all balances for first linked broker"),
         PARCEL_FIRST_LINKED_BROKER_ACCOUNT("Parcel first linked broker account"),
         GET_POSITIONS_FIRST_LINKED_BROKER_ACCOUNT("Get positions for first linked broker account"),
         REFRESH_ORDERS_STATUS_FIRST_LINKED_BROKER_ACCOUNT("Refresh orders status for first linked broker account"),
-        PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account");
+        PREVIEW_TRADE_FIRST_LINKED_BROKER_ACCOUNT("Preview trade for first linked broker account"),
+        PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT("Preview crypto trade for first crypto broker account"),
+        GET_CRYPTO_QUOTE_FIRST_CRYPTO_BROKER_ACCOUNT("Get crypto quote for first crypto broker account");
 
         private String label;
         MainActivityActions(String label) {
@@ -96,9 +105,10 @@ public class MainActivity extends AppCompatActivity {
         initTable();
 
         TradeItConfigurationBuilder configurationBuilder = new TradeItConfigurationBuilder(
-                this.getApplicationContext(),
-                "tradeit-test-api-key",
-                TradeItEnvironment.QA);
+            this.getApplicationContext(),
+            "tradeit-test-api-key",
+            TradeItEnvironment.QA
+        );
 
         TradeItSDK.configure(configurationBuilder);
 
@@ -109,13 +119,23 @@ public class MainActivity extends AppCompatActivity {
         TableLayout tableLayout = (TableLayout) findViewById(R.id.tableLayoutId);
         TableRow rowHeader = new TableRow(this);
         rowHeader.setBackgroundColor(Color.parseColor("#c0c0c0"));
-        rowHeader.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
-                                                               TableLayout.LayoutParams.WRAP_CONTENT));
+        rowHeader.setLayoutParams(
+            new TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            )
+        );
+
         String headerText = "TradeIt ExampleApp";
 
         TextView tv = new TextView(this);
-        tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                                                     TableRow.LayoutParams.WRAP_CONTENT));
+        tv.setLayoutParams(
+            new TableRow.LayoutParams(
+                TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT
+            )
+        );
+
         tv.setGravity(Gravity.CENTER);
         tv.setTextSize(18);
         tv.setText(headerText);
@@ -129,7 +149,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void addRow(TableLayout tableLayout, String label, int id) {
         TableRow row = new TableRow(this);
-        row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        row.setLayoutParams(
+            new TableRow.LayoutParams(
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT
+            )
+        );
+
         row.setBackgroundResource(R.drawable.row_border);
         TextView textView = new TextView(this);
         textView.setPadding(10, 10, 10, 10);
@@ -201,6 +227,14 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "preview trade first linked broker account was tapped!");
                     previewTradeFirstLinkedBroker();
                     break;
+                case PREVIEW_CRYPTO_TRADE_FIRST_CRYPTO_BROKER_ACCOUNT:
+                    Log.d(TAG, "preview trade first crypto broker account was tapped!");
+                    previewCryptoTradeFirstCryptoBrokerAccount();
+                    break;
+                case GET_CRYPTO_QUOTE_FIRST_CRYPTO_BROKER_ACCOUNT:
+                    Log.d(TAG, "getCryptoQuote first crypto broker account was tapped!");
+                    getCryptoQuoteFirstCryptoBrokerAccount();
+                    break;
                 case SYNC_LOCAL_LINKED_BROKERS:
                     Log.d(TAG, "synch local linked brokers was tapped!");
                     syncLocalLinkedBrokers();
@@ -224,16 +258,24 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void showSecurityQuestion(TradeItSecurityQuestion securityQuestion, EditText editText, DialogInterface.OnClickListener onSubmitListener, DialogInterface.OnClickListener onCancelListener) {
+    private void showSecurityQuestion(
+        TradeItSecurityQuestion securityQuestion,
+        EditText editText,
+        DialogInterface.OnClickListener onSubmitListener,
+        DialogInterface.OnClickListener onCancelListener
+    ) {
         final EditText input = editText;
-        String message = !securityQuestion.getSecurityQuestionOptions().isEmpty() ? TextUtils.join("\n", securityQuestion.getSecurityQuestionOptions()) : "";
+        String message = !securityQuestion.getSecurityQuestionOptions().isEmpty() ?
+            TextUtils.join("\n", securityQuestion.getSecurityQuestionOptions()) :
+            "";
+
         new AlertDialog.Builder(this)
-                .setTitle(securityQuestion.getSecurityQuestion())
-                .setMessage(message)
-                .setView(input)
-                .setPositiveButton(android.R.string.ok, onSubmitListener)
-                .setNegativeButton(android.R.string.cancel, onCancelListener)
-                .show();
+            .setTitle(securityQuestion.getSecurityQuestion())
+            .setMessage(message)
+            .setView(input)
+            .setPositiveButton(android.R.string.ok, onSubmitListener)
+            .setNegativeButton(android.R.string.cancel, onCancelListener)
+            .show();
     }
 
     private void deleteLinkedBrokers() {
@@ -264,30 +306,39 @@ public class MainActivity extends AppCompatActivity {
 
     private void authenticateAllLinkedBrokers() {
         final MainActivity mainActivity = this;
-        linkedBrokerManager.authenticateAll(new TradeItCallbackWithSecurityQuestionAndCompletion() {
-            @Override
-            public void onFinished() {
-                Log.d(TAG, "authenticateAllLinkedBrokers - onFinished");
-                goToLinkedBrokersActivity();
-            }
+        linkedBrokerManager.authenticateAll(
+            new TradeItCallbackWithSecurityQuestionAndCompletion() {
+                @Override
+                public void onFinished() {
+                    Log.d(TAG, "authenticateAllLinkedBrokers - onFinished");
+                    goToLinkedBrokersActivity();
+                }
 
-            @Override
-            public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion, final TradeItCallbackWithSecurityQuestionImpl callback) {
-                final EditText input = new EditText(mainActivity);
-                showSecurityQuestion(securityQuestion, input, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        callback.submitSecurityAnswer(input.getText().toString());
-                    }
-                },
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        callback.cancelSecurityQuestion();
-                    }
-                });
+                @Override
+                public void onSecurityQuestion(
+                    TradeItSecurityQuestion securityQuestion,
+                    final TradeItCallbackWithSecurityQuestionImpl callback
+                ) {
+                    final EditText input = new EditText(mainActivity);
+                    showSecurityQuestion(
+                        securityQuestion,
+                        input,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                callback.submitSecurityAnswer(input.getText().toString());
+                            }
+                        },
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                callback.cancelSecurityQuestion();
+                            }
+                        }
+                    );
+                }
             }
-        });
+        );
     }
 
     private void authenticateFirstLinkedBroker(int index) {
@@ -298,17 +349,20 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(index);
             final MainActivity mainActivity = this;
-            linkedBroker.authenticate(new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
-                @Override
-                public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
-                    goToLinkedBrokersActivity();
-                }
+            linkedBroker.authenticate(
+                new TradeItCallbackWithSecurityQuestionImpl<List<TradeItLinkedBrokerAccountParcelable>>() {
+                    @Override
+                    public void onSuccess(final List<TradeItLinkedBrokerAccountParcelable> accounts) {
+                        goToLinkedBrokersActivity();
+                    }
 
-                @Override
-                public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
-                    final EditText input = new EditText(mainActivity);
-                    final TradeItCallbackWithSecurityQuestionImpl securityQuestionImpl = this;
-                    showSecurityQuestion(securityQuestion, input,
+                    @Override
+                    public void onSecurityQuestion(TradeItSecurityQuestion securityQuestion) {
+                        final EditText input = new EditText(mainActivity);
+                        final TradeItCallbackWithSecurityQuestionImpl securityQuestionImpl = this;
+                        showSecurityQuestion(
+                            securityQuestion,
+                            input,
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -321,14 +375,15 @@ public class MainActivity extends AppCompatActivity {
                                     securityQuestionImpl.cancelSecurityQuestion();
                                 }
                             }
-                    );
-                }
+                        );
+                    }
 
-                @Override
-                public void onError(TradeItErrorResult error) {
-                    showAlert("authenticateFirstLinkedBroker", "Error authenticating: " + error);
+                    @Override
+                    public void onError(TradeItErrorResult error) {
+                        showAlert("authenticateFirstLinkedBroker", "Error authenticating: " + error);
+                    }
                 }
-            });
+            );
         }
     }
 
@@ -375,12 +430,14 @@ public class MainActivity extends AppCompatActivity {
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
             showAlert("refreshAllBalancesFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
-            linkedBrokerManager.refreshAccountBalances(new TradeItCallBackCompletion() {
-                @Override
-                public void onFinished() {
-                    goToLinkedBrokersActivity();
+            linkedBrokerManager.refreshAccountBalances(
+                new TradeItCallBackCompletion() {
+                    @Override
+                    public void onFinished() {
+                        goToLinkedBrokersActivity();
+                    }
                 }
-            });
+            );
         }
     }
 
@@ -394,19 +451,21 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
             for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
-                linkedBrokerAccount.refreshPositions(new TradeItCallback<List<TradeItPositionParcelable>>() {
-                    @Override
-                    public void onSuccess(List<TradeItPositionParcelable> positions) {
-                        Intent intent = new Intent(mainActivity, PositionsActivity.class);
-                        intent.putParcelableArrayListExtra(POSITIONS_PARAMETER, (ArrayList<? extends Parcelable>) positions);
-                        startActivity(intent);
-                    }
+                linkedBrokerAccount.refreshPositions(
+                    new TradeItCallback<List<TradeItPositionParcelable>>() {
+                        @Override
+                        public void onSuccess(List<TradeItPositionParcelable> positions) {
+                            Intent intent = new Intent(mainActivity, PositionsActivity.class);
+                            intent.putParcelableArrayListExtra(POSITIONS_PARAMETER, (ArrayList<? extends Parcelable>) positions);
+                            startActivity(intent);
+                        }
 
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        showAlert("getPositionsFirstLinkedBroker", "Error refreshing positions: " + error);
+                        @Override
+                        public void onError(TradeItErrorResult error) {
+                            showAlert("getPositionsFirstLinkedBroker", "Error refreshing positions: " + error);
+                        }
                     }
-                });
+                );
             }
         }
     }
@@ -421,19 +480,21 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
             for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
-                linkedBrokerAccount.refreshOrdersStatus(new TradeItCallback<List<TradeItOrderStatusParcelable>>() {
-                    @Override
-                    public void onSuccess(List<TradeItOrderStatusParcelable> orderStatusDetailsList) {
-                        Intent intent = new Intent(mainActivity, OrdersStatusActivity.class);
-                        intent.putParcelableArrayListExtra(ORDERS_STATUS_PARAMETER, (ArrayList<? extends Parcelable>) orderStatusDetailsList);
-                        startActivity(intent);
-                    }
+                linkedBrokerAccount.refreshOrdersStatus(
+                    new TradeItCallback<List<TradeItOrderStatusParcelable>>() {
+                        @Override
+                        public void onSuccess(List<TradeItOrderStatusParcelable> orderStatusDetailsList) {
+                            Intent intent = new Intent(mainActivity, OrdersStatusActivity.class);
+                            intent.putParcelableArrayListExtra(ORDERS_STATUS_PARAMETER, (ArrayList<? extends Parcelable>) orderStatusDetailsList);
+                            startActivity(intent);
+                        }
 
-                    @Override
-                    public void onError(TradeItErrorResult error) {
-                        showAlert("getOrdersStatusFirstLinkedBroker", "Error refreshing orders status: " + error);
+                        @Override
+                        public void onError(TradeItErrorResult error) {
+                            showAlert("getOrdersStatusFirstLinkedBroker", "Error refreshing orders status: " + error);
+                        }
                     }
-                });
+                );
             }
         }
     }
@@ -446,7 +507,13 @@ public class MainActivity extends AppCompatActivity {
         } else if (linkedBrokers.get(0).getAccounts().isEmpty()) {
             showAlert("previewTradeFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
-            final TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokers.get(0).getAccounts().get(0), "GE");
+            String symbol;
+            if (linkedBrokers.get(0).getBrokerName().equals("kabu")) {
+                symbol = "8703";
+            } else {
+                symbol = "GE";
+            }
+            final TradeItOrderParcelable order = new TradeItOrderParcelable(linkedBrokers.get(0).getAccounts().get(0), symbol);
             order.setLimitPrice(20.0);
             order.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
             order.setPriceType(TradeItOrderPriceType.LIMIT);
@@ -456,6 +523,79 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void previewCryptoTradeFirstCryptoBrokerAccount() {
+        final MainActivity mainActivity = this;
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        if (linkedBrokers.isEmpty()) {
+            showAlert("previewTradeFirstLinkedBroker", "No linked broker!");
+            return;
+        }
+        TradeItLinkedBrokerAccountParcelable cryptoAccount = getFirstCryptoAccount(linkedBrokers);
+        if (cryptoAccount == null) {
+            showAlert("previewTradeFirstLinkedBroker", "No crypto account!");
+            return;
+        }
+        final TradeItCryptoOrderParcelable cryptoOrderParcelable = new TradeItCryptoOrderParcelable(
+                cryptoAccount,
+                new SymbolPairParcelable("BTC","USD"),
+                TradeItOrderAction.BUY
+        );
+        cryptoOrderParcelable.setPriceType(TradeItOrderPriceType.LIMIT);
+        cryptoOrderParcelable.setExpiration(TradeItOrderExpirationType.GOOD_FOR_DAY);
+        cryptoOrderParcelable.setLimitPrice(new BigDecimal(2000.0));
+        cryptoOrderParcelable.setOrderQuantityType(TradeItOrderQuantityType.QUOTE_CURRENCY);
+        cryptoOrderParcelable.setQuantity(new BigDecimal(1.0));
+        Intent intent = new Intent(mainActivity, PreviewCryptoOrderActivity.class);
+        intent.putExtra(PREVIEW_ORDER_PARAMETER, cryptoOrderParcelable);
+        startActivity(intent);
+    }
+
+    private void getCryptoQuoteFirstCryptoBrokerAccount() {
+        final MainActivity mainActivity = this;
+        List<TradeItLinkedBrokerParcelable> linkedBrokers = linkedBrokerManager.getLinkedBrokers();
+        if (linkedBrokers.isEmpty()) {
+            showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No linked broker!");
+            return;
+        }
+        TradeItLinkedBrokerAccountParcelable cryptoAccount = getFirstCryptoAccount(linkedBrokers);
+        if (cryptoAccount == null) {
+            showAlert("getCryptoQuoteFirstCryptoBrokerAccount", "No crypto account!");
+            return;
+        }
+        cryptoAccount.getCryptoQuote("BTC/USD", new TradeItCallback<TradeItCryptoQuoteResponseParcelable>() {
+            @Override
+            public void onSuccess(TradeItCryptoQuoteResponseParcelable tradeItCryptoQuoteResponseParcelable) {
+                Intent intent = new Intent(mainActivity, GetCryptoQuoteActivity.class);
+                intent.putExtra(GET_CRYPTO_QUOTE_PARAMETER, tradeItCryptoQuoteResponseParcelable);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(TradeItErrorResult tradeItErrorResult) {
+                showAlert(tradeItErrorResult.getShortMessage(),
+                        tradeItErrorResult.getLongMessages().toString()
+                );
+            }
+        });
+    }
+
+    private TradeItLinkedBrokerAccountParcelable getFirstCryptoAccount(
+            List<TradeItLinkedBrokerParcelable> linkedBrokers
+    ) {
+        TradeItLinkedBrokerAccountParcelable cryptoAccount = null;
+        for (TradeItLinkedBrokerParcelable linkedBroker: linkedBrokers) {
+            if (cryptoAccount != null) {
+                break;
+            }
+            for (TradeItLinkedBrokerAccountParcelable accountParcelable: linkedBroker.getAccounts()) {
+                if(accountParcelable.getOrderCapabilityForInstrument(Instrument.CRYPTO) != null) {
+                    cryptoAccount = accountParcelable;
+                    break;
+                }
+            }
+        }
+        return cryptoAccount;
+    }
     private void goToLinkedBrokersActivity() {
         Intent intent = new Intent(this.getApplicationContext(), LinkedBrokersActivity.class);
         intent.putParcelableArrayListExtra(LINKED_BROKERS_PARAMETER, (ArrayList<? extends Parcelable>) linkedBrokerManager.getLinkedBrokers());
@@ -476,24 +616,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void syncLocalLinkedBrokers() {
         TradeItLinkedBrokerData linkedBrokerData1 = new TradeItLinkedBrokerData(
-                "dummy",
-                "8fa14999720337719675",
-                "XZZt9cfIz9APLljOPeKhFjOuz5mSa1E9Q5Un%2Fc1ARlaD4wQixu6S%2BUIQ6rOhiUDV1RJM0stg7EqVslOH5oxGYHBvdLrKqNoi%2BdRzGscDF3nNbzBR3QJMV5SxsgyEkaLrmFETBZUiaRcfKSR6kvLznA%3D%3D"
+            "dummy",
+            "8fa14999720337719675",
+            "XZZt9cfIz9APLljOPeKhFjOuz5mSa1E9Q5Un%2Fc1ARlaD4wQixu6S%2BUIQ6rOhiUDV1RJM0stg7EqVslOH5oxGYHBvdLrKqNoi%2BdRzGscDF3nNbzBR3QJMV5SxsgyEkaLrmFETBZUiaRcfKSR6kvLznA%3D%3D"
         ).withLinkActivationPending(true);
         linkedBrokerData1.injectAccount(new TradeItLinkedBrokerAccountData("MyAccountName", "MyAccountNumber", "USD"));
 
         TradeItLinkedBrokerData linkedBrokerData2 = new TradeItLinkedBrokerData(
-                "dummyFx",
-                "3741499971984583d2f1",
-                "ecwzVqxPiTtgalvlgPQOofmaxc%2BVj1JWnl8UfTwnXlMS8lQgNJ8zevAWAR1hcflBkyJ0V%2FWCuxvQdCe1vowLOcX7Hj9vpADuQfuBppFo1faGCV7q9UEjr0J4F8OhlFhgL2SwRLRz0uD411DokfX86g%3D%3D"
+            "dummyFx",
+            "3741499971984583d2f1",
+            "ecwzVqxPiTtgalvlgPQOofmaxc%2BVj1JWnl8UfTwnXlMS8lQgNJ8zevAWAR1hcflBkyJ0V%2FWCuxvQdCe1vowLOcX7Hj9vpADuQfuBppFo1faGCV7q9UEjr0J4F8OhlFhgL2SwRLRz0uD411DokfX86g%3D%3D"
         );
 
         try {
             linkedBrokerManager.syncLocalLinkedBrokers(Arrays.asList(linkedBrokerData1, linkedBrokerData2));
             goToLinkedBrokersActivity();
-        } catch (TradeItSaveLinkedLoginException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (TradeItDeleteLinkedLoginException e) {
+        } catch (TradeItSaveLinkedLoginException | TradeItDeleteLinkedLoginException e) {
             Log.e(TAG, e.getMessage(), e);
         }
     }

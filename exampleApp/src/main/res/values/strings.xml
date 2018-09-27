@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AndroidExampleApp</string>
+    <string name="title_activity_get_crypto_quote">GetCryptoQuoteActivity</string>
 </resources>

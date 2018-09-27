@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="it.trade.android.exampleapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LinkedBrokersActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".OauthLinkBrokerActivity"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="tradeit"
+                    android:scheme="exampleapp" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LinkedBrokerAccountsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ParceledAccountActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".PositionsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".PreviewOrderActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".PreviewCryptoOrderActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".BrokersListActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".OrdersStatusActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".GetCryptoQuoteActivity"
+            android:parentActivityName=".MainActivity" />
+    </application>
+
+</manifest>

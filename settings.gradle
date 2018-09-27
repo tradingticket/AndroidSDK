@@ -1,1 +1,1 @@
-include ':exampleApp', ':tradeit-android-sdk'
+include ':exampleApp', ':exampleAppKotlin', ':tradeit-android-sdk'

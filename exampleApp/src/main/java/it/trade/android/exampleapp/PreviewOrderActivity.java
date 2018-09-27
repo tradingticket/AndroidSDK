@@ -19,7 +19,7 @@ import it.trade.model.callback.TradeItCallback;
 import static it.trade.android.exampleapp.MainActivity.PREVIEW_ORDER_PARAMETER;
 
 public class PreviewOrderActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getName();
+    private static final String TAG = PreviewOrderActivity.class.getName();
     private String orderId;
     private TradeItOrderParcelable order;
     private TextView textView;
