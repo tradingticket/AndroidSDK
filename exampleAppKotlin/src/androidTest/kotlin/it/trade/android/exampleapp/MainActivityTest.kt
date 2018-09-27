@@ -92,37 +92,6 @@ class MainActivityTest {
         testDeleteAllLinkedBrokers()
     }
 
-    @Test
-    @Throws(InterruptedException::class)
-    fun testDummyMultiple() {
-        testOauthFlow("dummyOption")
-
-        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.label)
-
-        waitAwhile() //TODO there should be a better way for waiting
-
-        checkFieldContainsText(R.id.alertTitle, "Select an option from the following")
-
-        checkFieldContainsText(android.R.id.message, "option 1\noption 2\noption 3\noption 4\noption 5\noption 6\noption 7\noption 8\noption 9\noption 10")
-
-        val editText = onView(
-                allOf<View>(withClassName(`is`("android.widget.EditText")),
-                        withParent(allOf<View>(withId(R.id.custom),
-                                withParent(withId(R.id.customPanel)))),
-                        isDisplayed()))
-        editText.perform(replaceText("option 1"), closeSoftKeyboard())
-
-        tapOnText("OK")
-
-        waitAwhile() //TODO there should be a better way for waiting
-
-        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS")
-
-        navigateUp()
-
-        testDeleteAllLinkedBrokers()
-    }
-
     @Throws(InterruptedException::class, UiObjectNotFoundException::class)
     private fun testOauthFlow(dummyLogin: String) {
         tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.label)

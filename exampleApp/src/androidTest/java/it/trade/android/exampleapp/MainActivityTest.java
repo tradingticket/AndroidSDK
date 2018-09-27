@@ -115,36 +115,6 @@ public class MainActivityTest {
         testDeleteAllLinkedBrokers();
     }
 
-    @Test
-    public void testDummyMultiple() throws InterruptedException, UiObjectNotFoundException {
-        testOauthFlow("dummyOption");
-
-        tapOnText(MainActivity.MainActivityActions.AUTHENTICATE_FIRST_LINKED_BROKER.getLabel());
-
-        waitAwhile();
-
-        checkFieldContainsText(R.id.alertTitle, "Select an option from the following");
-
-        checkFieldContainsText(android.R.id.message, "option 1\noption 2\noption 3\noption 4\noption 5\noption 6\noption 7\noption 8\noption 9\noption 10");
-
-        ViewInteraction editText = onView(
-                allOf(withClassName(is("android.widget.EditText")),
-                        withParent(allOf(withId(R.id.custom),
-                                withParent(withId(R.id.customPanel)))),
-                        isDisplayed()));
-        editText.perform(replaceText("option 1"), closeSoftKeyboard());
-
-        tapOnText("OK");
-
-        waitAwhile();
-
-        checkFieldContainsText(R.id.linked_brokers_textview, "1 PARCELED LINKED BROKERS");
-
-        navigateUp();
-
-        testDeleteAllLinkedBrokers();
-    }
-
     //TODO FIXME - oAuth flow automated test doesn't work anymore
     private void testOauthFlow(String dummyLogin) throws InterruptedException, UiObjectNotFoundException {
         tapOnText(MainActivity.MainActivityActions.OAUTH_LINKED_A_BROKER.getLabel());
