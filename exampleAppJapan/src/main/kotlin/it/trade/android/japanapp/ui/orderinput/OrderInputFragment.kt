@@ -1,5 +1,6 @@
 package it.trade.android.japanapp.ui.orderinput
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -7,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import it.trade.android.japanapp.R
+import kotlinx.android.synthetic.main.order_input_fragment.*
+import kotlinx.android.synthetic.main.order_input_fragment.view.*
 
 class OrderInputFragment : Fragment() {
 
@@ -23,8 +26,32 @@ class OrderInputFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(OrderInputViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity!!).get(OrderInputViewModel::class.java)
         // TODO: Use the ViewModel
+        viewModel.getOrderModel().observe(this, Observer { orderForm ->
+            orderForm?.run {
+                tvSymbolName.text = symbol.name
+                tvSymbol.text = "${symbol.symbol} ${symbol.exchange}"
+                tvCurrentTime.text = "13:00"
+
+                tvPrice.text = symbol.price.toString()
+                val change = String.format("%+,.0f", priceChange)
+                val percentage = String.format("%+.2f", priceChangePercentage * 100)
+                tvPriceChange.text = "$change ($percentage%)"
+
+                tvBuyingPower.text = String.format("%,.0f", buyingPower.availableCash)
+                tvNisaLimit.text = String.format("(NISA) %,.0f", buyingPower.availableNisaLimit)
+
+                etQuantity.setText(String.format("%d", orderInfo.quantity))
+                etPrice.setText(String.format("%.0f", orderInfo.limitPrice))
+
+                val lower = String.format("%,.0f", symbol.priceLowerLimit)
+                val upper = String.format("%,.0f", symbol.priceUpperLimit)
+                tvPriceLimit.text = "(値幅制限 $lower-$upper)"
+                val estimated = String.format("%,.0f", estimatedValue)
+                tvEstimatedValue.text = "$estimated 円"
+            }
+        })
     }
 
 }
