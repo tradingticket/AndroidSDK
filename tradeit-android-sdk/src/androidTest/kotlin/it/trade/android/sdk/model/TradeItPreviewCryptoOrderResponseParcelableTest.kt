@@ -1,8 +1,8 @@
 package it.trade.android.sdk.model
 
 import android.os.Parcel
+import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
-import android.test.suitebuilder.annotation.SmallTest
 import it.trade.model.reponse.Warning
 import it.trade.model.reponse.WarningLink
 import org.hamcrest.Matchers.`is`
