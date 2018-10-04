@@ -2,6 +2,7 @@ package it.trade.android.japanapp.ui.orderinput
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -34,7 +35,7 @@ class OrderInputFragment : Fragment() {
                 tvSymbol.text = "${symbol.symbol} ${symbol.exchange}"
                 tvCurrentTime.text = "13:00"
 
-                tvPrice.text = symbol.price.toString()
+                tvPrice.text = String.format("%,.0f", symbol.price)
                 val change = String.format("%+,.0f", priceChange)
                 val percentage = String.format("%+.2f", priceChangePercentage * 100)
                 tvPriceChange.text = "$change ($percentage%)"
@@ -52,6 +53,40 @@ class OrderInputFragment : Fragment() {
                 tvEstimatedValue.text = "$estimated 円"
             }
         })
+        btQuantityPlus.setOnClickListener {
+            viewModel.increaseQuantity()
+        }
+        btQuantityMinus.setOnClickListener {
+            viewModel.decreaseQuantity()
+        }
+        btPricePlus.setOnClickListener {
+            viewModel.increasePrice()
+        }
+        btPriceMinus.setOnClickListener {
+            viewModel.decreasePrice()
+        }
+        btLimit.isChecked = true
+        btMarket.isChecked = false
+        btMarket.setOnClickListener {
+            btLimit.isChecked = false
+            btMarket.isChecked = true
+            togglePriceType()
+        }
+        btLimit.setOnClickListener {
+            btLimit.isChecked = true
+            btMarket.isChecked = false
+            togglePriceType()
+        }
+    }
+
+    private fun togglePriceType() {
+        if (btLimit.isChecked) {
+            priceInput.visibility = View.VISIBLE
+            tvPriceLimit.visibility = View.VISIBLE
+        } else {
+            priceInput.visibility = View.GONE
+            tvPriceLimit.visibility = View.GONE
+        }
     }
 
 }

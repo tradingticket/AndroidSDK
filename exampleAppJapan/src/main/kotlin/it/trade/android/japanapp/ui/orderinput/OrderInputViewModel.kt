@@ -13,14 +13,86 @@ class OrderInputViewModel : ViewModel() {
         if (!this::orderForm.isInitialized) {
             orderForm = MutableLiveData()
             orderForm.value = OrderForm(
-                    TradeItSDKHolder.getSymoblProvider().getJapanSymbol("8703"),
+                    TradeItSDKHolder.getSymbolProvider().getJapanSymbol("8703"),
                     TradeItSDKHolder.getBuyingPower())
         }
         return orderForm
     }
 
+    fun increaseQuantity() {
+        val value = orderForm.value
+        orderForm.value = value?.apply {
+            orderInfo = orderInfo.copy(quantity = orderInfo.quantity + symbol.lotSize)
+        }
+    }
+
+    fun decreaseQuantity() {
+        val value = orderForm.value
+        if (value?.orderInfo?.quantity == value?.symbol?.lotSize) {
+            // do not decrease further when it's lotsize already
+            return
+        } else {
+            orderForm.value = value?.apply {
+                orderInfo = orderInfo.copy(quantity = orderInfo.quantity - symbol.lotSize)
+            }
+        }
+    }
+
+    fun increasePrice() {
+        val value = orderForm.value
+        orderForm.value = value?.apply {
+            if (orderInfo.limitPrice < symbol.priceUpperLimit) {
+                orderInfo = orderInfo.copy(limitPrice = orderInfo.limitPrice + 1)
+            }
+        }
+    }
+
+    fun decreasePrice() {
+        val value = orderForm.value
+        orderForm.value = value?.apply {
+            if (orderInfo.limitPrice > symbol.priceLowerLimit) {
+                orderInfo = orderInfo.copy(limitPrice = orderInfo.limitPrice - 1)
+            }
+        }
+    }
+
 }
 
+class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower) {
+    var orderInfo: OrderInfo = OrderInfo(
+            quantity = symbol.lotSize,
+            limitPrice = symbol.price,
+            type = OrderType.LIMIT,
+            expiry = OrderExpiry.DAY,
+            accountType = AccountType.SPECIFIC
+    )
+
+    val estimatedValue: Double
+        get() {
+            return orderInfo.quantity * orderInfo.limitPrice
+        }
+
+    val priceChange: Double
+        get() {
+            return symbol.price - symbol.previousDayPrice
+        }
+
+    val priceChangePercentage: Double
+        get() {
+            return priceChange / symbol.previousDayPrice
+        }
+
+    val availableExpiry: List<OrderExpiry>
+        get() {
+            return if (orderInfo.type == OrderType.LIMIT) {
+                listOf(OrderExpiry.DAY, OrderExpiry.WEEK, OrderExpiry.TILL_DATE, OrderExpiry.OPENING, OrderExpiry.CLOSING, OrderExpiry.FUNARI)
+            } else {
+                listOf(OrderExpiry.DAY, OrderExpiry.OPENING, OrderExpiry.CLOSING)
+            }
+        }
+}
+
+//TODO temp solutions below
 interface JapanSymbolProvider {
     fun getJapanSymbol(symol: String): JapanSymbol
 }
@@ -34,40 +106,17 @@ class SampleJapanSymbol : JapanSymbolProvider {
 }
 
 object TradeItSDKHolder {
-    fun getSymoblProvider(): JapanSymbolProvider {
+    fun getSymbolProvider(): JapanSymbolProvider {
         return SampleJapanSymbol()
     }
+
     // need broker/account
     fun getBuyingPower(): BuyingPower {
         return BuyingPower(500000.toDouble(), 100000.toDouble())
     }
 }
 
-class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower) {
-    val orderInfo: OrderInfo = OrderInfo(
-            quantity = symbol.lotSize,
-            limitPrice = symbol.price,
-            type = OrderType.LIMIT,
-            expiry = OrderExpiry.DAY,
-            accountType = AccountType.SPECIFIC
-    )
-
-    val estimatedValue: Double = orderInfo.quantity * orderInfo.limitPrice
-
-    val priceChange: Double = symbol.price - symbol.previousDayPrice
-
-    val priceChangePercentage: Double = priceChange / symbol.previousDayPrice
-
-    val availableExpiry: List<OrderExpiry>
-        get() {
-            return if (orderInfo.type == OrderType.LIMIT) {
-                listOf(OrderExpiry.DAY, OrderExpiry.WEEK, OrderExpiry.TILL_DATE, OrderExpiry.OPENING, OrderExpiry.CLOSING, OrderExpiry.FUNARI)
-            } else {
-                listOf(OrderExpiry.DAY, OrderExpiry.OPENING, OrderExpiry.CLOSING)
-            }
-        }
-}
-
+// TODO need to separate the price portion out
 data class JapanSymbol(val name: String, val symbol: String, val exchange: String,
                        val price: Double, val previousDayPrice: Double,
                        val priceLowerLimit: Double, val priceUpperLimit: Double,
