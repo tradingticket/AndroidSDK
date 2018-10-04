@@ -16,6 +16,13 @@ class OrderInputFragment : Fragment() {
 
     companion object {
         fun newInstance() = OrderInputFragment()
+        fun newInstance(symbol: String): OrderInputFragment {
+            val args = Bundle()
+            args.putString("symbol", symbol)
+            val fragment = OrderInputFragment()
+            fragment.arguments = args
+            return fragment
+        }
     }
 
     private lateinit var viewModel: OrderInputViewModel
@@ -29,6 +36,9 @@ class OrderInputFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(activity!!).get(OrderInputViewModel::class.java)
         // TODO: Use the ViewModel
+        arguments?.getString("symbol")?.let {
+           viewModel.init(it)
+        }
         viewModel.getOrderModel().observe(this, Observer { orderForm ->
             orderForm?.run {
                 tvSymbolName.text = symbol.name
@@ -71,6 +81,7 @@ class OrderInputFragment : Fragment() {
             btLimit.isChecked = false
             btMarket.isChecked = true
             togglePriceType()
+            viewModel.resetPrice()
         }
         btLimit.setOnClickListener {
             btLimit.isChecked = true

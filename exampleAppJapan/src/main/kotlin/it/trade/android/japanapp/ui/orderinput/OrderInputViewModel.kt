@@ -56,6 +56,24 @@ class OrderInputViewModel : ViewModel() {
         }
     }
 
+    fun init(symbol: String?) {
+        // TODO need a cleaner way to initialize the OrderForm
+        if (symbol != null) {
+            if (!this::orderForm.isInitialized || (this::orderForm.isInitialized && symbol != orderForm.value?.symbol?.symbol)) {
+                orderForm = MutableLiveData()
+                orderForm.value = OrderForm(
+                        TradeItSDKHolder.getSymbolProvider().getJapanSymbol(symbol),
+                        TradeItSDKHolder.getBuyingPower())
+            }
+        }
+    }
+
+    fun resetPrice() {
+        val value = orderForm.value
+        orderForm.value = value?.apply {
+            orderInfo = orderInfo.copy(limitPrice = symbol.price)
+        }
+    }
 }
 
 class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower) {
@@ -94,13 +112,13 @@ class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower) {
 
 //TODO temp solutions below
 interface JapanSymbolProvider {
-    fun getJapanSymbol(symol: String): JapanSymbol
+    fun getJapanSymbol(symbol: String): JapanSymbol
 }
 
 class SampleJapanSymbol : JapanSymbolProvider {
-    override fun getJapanSymbol(symol: String): JapanSymbol {
+    override fun getJapanSymbol(symbol: String): JapanSymbol {
         return JapanSymbol("カブドットコム証券(株)",
-                "8703", "東証1部", 386.0,
+                symbol, "東証1部", 386.0,
                 384.0, 286.0, 486.0, 100)
     }
 }

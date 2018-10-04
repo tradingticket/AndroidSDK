@@ -190,11 +190,12 @@
 
         <android.support.v7.widget.LinearLayoutCompat
             android:id="@+id/orderInfo"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/quantityInput"
+            app:layout_constraintStart_toStartOf="@+id/quantityInput"
             app:layout_constraintTop_toBottomOf="@+id/divider3">
 
 
@@ -342,8 +343,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="@+id/orderInfo"
-            app:layout_constraintStart_toStartOf="@+id/orderInfo"
+            app:layout_constraintEnd_toEndOf="@+id/quantityInput"
+            app:layout_constraintStart_toStartOf="@+id/quantityInput"
             app:layout_constraintTop_toBottomOf="@+id/divider4">
 
             <android.support.v7.widget.LinearLayoutCompat
@@ -417,8 +418,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="@+id/orderInfo"
-            app:layout_constraintStart_toStartOf="@+id/orderInfo"
+            app:layout_constraintEnd_toEndOf="@+id/quantityInput"
+            app:layout_constraintStart_toStartOf="@+id/quantityInput"
             app:layout_constraintTop_toBottomOf="@+id/divider5">
 
             <android.support.v7.widget.LinearLayoutCompat
