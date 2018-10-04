@@ -20,18 +20,15 @@ class OrderInputViewModel : ViewModel() {
     }
 
     fun increaseQuantity() {
-        val value = orderForm.value
-        orderForm.value = value?.apply {
+        orderForm.value = orderForm.value?.apply {
             orderInfo = orderInfo.copy(quantity = orderInfo.quantity + symbol.lotSize)
         }
     }
 
     fun decreaseQuantity() {
         val value = orderForm.value
-        if (value?.orderInfo?.quantity == value?.symbol?.lotSize) {
+        if (value?.orderInfo?.quantity != value?.symbol?.lotSize) {
             // do not decrease further when it's lotsize already
-            return
-        } else {
             orderForm.value = value?.apply {
                 orderInfo = orderInfo.copy(quantity = orderInfo.quantity - symbol.lotSize)
             }
@@ -39,8 +36,7 @@ class OrderInputViewModel : ViewModel() {
     }
 
     fun increasePrice() {
-        val value = orderForm.value
-        orderForm.value = value?.apply {
+        orderForm.value = orderForm.value?.apply {
             if (orderInfo.limitPrice < symbol.priceUpperLimit) {
                 orderInfo = orderInfo.copy(limitPrice = orderInfo.limitPrice + 1)
             }
@@ -48,8 +44,7 @@ class OrderInputViewModel : ViewModel() {
     }
 
     fun decreasePrice() {
-        val value = orderForm.value
-        orderForm.value = value?.apply {
+        orderForm.value = orderForm.value?.apply {
             if (orderInfo.limitPrice > symbol.priceLowerLimit) {
                 orderInfo = orderInfo.copy(limitPrice = orderInfo.limitPrice - 1)
             }
@@ -69,8 +64,7 @@ class OrderInputViewModel : ViewModel() {
     }
 
     fun resetPrice() {
-        val value = orderForm.value
-        orderForm.value = value?.apply {
+        orderForm.value = orderForm.value?.apply {
             orderInfo = orderInfo.copy(limitPrice = symbol.price)
         }
     }

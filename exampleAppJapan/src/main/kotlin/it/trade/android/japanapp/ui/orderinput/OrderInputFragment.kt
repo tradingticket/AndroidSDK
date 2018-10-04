@@ -35,9 +35,8 @@ class OrderInputFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(activity!!).get(OrderInputViewModel::class.java)
-        // TODO: Use the ViewModel
         arguments?.getString("symbol")?.let {
-           viewModel.init(it)
+            viewModel.init(it)
         }
         viewModel.getOrderModel().observe(this, Observer { orderForm ->
             orderForm?.run {

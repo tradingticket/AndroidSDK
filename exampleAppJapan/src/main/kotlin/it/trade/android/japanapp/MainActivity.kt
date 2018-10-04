@@ -12,6 +12,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
+                    // TODO this symbol is only for testing. and it's chosen as different to
+                    // the 8703 in Fragment class, so to distinguish how Fragment is initialized.
+                    // actual value should be provided by symbol lookup Fragment(not yet created.)
                     .replace(R.id.container, OrderInputFragment.newInstance("8704"))
                     .commitNow()
         }
