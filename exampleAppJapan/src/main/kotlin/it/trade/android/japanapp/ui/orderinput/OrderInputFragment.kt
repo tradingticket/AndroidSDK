@@ -54,6 +54,8 @@ class OrderInputFragment : Fragment() {
 
                 etQuantity.setText(String.format("%d", orderInfo.quantity))
                 etPrice.setText(String.format("%.0f", orderInfo.limitPrice))
+                btMarket.isChecked = orderInfo.type == OrderType.MARKET
+                btLimit.isChecked = orderInfo.type == OrderType.LIMIT
 
                 val lower = String.format("%,.0f", symbol.priceLowerLimit)
                 val upper = String.format("%,.0f", symbol.priceUpperLimit)
@@ -74,17 +76,12 @@ class OrderInputFragment : Fragment() {
         btPriceMinus.setOnClickListener {
             viewModel.decreasePrice()
         }
-        btLimit.isChecked = true
-        btMarket.isChecked = false
         btMarket.setOnClickListener {
-            btLimit.isChecked = false
-            btMarket.isChecked = true
+            viewModel.setMarketOrder()
             togglePriceType()
-            viewModel.resetPrice()
         }
         btLimit.setOnClickListener {
-            btLimit.isChecked = true
-            btMarket.isChecked = false
+            viewModel.setLimitOrder()
             togglePriceType()
         }
     }

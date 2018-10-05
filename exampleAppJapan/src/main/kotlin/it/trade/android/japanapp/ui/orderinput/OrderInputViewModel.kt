@@ -5,8 +5,6 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 
 class OrderInputViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
-
     private lateinit var orderForm: MutableLiveData<OrderForm>
 
     fun getOrderModel(): LiveData<OrderForm> {
@@ -63,9 +61,15 @@ class OrderInputViewModel : ViewModel() {
         }
     }
 
-    fun resetPrice() {
+    fun setMarketOrder() {
         orderForm.value = orderForm.value?.apply {
-            orderInfo = orderInfo.copy(limitPrice = symbol.price)
+            orderInfo = orderInfo.copy(type = OrderType.MARKET, limitPrice = symbol.price)
+        }
+    }
+
+    fun setLimitOrder() {
+        orderForm.value = orderForm.value?.apply {
+            orderInfo = orderInfo.copy(type = OrderType.LIMIT)
         }
     }
 }
