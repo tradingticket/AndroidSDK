@@ -3,15 +3,20 @@ package it.trade.android.japanapp.ui.orderinput
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
+import android.util.Log
 
-class OrderInputViewModel : ViewModel() {
+private const val TAG = "OrderInputViewModel"
+
+class OrderInputViewModel(private val symbol: String) : ViewModel() {
     private lateinit var orderForm: MutableLiveData<OrderForm>
 
     fun getOrderModel(): LiveData<OrderForm> {
         if (!this::orderForm.isInitialized) {
+            Log.d(TAG, "initialized.")
             orderForm = MutableLiveData()
             orderForm.value = OrderForm(
-                    TradeItSDKHolder.getSymbolProvider().getJapanSymbol("8703"),
+                    TradeItSDKHolder.getSymbolProvider().getJapanSymbol(symbol),
                     TradeItSDKHolder.getBuyingPower())
         }
         return orderForm
@@ -49,18 +54,6 @@ class OrderInputViewModel : ViewModel() {
         }
     }
 
-    fun init(symbol: String?) {
-        // TODO need a cleaner way to initialize the OrderForm
-        if (symbol != null) {
-            if (!this::orderForm.isInitialized || (this::orderForm.isInitialized && symbol != orderForm.value?.symbol?.symbol)) {
-                orderForm = MutableLiveData()
-                orderForm.value = OrderForm(
-                        TradeItSDKHolder.getSymbolProvider().getJapanSymbol(symbol),
-                        TradeItSDKHolder.getBuyingPower())
-            }
-        }
-    }
-
     fun setMarketOrder() {
         orderForm.value = orderForm.value?.apply {
             orderInfo = orderInfo.copy(type = OrderType.MARKET, limitPrice = symbol.price)
@@ -72,6 +65,14 @@ class OrderInputViewModel : ViewModel() {
             orderInfo = orderInfo.copy(type = OrderType.LIMIT)
         }
     }
+}
+
+class OrderInputViewModelFactory(private val symbol: String) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+        return OrderInputViewModel(symbol) as T
+    }
+
 }
 
 class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower) {

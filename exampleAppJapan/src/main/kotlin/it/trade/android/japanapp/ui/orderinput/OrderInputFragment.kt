@@ -5,9 +5,12 @@ import android.arch.lifecycle.ViewModelProviders
 import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import it.trade.android.japanapp.R
 import kotlinx.android.synthetic.main.order_input_fragment.*
 import kotlinx.android.synthetic.main.order_input_fragment.view.*
@@ -15,7 +18,6 @@ import kotlinx.android.synthetic.main.order_input_fragment.view.*
 class OrderInputFragment : Fragment() {
 
     companion object {
-        fun newInstance() = OrderInputFragment()
         fun newInstance(symbol: String): OrderInputFragment {
             val args = Bundle()
             args.putString("symbol", symbol)
@@ -26,18 +28,17 @@ class OrderInputFragment : Fragment() {
     }
 
     private lateinit var viewModel: OrderInputViewModel
+    private lateinit var symbol: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
+        symbol = arguments?.getString("symbol") ?: "8703"
         return inflater.inflate(R.layout.order_input_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(activity!!).get(OrderInputViewModel::class.java)
-        arguments?.getString("symbol")?.let {
-            viewModel.init(it)
-        }
+        viewModel = ViewModelProviders.of(activity!!, OrderInputViewModelFactory(symbol)).get(OrderInputViewModel::class.java)
         viewModel.getOrderModel().observe(this, Observer { orderForm ->
             orderForm?.run {
                 tvSymbolName.text = symbol.name
@@ -94,6 +95,18 @@ class OrderInputFragment : Fragment() {
             priceInput.visibility = View.GONE
             tvPriceLimit.visibility = View.GONE
         }
+    }
+
+    fun EditText.onChange(cb: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                cb(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
 }
