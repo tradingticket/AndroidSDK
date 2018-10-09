@@ -16,4 +16,6 @@
     <string name="general">一般</string>
     <string name="nisa">NISA</string>
     <string name="order_review">注文内容の確認へ</string>
+    <string name="invalid_price">指定価格が値幅制限以内にしてください。</string>
+    <string name="invalid_quantity">指定株数をロットサイズの整数倍にしてください</string>
 </resources>

@@ -2,7 +2,6 @@ package it.trade.android.japanapp.ui.orderinput
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.Editable
@@ -13,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import it.trade.android.japanapp.R
 import kotlinx.android.synthetic.main.order_input_fragment.*
-import kotlinx.android.synthetic.main.order_input_fragment.view.*
 
 class OrderInputFragment : Fragment() {
 
@@ -85,6 +83,26 @@ class OrderInputFragment : Fragment() {
             viewModel.setLimitOrder()
             togglePriceType()
         }
+        etPrice.onChange { price ->
+            val selection = etPrice.selectionStart
+            val result = viewModel.setLimitPrice(price)
+            etPrice.error = null
+            if (!result) {
+                etPrice.error = getString(R.string.invalid_price)
+            } else if (selection >= 0) {
+                etPrice.setSelection(selection)
+            }
+        }
+        etQuantity.onChange { quantity ->
+            val selection = etQuantity.selectionStart
+            val result = viewModel.setQuantity(quantity)
+            etQuantity.error = null
+            if (!result) {
+                etQuantity.error = getString(R.string.invalid_quantity)
+            } else if (selection >= 0) {
+                etQuantity.setSelection(selection)
+            }
+        }
     }
 
     private fun togglePriceType() {
@@ -97,7 +115,7 @@ class OrderInputFragment : Fragment() {
         }
     }
 
-    fun EditText.onChange(cb: (String) -> Unit) {
+    private fun EditText.onChange(cb: (String) -> Unit) {
         this.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 cb(s.toString())

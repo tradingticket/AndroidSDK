@@ -65,6 +65,52 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
             orderInfo = orderInfo.copy(type = OrderType.LIMIT)
         }
     }
+
+    fun setLimitPrice(price: String): Boolean {
+        val newPrice = try {
+            price.toDouble()
+        } catch (e: NumberFormatException) {
+            return false
+        }
+        if (newPrice == orderForm.value?.orderInfo?.limitPrice) {
+            // to avoid infinite loop, don't update model when value is not actually updated
+            return true
+        }
+        var isValid = false
+        val newValue = orderForm.value?.apply {
+            if (newPrice >= symbol.priceLowerLimit && newPrice <= symbol.priceUpperLimit) {
+                orderInfo = orderInfo.copy(limitPrice = newPrice)
+                isValid = true
+            }
+        }
+        if (isValid){
+            orderForm.value = newValue
+        }
+        return isValid
+    }
+
+    fun setQuantity(quantity: String): Boolean {
+        val newQuantity = try {
+            quantity.toInt()
+        } catch (e: NumberFormatException) {
+            return false
+        }
+        if (newQuantity == orderForm.value?.orderInfo?.quantity) {
+            // to avoid infinite loop, don't update model when value is not actually updated
+            return true
+        }
+        var isValid = false
+        val newValue = orderForm.value?.apply {
+            if (newQuantity % symbol.lotSize == 0) {
+                orderInfo = orderInfo.copy(quantity = newQuantity)
+                isValid = true
+            }
+        }
+        if (isValid) {
+            orderForm.value = newValue
+        }
+        return isValid
+    }
 }
 
 class OrderInputViewModelFactory(private val symbol: String) : ViewModelProvider.NewInstanceFactory() {

@@ -150,9 +150,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:ems="6"
+                android:ems="8"
                 android:inputType="number"
                 android:textAlignment="center"
+                android:selectAllOnFocus="true"
                 app:layout_constraintEnd_toStartOf="@+id/btQuantityPlus"
                 app:layout_constraintStart_toEndOf="@+id/btQuantityMinus" />
 
@@ -253,9 +254,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:ems="6"
+                    android:ems="8"
                     android:inputType="number"
                     android:textAlignment="center"
+                    android:selectAllOnFocus="true"
                     app:layout_constraintEnd_toStartOf="@+id/btPricePlus"
                     app:layout_constraintStart_toEndOf="@+id/btPriceMinus" />
 
