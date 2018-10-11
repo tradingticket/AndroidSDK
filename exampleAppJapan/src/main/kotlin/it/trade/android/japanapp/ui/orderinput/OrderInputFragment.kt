@@ -6,12 +6,16 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.PopupMenu
 import it.trade.android.japanapp.R
 import kotlinx.android.synthetic.main.order_input_fragment.*
+
+private const val TAG = "OrderInputFragment"
 
 class OrderInputFragment : Fragment() {
 
@@ -61,6 +65,14 @@ class OrderInputFragment : Fragment() {
                 tvPriceLimit.text = "(値幅制限 $lower-$upper)"
                 val estimated = String.format("%,.0f", estimatedValue)
                 tvEstimatedValue.text = "$estimated 円"
+
+                Log.d(TAG, "current expiry is ${orderInfo.expiry}")
+                btDay.isChecked = orderInfo.expiry == OrderExpiry.DAY
+                btWeek.isChecked = orderInfo.expiry == OrderExpiry.WEEK
+                btWeek.isEnabled = orderInfo.type == OrderType.LIMIT
+                btTillDate.isChecked = orderInfo.expiry == OrderExpiry.TILL_DATE
+                btTillDate.isEnabled = orderInfo.type == OrderType.LIMIT
+                btSession.isChecked = orderInfo.expiry in listOf(OrderExpiry.OPENING, OrderExpiry.CLOSING, OrderExpiry.FUNARI)
             }
         })
         btQuantityPlus.setOnClickListener {
@@ -103,6 +115,44 @@ class OrderInputFragment : Fragment() {
                 etQuantity.setSelection(selection)
             }
         }
+        btDay.setOnClickListener {
+            viewModel.setExpiry(OrderExpiry.DAY)
+        }
+        btWeek.setOnClickListener {
+            viewModel.setExpiry(OrderExpiry.WEEK)
+        }
+        btTillDate.setOnClickListener {
+            viewModel.setExpiry(OrderExpiry.TILL_DATE)
+        }
+        btSession.setOnClickListener {
+            // the button status should only updated by the viewModel instead of the click event
+            btSession.isChecked = !btSession.isChecked
+            val popup = PopupMenu(activity!!, it)
+            popup.inflate(R.menu.session_popup)
+            if (btMarket.isChecked) {
+                popup.menu.findItem(R.id.funari).isVisible = false
+            }
+            popup.setOnMenuItemClickListener { item ->
+                when (item?.itemId) {
+                    R.id.opening -> {
+                        viewModel.setExpiry(OrderExpiry.OPENING)
+                        true
+                    }
+                    R.id.closing -> {
+                        viewModel.setExpiry(OrderExpiry.CLOSING)
+                        true
+                    }
+                    R.id.funari -> {
+                        viewModel.setExpiry(OrderExpiry.FUNARI)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.setOnDismissListener { _ -> viewModel.dummyUpdate()}
+            popup.show()
+        }
+
     }
 
     private fun togglePriceType() {

@@ -152,8 +152,8 @@
                 android:layout_marginTop="8dp"
                 android:ems="8"
                 android:inputType="number"
-                android:textAlignment="center"
                 android:selectAllOnFocus="true"
+                android:textAlignment="center"
                 app:layout_constraintEnd_toStartOf="@+id/btQuantityPlus"
                 app:layout_constraintStart_toEndOf="@+id/btQuantityMinus" />
 
@@ -256,8 +256,8 @@
                     android:layout_marginTop="8dp"
                     android:ems="8"
                     android:inputType="number"
-                    android:textAlignment="center"
                     android:selectAllOnFocus="true"
+                    android:textAlignment="center"
                     app:layout_constraintEnd_toStartOf="@+id/btPricePlus"
                     app:layout_constraintStart_toEndOf="@+id/btPriceMinus" />
 
@@ -356,13 +356,15 @@
                 android:layout_marginEnd="8dp">
 
                 <ToggleButton
+                    android:id="@+id/btDay"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textOff="@string/day"
                     android:textOn="@string/day" />
 
                 <ToggleButton
+                    android:id="@+id/btWeek"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -377,19 +379,29 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp">
 
-                <Spinner
-                    android:layout_width="wrap_content"
+                <ToggleButton
+                    android:id="@+id/btTillDate"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:drawableEnd="@drawable/ic_arrow_drop_down"
+                    android:textAlignment="center"
+                    android:textOff="@string/till_date"
+                    android:textOn="@string/till_date">
 
-                </Spinner>
+                </ToggleButton>
 
-                <Spinner
-                    android:layout_width="wrap_content"
+                <ToggleButton
+                    android:id="@+id/btSession"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:drawableEnd="@drawable/ic_arrow_drop_down"
+                    android:textAlignment="center"
+                    android:textOff="@string/opening"
+                    android:textOn="@string/opening">
 
-                </Spinner>
+                </ToggleButton>
             </android.support.v7.widget.LinearLayoutCompat>
         </android.support.v7.widget.LinearLayoutCompat>
 
@@ -481,8 +493,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:text="@string/order_review"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

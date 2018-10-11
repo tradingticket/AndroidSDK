@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.util.Log
+import kotlin.math.exp
 
 private const val TAG = "OrderInputViewModel"
 
@@ -56,7 +57,11 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
 
     fun setMarketOrder() {
         orderForm.value = orderForm.value?.apply {
-            orderInfo = orderInfo.copy(type = OrderType.MARKET, limitPrice = symbol.price)
+            val expiry = if (orderInfo.expiry in listOf(OrderExpiry.WEEK, OrderExpiry.TILL_DATE, OrderExpiry.FUNARI))
+                OrderExpiry.DAY
+            else
+                orderInfo.expiry
+            orderInfo = orderInfo.copy(type = OrderType.MARKET, limitPrice = symbol.price, expiry = expiry)
         }
     }
 
@@ -83,7 +88,7 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
                 isValid = true
             }
         }
-        if (isValid){
+        if (isValid) {
             orderForm.value = newValue
         }
         return isValid
@@ -110,6 +115,16 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
             orderForm.value = newValue
         }
         return isValid
+    }
+
+    fun setExpiry(expiry: OrderExpiry) {
+        orderForm.value = orderForm.value?.apply {
+            orderInfo = orderInfo.copy(expiry = expiry)
+        }
+    }
+
+    fun dummyUpdate() {
+        orderForm.value = orderForm.value
     }
 }
 
@@ -143,15 +158,6 @@ class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower) {
     val priceChangePercentage: Double
         get() {
             return priceChange / symbol.previousDayPrice
-        }
-
-    val availableExpiry: List<OrderExpiry>
-        get() {
-            return if (orderInfo.type == OrderType.LIMIT) {
-                listOf(OrderExpiry.DAY, OrderExpiry.WEEK, OrderExpiry.TILL_DATE, OrderExpiry.OPENING, OrderExpiry.CLOSING, OrderExpiry.FUNARI)
-            } else {
-                listOf(OrderExpiry.DAY, OrderExpiry.OPENING, OrderExpiry.CLOSING)
-            }
         }
 }
 
