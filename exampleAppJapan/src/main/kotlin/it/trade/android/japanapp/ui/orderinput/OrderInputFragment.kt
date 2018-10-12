@@ -139,7 +139,13 @@ class OrderInputFragment : Fragment() {
             viewModel.setExpiry(OrderExpiry.WEEK)
         }
         btTillDate.setOnClickListener {
-            viewModel.setExpiry(OrderExpiry.TILL_DATE)
+            btTillDate.isChecked = !btTillDate.isChecked
+            val datePicker = DatePickerFragment()
+            datePicker.setDateSetPickerCallBack { date ->
+                Log.d(TAG, "picked $date")
+                viewModel.setTillDate(date)
+            }
+            datePicker.show(activity!!.supportFragmentManager, "OrderInputDatePicker")
         }
         btSession.setOnClickListener {
             // the button status should only updated by the viewModel instead of the click event

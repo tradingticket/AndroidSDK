@@ -140,6 +140,12 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
             }
         }
     }
+
+    fun setTillDate(date: String) {
+        orderForm.value = orderForm.value?.apply {
+            orderInfo = orderInfo.copy(expiry = OrderExpiry.TILL_DATE, expiryDate = date)
+        }
+    }
 }
 
 class OrderInputViewModelFactory(private val symbol: String) : ViewModelProvider.NewInstanceFactory() {
@@ -156,6 +162,7 @@ class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower, val avail
             limitPrice = symbol.price,
             type = OrderType.LIMIT,
             expiry = OrderExpiry.DAY,
+            expiryDate = "",
             accountType = AccountType.SPECIFIC
     )
 
@@ -210,7 +217,7 @@ data class JapanSymbol(val name: String, val symbol: String, val exchange: Strin
                        val lotSize: Int)
 
 data class OrderInfo(val quantity: Int, val limitPrice: Double, val type: OrderType,
-                     val expiry: OrderExpiry, val accountType: AccountType)
+                     val expiry: OrderExpiry, val expiryDate: String, val accountType: AccountType)
 
 data class BuyingPower(val availableCash: Double, val availableNisaLimit: Double)
 
