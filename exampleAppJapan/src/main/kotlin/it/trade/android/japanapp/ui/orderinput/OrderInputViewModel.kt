@@ -5,7 +5,6 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.util.Log
-import kotlin.math.exp
 
 private const val TAG = "OrderInputViewModel"
 
@@ -18,9 +17,15 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
             orderForm = MutableLiveData()
             orderForm.value = OrderForm(
                     TradeItSDKHolder.getSymbolProvider().getJapanSymbol(symbol),
-                    TradeItSDKHolder.getBuyingPower())
+                    TradeItSDKHolder.getBuyingPower(),
+                    TradeItSDKHolder.getAccountTypes())
         }
         return orderForm
+    }
+
+    fun getAvailabeAccountTypes():List<AccountType> {
+        // Japan user should always has a GENERAL account type
+        return orderForm.value?.availableAccounts ?: listOf(AccountType.GENERAL)
     }
 
     fun increaseQuantity() {
@@ -126,6 +131,15 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
     fun dummyUpdate() {
         orderForm.value = orderForm.value
     }
+
+    fun setAccountType(position: Int) {
+        val accountType = getAvailabeAccountTypes()[position]
+        if (accountType != orderForm.value?.orderInfo?.accountType) {
+            orderForm.value = orderForm.value?.apply {
+                orderInfo = orderInfo.copy(accountType = accountType)
+            }
+        }
+    }
 }
 
 class OrderInputViewModelFactory(private val symbol: String) : ViewModelProvider.NewInstanceFactory() {
@@ -136,7 +150,7 @@ class OrderInputViewModelFactory(private val symbol: String) : ViewModelProvider
 
 }
 
-class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower) {
+class OrderForm(val symbol: JapanSymbol, val buyingPower: BuyingPower, val availableAccounts: List<AccountType>) {
     var orderInfo: OrderInfo = OrderInfo(
             quantity = symbol.lotSize,
             limitPrice = symbol.price,
@@ -177,6 +191,10 @@ class SampleJapanSymbol : JapanSymbolProvider {
 object TradeItSDKHolder {
     fun getSymbolProvider(): JapanSymbolProvider {
         return SampleJapanSymbol()
+    }
+
+    fun getAccountTypes(): List<AccountType> {
+        return listOf(AccountType.SPECIFIC, AccountType.GENERAL, AccountType.NISA)
     }
 
     // need broker/account

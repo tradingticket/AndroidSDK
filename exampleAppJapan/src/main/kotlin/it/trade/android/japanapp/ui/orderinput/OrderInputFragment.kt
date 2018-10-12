@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.PopupMenu
 import it.trade.android.japanapp.R
@@ -31,6 +33,7 @@ class OrderInputFragment : Fragment() {
 
     private lateinit var viewModel: OrderInputViewModel
     private lateinit var symbol: String
+    private lateinit var accountAdapter: ArrayAdapter<String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -73,6 +76,20 @@ class OrderInputFragment : Fragment() {
                 btTillDate.isChecked = orderInfo.expiry == OrderExpiry.TILL_DATE
                 btTillDate.isEnabled = orderInfo.type == OrderType.LIMIT
                 btSession.isChecked = orderInfo.expiry in listOf(OrderExpiry.OPENING, OrderExpiry.CLOSING, OrderExpiry.FUNARI)
+
+                val accountTypes = viewModel.getAvailabeAccountTypes()
+                accountAdapter.clear()
+                val selected = orderInfo.accountType
+                Log.d(TAG, "current account type: $selected")
+                for ((index, accountType) in accountTypes.withIndex()) {
+                    when (accountType) {
+                        AccountType.SPECIFIC -> accountAdapter.add(getString(R.string.specific))
+                        AccountType.GENERAL -> accountAdapter.add(getString(R.string.general))
+                        AccountType.NISA -> accountAdapter.add(getString(R.string.nisa))
+                    }
+                    if (accountType == selected) spAccount.setSelection(index)
+                }
+
             }
         })
         btQuantityPlus.setOnClickListener {
@@ -151,6 +168,18 @@ class OrderInputFragment : Fragment() {
             }
             popup.setOnDismissListener { _ -> viewModel.dummyUpdate()}
             popup.show()
+        }
+        accountAdapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_item).apply{
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        spAccount.adapter = accountAdapter
+        spAccount.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                viewModel.setAccountType(position)
+            }
+
         }
 
     }

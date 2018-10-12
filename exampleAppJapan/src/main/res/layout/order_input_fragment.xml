@@ -118,7 +118,7 @@
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNisaLimit" />
+            app:layout_constraintTop_toBottomOf="@+id/accountType" />
 
         <TextView
             android:id="@+id/tvQuantityCaps"
@@ -415,7 +415,7 @@
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/orderCondition" />
+            app:layout_constraintTop_toBottomOf="@+id/tvNisaLimit" />
 
         <TextView
             android:id="@+id/tvAccountCaps"
@@ -432,49 +432,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:gravity="end"
             app:layout_constraintEnd_toEndOf="@+id/quantityInput"
             app:layout_constraintStart_toStartOf="@+id/quantityInput"
             app:layout_constraintTop_toBottomOf="@+id/divider5">
 
-            <android.support.v7.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp">
-
-                <ToggleButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textOff="@string/specific"
-                    android:textOn="@string/specific" />
-
-                <ToggleButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textOff="@string/general"
-                    android:textOn="@string/general" />
-            </android.support.v7.widget.LinearLayoutCompat>
-
-            <android.support.v7.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp">
-
-                <ToggleButton
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textOff="@string/nisa"
-                    android:textOn="@string/nisa" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-            </android.support.v7.widget.LinearLayoutCompat>
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/spAccount"
+                android:paddingTop="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </android.support.v7.widget.AppCompatSpinner>
         </android.support.v7.widget.LinearLayoutCompat>
 
         <View
@@ -487,7 +457,7 @@
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/accountType" />
+            app:layout_constraintTop_toBottomOf="@+id/orderCondition" />
 
         <Button
             android:layout_width="match_parent"
