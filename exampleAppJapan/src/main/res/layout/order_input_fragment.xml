@@ -134,37 +134,28 @@
             android:id="@+id/quantityInput"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider2">
 
-            <Button
-                android:id="@+id/btQuantityMinus"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="-" />
-
-            <EditText
-                android:id="@+id/etQuantity"
+            <android.support.design.widget.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:ems="8"
-                android:inputType="number"
-                android:selectAllOnFocus="true"
-                android:textAlignment="center"
-                app:layout_constraintEnd_toStartOf="@+id/btQuantityPlus"
-                app:layout_constraintStart_toEndOf="@+id/btQuantityMinus" />
+                android:gravity="center_vertical">
 
-            <Button
-                android:id="@+id/btQuantityPlus"
-                android:layout_width="40dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:text="+"
-                app:layout_constraintEnd_toEndOf="parent" />
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/etQuantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_minus"
+                    android:drawableEnd="@drawable/ic_plus"
+                    android:ems="12"
+                    android:inputType="number"
+                    android:selectAllOnFocus="true"
+                    android:textAlignment="center" />
+            </android.support.design.widget.TextInputLayout>
         </android.support.v7.widget.LinearLayoutCompat>
 
         <View
@@ -211,7 +202,6 @@
                     android:id="@+id/btLimit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:text="@string/limit"
                     android:textOff="@string/limit"
@@ -223,7 +213,6 @@
                     android:id="@+id/btMarket"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:text="@string/market"
                     android:textOff="@string/market"
@@ -241,34 +230,24 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/orderType">
 
-                <Button
-                    android:id="@+id/btPriceMinus"
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:text="-" />
-
-                <EditText
-                    android:id="@+id/etPrice"
+                <android.support.design.widget.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:ems="8"
-                    android:inputType="number"
-                    android:selectAllOnFocus="true"
-                    android:textAlignment="center"
-                    app:layout_constraintEnd_toStartOf="@+id/btPricePlus"
-                    app:layout_constraintStart_toEndOf="@+id/btPriceMinus" />
+                    android:gravity="center_vertical">
 
-                <Button
-                    android:id="@+id/btPricePlus"
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="+"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/etPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableStart="@drawable/ic_minus"
+                        android:drawableEnd="@drawable/ic_plus"
+                        android:ems="12"
+                        android:inputType="number"
+                        android:selectAllOnFocus="true"
+                        android:textAlignment="center" />
+                </android.support.design.widget.TextInputLayout>
             </android.support.v7.widget.LinearLayoutCompat>
 
             <TextView
@@ -351,9 +330,7 @@
 
             <android.support.v7.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp">
+                android:layout_height="wrap_content">
 
                 <ToggleButton
                     android:id="@+id/btDay"
@@ -375,9 +352,7 @@
 
             <android.support.v7.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp">
+                android:layout_height="wrap_content">
 
                 <ToggleButton
                     android:id="@+id/btTillDate"
@@ -431,20 +406,19 @@
             android:id="@+id/accountType"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:gravity="end"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="@+id/quantityInput"
             app:layout_constraintStart_toStartOf="@+id/quantityInput"
             app:layout_constraintTop_toBottomOf="@+id/divider5">
 
             <android.support.v7.widget.AppCompatSpinner
                 android:id="@+id/spAccount"
-                android:paddingTop="8dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </android.support.v7.widget.AppCompatSpinner>
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="8dp" />
         </android.support.v7.widget.LinearLayoutCompat>
 
         <View

@@ -8,6 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -92,17 +93,43 @@ class OrderInputFragment : Fragment() {
 
             }
         })
-        btQuantityPlus.setOnClickListener {
-            viewModel.increaseQuantity()
+        etQuantity.setOnTouchListener { v, event ->
+            val x = event?.x?.toInt()!!
+            val (start, _, end, _) = etQuantity.compoundDrawablesRelative
+            var processed = false
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                when {
+                    x <= (etQuantity.paddingStart + start.bounds.width()) -> {
+                        viewModel.decreaseQuantity()
+                        processed = true
+                    }
+                    x >= (etQuantity.right - end.bounds.width() - etQuantity.paddingEnd) -> {
+                        viewModel.increaseQuantity()
+                        processed = true
+                    }
+                    else -> v!!.performClick()
+                }
+            }
+            processed
         }
-        btQuantityMinus.setOnClickListener {
-            viewModel.decreaseQuantity()
-        }
-        btPricePlus.setOnClickListener {
-            viewModel.increasePrice()
-        }
-        btPriceMinus.setOnClickListener {
-            viewModel.decreasePrice()
+        etPrice.setOnTouchListener { v, event ->
+            val x = event?.x?.toInt()!!
+            val (start, _, end, _) = etPrice.compoundDrawablesRelative
+            var processed = false
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                when {
+                    x <= (etPrice.paddingStart + start.bounds.width()) -> {
+                        viewModel.decreasePrice()
+                        processed = true
+                    }
+                    x >= (etPrice.right - end.bounds.width() - etPrice.paddingEnd) -> {
+                        viewModel.increasePrice()
+                        processed = true
+                    }
+                    else -> v!!.performClick()
+                }
+            }
+            processed
         }
         btMarket.setOnClickListener {
             viewModel.setMarketOrder()
@@ -172,15 +199,15 @@ class OrderInputFragment : Fragment() {
                     else -> false
                 }
             }
-            popup.setOnDismissListener { _ -> viewModel.dummyUpdate()}
+            popup.setOnDismissListener { _ -> viewModel.dummyUpdate() }
             popup.show()
         }
-        accountAdapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_item).apply{
+        accountAdapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_item).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
         spAccount.adapter = accountAdapter
         spAccount.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 viewModel.setAccountType(position)
