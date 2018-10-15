@@ -142,9 +142,9 @@ class OrderInputFragment : Fragment() {
         etPrice.onChange { price ->
             val selection = etPrice.selectionStart
             val result = viewModel.setLimitPrice(price)
-            etPrice.error = null
+            priceLayout.error = null
             if (!result) {
-                etPrice.error = getString(R.string.invalid_price)
+                priceLayout.error = getString(R.string.invalid_price)
             } else if (selection >= 0) {
                 etPrice.setSelection(selection)
             }
@@ -152,9 +152,9 @@ class OrderInputFragment : Fragment() {
         etQuantity.onChange { quantity ->
             val selection = etQuantity.selectionStart
             val result = viewModel.setQuantity(quantity)
-            etQuantity.error = null
+            quantityLayout.error = null
             if (!result) {
-                etQuantity.error = getString(R.string.invalid_quantity)
+                quantityLayout.error = getString(R.string.invalid_quantity)
             } else if (selection >= 0) {
                 etQuantity.setSelection(selection)
             }
