@@ -111,7 +111,7 @@ class OrderInputViewModel(private val symbol: String) : ViewModel() {
         }
         var isValid = false
         val newValue = orderForm.value?.apply {
-            if (newQuantity % symbol.lotSize == 0) {
+            if (newQuantity != 0 && newQuantity % symbol.lotSize == 0) {
                 orderInfo = orderInfo.copy(quantity = newQuantity)
                 isValid = true
             }

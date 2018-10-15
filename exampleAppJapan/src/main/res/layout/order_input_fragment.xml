@@ -145,8 +145,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                app:errorTextAppearance=""
-                app:errorEnabled="true">
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/smallText">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/etQuantity"
@@ -239,7 +239,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    app:errorEnabled="true">
+                    app:errorEnabled="true"
+                    app:errorTextAppearance="@style/smallText">
 
                     <android.support.design.widget.TextInputEditText
                         android:id="@+id/etPrice"
