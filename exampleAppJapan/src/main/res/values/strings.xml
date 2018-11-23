@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Japan Example App</string>
+    <string name="buying_power">買付可能額</string>
+    <string name="quantity">株数</string>
+    <string name="order_info">注文条件</string>
+    <string name="market">成行</string>
+    <string name="limit">指値</string>
+    <string name="estimated_value">概算約定代金</string>
+    <string name="order_condition">執行条件</string>
+    <string name="day">本日中</string>
+    <string name="week">今週中</string>
+    <string name="till_date">期間指定</string>
+    <string name="opening">寄付</string>
+    <string name="closing">引け</string>
+    <string name="funari">不成</string>
+    <string name="account_type">口座区分</string>
+    <string name="specific">特定</string>
+    <string name="general">一般</string>
+    <string name="nisa">NISA</string>
+    <string name="order_review">注文内容の確認へ</string>
+    <string name="invalid_price">値幅制限以内の数値を入力してください。</string>
+    <string name="invalid_quantity">指定株数をロットサイズの整数倍にしてください</string>
+</resources>
