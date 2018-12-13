@@ -37,8 +37,8 @@ class TradeItOrderStatusParcelableTest {
         orderStatusDetails.orderNumber = "1"
         val orderLeg = OrderLeg()
         orderLeg.symbol = "GE"
-        orderLeg.filledQuantity = 0
-        orderLeg.orderedQuantity = 10
+        orderLeg.filledQuantity = 0.0
+        orderLeg.orderedQuantity = 10.0
         orderLeg.action = "BUY"
         val priceInfo = PriceInfo()
         priceInfo.type = "LIMIT"

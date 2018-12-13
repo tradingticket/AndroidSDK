@@ -189,8 +189,8 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             orderStatusDetails1.orderNumber = "1"
             var orderLeg = OrderLeg()
             orderLeg.symbol = "GE"
-            orderLeg.filledQuantity = 0
-            orderLeg.orderedQuantity = 10
+            orderLeg.filledQuantity = 0.0
+            orderLeg.orderedQuantity = 10.0
             orderLeg.action = "BUY"
             var priceInfo = PriceInfo()
             priceInfo.type = "LIMIT"
@@ -206,8 +206,8 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             orderStatusDetails2.orderNumber = "1"
             orderLeg = OrderLeg()
             orderLeg.symbol = "AAPL"
-            orderLeg.filledQuantity = 0
-            orderLeg.orderedQuantity = 10
+            orderLeg.filledQuantity = 0.0
+            orderLeg.orderedQuantity = 10.0
             orderLeg.action = "BUY"
             priceInfo = PriceInfo()
             priceInfo.type = "MARKET"
@@ -305,8 +305,8 @@ class TradeItLinkedBrokerAccountParcelableSpec {
             orderStatusDetails.orderNumber = "1"
             val orderLeg = OrderLeg()
             orderLeg.symbol = "GE"
-            orderLeg.filledQuantity = 0
-            orderLeg.orderedQuantity = 10
+            orderLeg.filledQuantity = 0.0
+            orderLeg.orderedQuantity = 10.0
             orderLeg.action = "BUY"
             val priceInfo = PriceInfo()
             priceInfo.type = "LIMIT"
