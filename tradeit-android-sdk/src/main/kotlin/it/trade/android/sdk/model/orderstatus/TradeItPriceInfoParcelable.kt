@@ -10,16 +10,20 @@ import it.trade.model.reponse.PriceInfo
 class TradeItPriceInfoParcelable : Parcelable {
 
     @SerializedName("trailPrice")
-    private var trailPrice: Double? = null
+    var trailPrice: Double? = null
+        private set
 
     @SerializedName("limitPrice")
-    private var limitPrice: Double? = null
+    var limitPrice: Double? = null
+        private set
 
     @SerializedName("type")
-    private var type: String? = null
+    var type: String? = null
+        private set
 
     @SerializedName("stopPrice")
-    private var stopPrice: Double? = null
+    var stopPrice: Double? = null
+        private set
 
     internal constructor(priceInfo: PriceInfo) {
         this.trailPrice = priceInfo.trailPrice

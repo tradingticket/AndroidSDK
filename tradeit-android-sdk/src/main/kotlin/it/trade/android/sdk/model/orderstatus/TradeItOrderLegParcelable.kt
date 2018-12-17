@@ -22,11 +22,11 @@ class TradeItOrderLegParcelable : Parcelable {
         private set
 
     @SerializedName("orderedQuantity")
-    var orderedQuantity: Int? = null
+    var orderedQuantity: Double? = null
         private set
 
     @SerializedName("filledQuantity")
-    var filledQuantity: Int? = null
+    var filledQuantity: Double? = null
         private set
 
     @SerializedName("action")
@@ -107,8 +107,8 @@ class TradeItOrderLegParcelable : Parcelable {
         this.priceInfo = `in`.readParcelable(TradeItPriceInfoParcelable::class.java.getClassLoader())
         this.fills = `in`.createTypedArrayList(TradeItFillParcelable.CREATOR)
         this.symbol = `in`.readString()
-        this.orderedQuantity = `in`.readValue(Int::class.java.getClassLoader()) as? Int
-        this.filledQuantity = `in`.readValue(Int::class.java.getClassLoader()) as? Int
+        this.orderedQuantity = `in`.readValue(Double::class.java.getClassLoader()) as? Double
+        this.filledQuantity = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.action = `in`.readString()
     }
 

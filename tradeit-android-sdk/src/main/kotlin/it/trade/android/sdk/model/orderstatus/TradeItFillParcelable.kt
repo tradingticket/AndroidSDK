@@ -22,7 +22,7 @@ class TradeItFillParcelable : Parcelable {
         private set
 
     @SerializedName("quantity")
-    var quantity: Int? = null
+    var quantity: Double? = null
         private set
 
     internal constructor(fill: Fill) {
@@ -79,7 +79,7 @@ class TradeItFillParcelable : Parcelable {
         this.timestampFormat = `in`.readString()
         this.price = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.timestamp = `in`.readString()
-        this.quantity = `in`.readValue(Int::class.java.getClassLoader()) as? Int
+        this.quantity = `in`.readValue(Double::class.java.getClassLoader()) as? Double
     }
 
     companion object {
