@@ -450,12 +450,13 @@ public class MainActivity extends AppCompatActivity {
             showAlert("getPositionsFirstLinkedBroker", "No linked broker accounts detected for first linked broker! Try authenticating.");
         } else {
             TradeItLinkedBrokerParcelable linkedBroker = linkedBrokers.get(0);
-            for (TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
+            for (final TradeItLinkedBrokerAccountParcelable linkedBrokerAccount : linkedBroker.getAccounts()) {
                 linkedBrokerAccount.refreshPositions(
                     new TradeItCallback<List<TradeItPositionParcelable>>() {
                         @Override
                         public void onSuccess(List<TradeItPositionParcelable> positions) {
                             Intent intent = new Intent(mainActivity, PositionsActivity.class);
+                            intent.putExtra(PARCELED_ACCOUNT_PARAMETER, linkedBrokerAccount);
                             intent.putParcelableArrayListExtra(POSITIONS_PARAMETER, (ArrayList<? extends Parcelable>) positions);
                             startActivity(intent);
                         }

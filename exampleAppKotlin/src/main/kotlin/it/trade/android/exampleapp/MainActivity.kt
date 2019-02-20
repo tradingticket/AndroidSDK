@@ -376,6 +376,7 @@ class MainActivity : AppCompatActivity() {
                             object : TradeItCallback<List<TradeItPositionParcelable>> {
                                 override fun onSuccess(positions: List<TradeItPositionParcelable>) {
                                     val intent = Intent(mainActivity, PositionsActivity::class.java)
+                                    intent.putExtra(PARCELED_ACCOUNT_PARAMETER, linkedBrokerAccount)
                                     intent.putParcelableArrayListExtra(POSITIONS_PARAMETER, positions as ArrayList<out Parcelable>)
                                     startActivity(intent)
                                 }
