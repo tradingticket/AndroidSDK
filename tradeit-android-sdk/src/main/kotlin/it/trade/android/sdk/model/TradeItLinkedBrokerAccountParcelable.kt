@@ -191,6 +191,28 @@ class TradeItLinkedBrokerAccountParcelable : Parcelable {
         )
     }
 
+    fun getProxyVoteUrl(symbol: String, callback: TradeItCallback<String>) {
+        this.tradeItApiClient?.getProxyVoteUrl(
+            accountNumber,
+            symbol,
+            object : TradeItCallback<TradeItProxyVoteUrlResponse> {
+                override fun onSuccess(response: TradeItProxyVoteUrlResponse) {
+                    response.proxyVoteUrl?.let {  callback.onSuccess(it)}
+                        ?: callback.onError(TradeItErrorResultParcelable(
+                            TradeItErrorCode.SYSTEM_ERROR,
+                            "Position not eligible",
+                            arrayListOf("This position is not eligible to proxy voting")
+                        ))
+                }
+
+                override fun onError(error: TradeItErrorResult) {
+                    val errorResultParcelable = TradeItErrorResultParcelable(error)
+                    callback.onError(errorResultParcelable)
+                }
+            }
+        )
+    }
+
     private fun mapPositionsToPositionsParcelable(positions: List<TradeItPosition>): List<TradeItPositionParcelable> {
         val positionsParcelable = ArrayList<TradeItPositionParcelable>()
         for (position in positions) {
