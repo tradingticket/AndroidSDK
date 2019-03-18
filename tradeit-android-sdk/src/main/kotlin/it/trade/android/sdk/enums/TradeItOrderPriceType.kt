@@ -4,8 +4,8 @@ package it.trade.android.sdk.enums
 enum class TradeItOrderPriceType private constructor(val priceTypeValue: String) {
     MARKET("market"),
     LIMIT("limit"),
-    STOP_MARKET("stopLimit"),
-    STOP_LIMIT("stopMarket");
+    STOP_MARKET("stopMarket"),
+    STOP_LIMIT("stopLimit");
 
 
     companion object {
