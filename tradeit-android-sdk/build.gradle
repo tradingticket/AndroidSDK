@@ -14,7 +14,7 @@ ext {
     siteUrl = 'https://github.com/tradingticket/AndroidSDK'
     gitUrl = 'https://github.com/tradingticket/AndroidSDK.git'
 
-    libraryVersion = '1.0.29'
+    libraryVersion = '1.0.30'
 
     developerId = 'tradingticket'
     developerName = 'Trade It'
