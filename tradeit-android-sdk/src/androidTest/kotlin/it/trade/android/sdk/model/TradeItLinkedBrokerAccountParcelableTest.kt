@@ -67,6 +67,7 @@ class TradeItLinkedBrokerAccountParcelableTest {
         position.quantity = 12.00
         position.symbol = "GE"
         position.lastPrice = 29.84
+        position.isProxyVoteEligible = false
         val positions = ArrayList<TradeItPositionParcelable>()
         positions.add(position)
         linkedBrokerAccount!!.positions = positions

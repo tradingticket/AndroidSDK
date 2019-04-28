@@ -2,7 +2,6 @@ package it.trade.android.sdk.model
 
 import android.os.Parcel
 import android.os.Parcelable
-
 import it.trade.model.reponse.TradeItPosition
 
 class TradeItPositionParcelable : TradeItPosition, Parcelable {
@@ -22,6 +21,7 @@ class TradeItPositionParcelable : TradeItPosition, Parcelable {
         this.totalGainLossAbsolute = position.totalGainLossAbsolute
         this.exchange = position.exchange
         this.currency = position.currency
+        this.isProxyVoteEligible = position.isProxyVoteEligible
     }
 
     constructor() : super() {}
@@ -45,6 +45,7 @@ class TradeItPositionParcelable : TradeItPosition, Parcelable {
         dest.writeValue(this.totalGainLossAbsolute)
         dest.writeString(this.exchange)
         dest.writeString(this.currency)
+        dest.writeByte((if (isProxyVoteEligible) 1 else 0).toByte())
     }
 
     protected constructor(`in`: Parcel) {
@@ -62,6 +63,7 @@ class TradeItPositionParcelable : TradeItPosition, Parcelable {
         this.totalGainLossAbsolute = `in`.readValue(Double::class.java.getClassLoader()) as? Double
         this.exchange = `in`.readString()
         this.currency = `in`.readString()
+        this.isProxyVoteEligible = `in`.readByte().toInt() != 0
     }
 
     companion object {
